@@ -58,7 +58,7 @@ TEMPBUILDLIB=@TEMPLIB@
 OCAMLPATH:=$(TEMPBUILDLIB)/:$(OCAMLPATH)
 export OCAMLPATH
 
-all: $(STUBSLIB) $(if $(LIBRARY), install-buildlib, $(OCAMLBEST))
+all: $(STUBSLIB) $(OCAMLBEST)
 
 CMX = $(patsubst dll%.so, lib%.a, $(CMO:.cmo=.cmx))
 
@@ -69,18 +69,29 @@ opt:  $(if $(LIBRARY), install-buildlib, $(NAME).opt)
 
 # Build the lib
 
-%.cmxa %.cma: 
-	$(if $(STUBSOBJS), \
-	 $(OCAMLMKLIB) -o $* $^ $(STUBSOBJS), \
-	 $(if $(filter %.cmo,$^), $(OCAMLC)   -a -o $*.cma  $(filter %.cmo,$^));\
-	 $(if $(filter %.cmx,$^), $(OCAMLOPT) -a -o $*.cmxa $(filter %.cmx,$^)) \
-	 )
+#%.cmxa %.a %.cma: 
+#	$(if $(STUBSOBJS), \
+#	 $(OCAMLMKLIB) -o $* $^ $(STUBSOBJS))
+#	$(if $(filter %.cmo,$^), $(OCAMLC)   -a -o $*.cma  $(filter %.cmo,$^))
+#	$(if $(filter %.cmx,$^), $(OCAMLOPT) -a -o $*.cmxa $(filter %.cmx,$^))
+
+%.cmxa %.a %.so:
+	$(if $(STUBSOBJS),                     \
+	 $(OCAMLMKLIB)  -o $* $^ $(STUBSOBJS), \
+	 $(OCAMLOPT) -a -o $*.cmxa $^          \
+	)
+
+%.cma %.so:
+	$(if $(STUBSOBJS),                     \
+	 $(OCAMLMKLIB) -o $* $^ $(STUBSOBJS),  \
+	 $(OCAMLC)  -a -o $*.cma $^            \
+	)
 
 $(TEMPBUILDLIB):
 	mkdir $(TEMPBUILDLIB)
 
 install-buildlib: $(TEMPBUILDLIB) $(INSTALLIB)
-	-$(OCAMLFIND) remove  -destdir $(TEMPBUILDLIB) $(NAME) 
+	-$(RM) -r $(TEMPBUILDLIB)/$(NAME) 
 	$(OCAMLFIND)  install -ldconf ignore -destdir $(TEMPBUILDLIB) $(NAME) $(INSTALLIB)
 
 install-lib: $(INSTALLIB) 

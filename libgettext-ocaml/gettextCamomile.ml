@@ -2,6 +2,8 @@
     ( @see <http://camomile.sourceforge.net/> Camomile library ) 
 *)
 
+open Camomile;;
+
 module Charset : GettextCharset.CHARSET_TYPE =
   struct
     type encoding = string
@@ -72,6 +74,10 @@ module Locale : GettextLocale.LOCALE_TYPE =
 ;;
 
 module Map : GettextModules.GETTEXT_TYPE =
- GettextModules.Generic(Locale(GettextDomain.Generic(Charset(GettextTranslate.Map))))
+ GettextModules.Generic 
+ (Locale)                 (* Camomile locale *)
+ (GettextDomain.Generic)  (* Generic domain *)
+ (Charset)                (* Camomile charset *)
+ (GettextTranslate.Map)   (* Generic translation *)
 ;;
   

@@ -10,12 +10,25 @@ package "stub" (
 )
 
 package "base" (
+  requires = "fileutils"
   archive(byte) = "gettextBase.cma"
   archive(native) = "gettextBase.cmxa"
 )
 
 package "compile" (
-  require = "gettext.base"
+  requires = "gettext.base"
   archive(byte) = "gettextCompile.cma"
   archive(native) = "gettextCompile.cmxa"
+)
+
+package "extension" (
+  requires = "gettext.base"
+  archive(byte) = "gettextExtension.cma"
+  archive(native) = "gettextExtension.cmxa"
+)
+
+package "camomile" (
+  requires = "gettext.extension camomile"
+  archive(byte) = "gettextCamomile.cma"
+  archive(native) = "gettextCamomile.cmxa"
 )

@@ -1,7 +1,7 @@
 NAME       = gettext
 CMO        =       
 LIBRARY    = true
-REQUIRES   = fileutils camomile
+REQUIRES   = fileutils
 PREDICATES =
 INSTALLIB  = META
 
@@ -25,9 +25,9 @@ CMO_STUB =           \
 
 gettextStub.cmo: gettextStub.cmi
 gettextStub.cmx: gettextStub.cmi
-gettextStub.cma gettextStub.cmxa: $(CMO_STUB)
-gettextStub.cma gettextStub.cmxa: $(CMO_STUB:.cmo=.cmx)
-gettextStub.cma gettextStub.cmxa: STUBSOBJS = -L/usr/lib/ocaml/3.07/ -lcamlidl
+gettextStub.cma: $(CMO_STUB)
+gettextStub.cmxa: $(CMO_STUB:.cmo=.cmx)
+gettextStub.cma gettextStub.cmxa: STUBSOBJS = -L$(OCAMLLIB) -lcamlidl
 
 clean::
 	-$(RM) gettextStub.ml gettextStub.mli gettextStub.h gettextStub_stubs.c 
@@ -53,8 +53,8 @@ CMO_BASE  =            \
 
 gettextMo_parser.cmo: gettextMo_parser.cmi
 gettextMo_parser.cmx: gettextMo_parser.cmi
-gettextBase.cma gettextBase.cmxa: $(CMO_BASE)
-gettextBase.cma gettextBase.cmxa: $(CMO_BASE:.cmo=.cmx)
+gettextBase.cma: $(CMO_BASE)
+gettextBase.cmxa: $(CMO_BASE:.cmo=.cmx)
 
 clean::
 	-$(RM) gettextMo_parser.output \
@@ -77,8 +77,8 @@ CMO_COMPILE =          \
 
 gettextPo_parser.cmo: gettextPo_parser.cmi
 gettextPo_parser.cmx: gettextPo_parser.cmi
-gettextCompile.cma gettextCompile.cmxa: $(CMO_COMPILE)
-gettextCompile.cma gettextCompile.cmxa: $(CMO_COMPILE:.cmo=.cmx)
+gettextCompile.cma: $(CMO_COMPILE)
+gettextCompile.cmxa: $(CMO_COMPILE:.cmo=.cmx)
 
 clean::
 	-$(RM) gettextPo_parser.output \
@@ -104,11 +104,28 @@ CMO_EXTENSION=         \
  gettextDomain.cmo     \
  gettextCharset.cmo    \
  gettextTranslate.cmo  \
- gettextModules.cmo    \
- gettextCamomile.cmo  
+ gettextModules.cmo    
 
-gettextExtension.cma gettextExtension.cmxa: $(CMO_EXTENSION)
-gettextExtension.cma gettextExtension.cmxa: $(CMO_EXTENSION:.cmo=.cmx)
+gettextExtension.cma: $(CMO_EXTENSION)
+gettextExtension.cmxa: $(CMO_EXTENSION:.cmo=.cmx)
+
+##########################
+# Ocaml Gettext Camomile #
+##########################
+
+REQUIRES += camomile
+
+INSTALLIB +=          \
+ gettextCamomile.cma  \
+ gettextCamomile.cmxa \
+ gettextCamomile.a    \
+ gettextCamomile.cmi
+
+CMO_CAMOMILE=         \
+ gettextCamomile.cmo
+
+gettextCamomile.cma: $(CMO_CAMOMILE)
+gettextCamomile.cmxa: $(CMO_CAMOMILE:.cmo=.cmx)
 
 ###############################
 # Pa_gettext extension        #
