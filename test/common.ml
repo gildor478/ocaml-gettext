@@ -194,3 +194,21 @@ let format_translation_singular_data =
   List.filter ( function Singular(_,_) -> true | _ -> false )
   format_translation_all_data
 ;;
+
+let print_env str = 
+  print_endline ("Version         : ocaml-gettext "^(GettextConfig.version));
+  print_endline ("Build date      : "^(GettextConfig.build_date));
+  print_endline ("OS              : "^(Sys.os_type));
+  print_endline ("Running "^str^" ...")
+;;
+
+let string_of_translation trans = 
+  match trans with
+    Singular(str_id, str) ->
+      Printf.sprintf "Singular(%S, %S)" str_id str
+  | Plural(str_id, str_plural, lst) ->
+      Printf.sprintf "Plural(%S, %S, [ %s ])" str_id str_plural 
+      (String.concat " ; " (List.map (fun x -> Printf.sprintf "%S" x) lst)) 
+;;
+
+

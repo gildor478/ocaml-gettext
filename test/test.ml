@@ -1,12 +1,11 @@
 open OUnit;;
-
 open FileUtil;;
 (* BUG: should be independant of Str *)
 open FileUtil.StrUtil;;
 open FilePath;;
 open FilePath.DefaultPath;;
-
 open GettextTypes;;
+open Common;;
 
 type tests = {
   verbose        : bool;
@@ -65,15 +64,6 @@ let print_debug tests str =
     (print_string str; print_newline ())
   else
     ()
-;;
-
-let string_of_translation trans = 
-  match trans with
-    Singular(str_id, str) ->
-      Printf.sprintf "Singular(%S, %S)" str_id str
-  | Plural(str_id, str_plural, lst) ->
-      Printf.sprintf "Plural(%S, %S, [ %s ])" str_id str_plural 
-      (String.concat " ; " (List.map (fun x -> Printf.sprintf "%S" x) lst)) 
 ;;
 
 let load_mo_file tests fl_mo = 
@@ -621,13 +611,7 @@ let all_test =
       (*merge_test         tests;*)
     ]
 in
-let () = 
-  print_endline ("Test            : ocaml-gettext "^(GettextConfig.version));
-  print_endline ("Test build date : "^(GettextConfig.build_date));
-  print_endline ("OS              : "^(Sys.os_type));
-  print_endline ("Test dir        : "^(tests.test_dir));
-  mkdir ~parent:true tests.test_dir;
-  print_endline ("Running...")
-in
+print_env "tests";
+mkdir ~parent:true tests.test_dir;
 run_test_tt all_test
 
