@@ -104,10 +104,10 @@ META:
 .SUFFIXES: .mli .ml .cmi .cmo .cmx .mll .mly .zog .idl .h .o
 
 %.ml %.mli %.h %_stubs.c: %.idl
-	$(CAMLIDL) -header $<
+	$(CAMLIDL) -no-include $<
 
 .c.o:
-	$(CC) -Wall -c $<
+	$(OCAMLC) $(INCLUDES) -c $<	
 
 .mli.cmi:
 	$(OCAMLC) $(INCLUDES) -package "$(REQUIRES)" -predicates "$(PREDICATES)" -c $<
