@@ -36,7 +36,7 @@ let check_singular id str =
 %token <string> STRING
 %token EOF
 
-%type < GettextTypes.po_content_type list > msgfmt
+%type < GettextTypes.po_content list > msgfmt
 %start msgfmt
 
 %%

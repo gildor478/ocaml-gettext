@@ -1,4 +1,19 @@
-type locale_category_type =
+type textdomain = string
+;;
+
+type locale = string
+;;
+
+type dir = string
+;;
+
+type filename = string
+;;
+
+type codeset = string
+;;
+
+type category =
     LC_CTYPE
   | LC_NUMERIC
   | LC_TIME
@@ -76,7 +91,7 @@ T + ((N-1)*8)| length & offset (N-1)th translation      |  | | | |
 
 *)
 
-type mo_header_type = {
+type mo_header = {
   endianess                : endianess;
   file_format_revision     : int32;
   number_of_strings        : int32;
@@ -100,7 +115,7 @@ type mo_header_type = {
 (* Plural-Forms: specific ( 0 is false and 1 is *)
 (* true                                         *)
 
-type mo_translation_type = {
+type mo_translation = {
   project_id_version        : string option;
   report_msgid_bugs_to      : string option;
   pot_creation_date         : string option;
@@ -119,28 +134,55 @@ type mo_translation_type = {
 }
 ;;
 
-type translated_type = 
+type translation = 
   Singular of string * string
 | Plural of string * string * string list
 ;;
 
-type po_content_type =
-  Domain of string * (translated_type list)
-| NoDomain of translated_type list
+type po_content =
+  Domain of string * (translation list)
+| NoDomain of translation list
+;;
+
+
+module MapString = Map.Make (struct
+  type t      = string
+  let compare = compare
+end)
+;;
+ 
+module MapTextdomain = Map.Make (struct
+  type t      = string
+  let compare = compare
+end)
+;;
+  
+module MapCategory = Map.Make (struct 
+  type t      = category
+  let compare a b = 
+    let val_category x = 
+      match x with 
+        LC_CTYPE    -> 0 
+      | LC_NUMERIC  -> 1
+      | LC_TIME     -> 2
+      | LC_COLLATE  -> 3
+      | LC_MONETARY -> 4
+      | LC_MESSAGES -> 5
+      | LC_ALL      -> 6
+    in
+    compare (val_category a) (val_category b)
+end)
 ;;
 
 (** Core types of ocaml-gettext library *)
 
-module MapTextdomain = MapString;;
-module MapCategory = Map.Make();;
-
 type t = {
-  failsafe    = failsafe;
-  textdomains = ((codeset option) * (dir option)) MapTextdomain.t;
-  categories  = locale MapCategory.t;
-  language    = locale option;
-  codeset     = codeset option;
-  default     = textdomain;
+  failsafe    : failsafe;
+  textdomains : ((codeset option) * (dir option)) MapTextdomain.t;
+  categories  : locale MapCategory.t;
+  language    : locale option;
+  codeset     : codeset option;
+  default     : textdomain;
 }
 ;;
   

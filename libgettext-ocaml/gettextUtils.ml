@@ -4,12 +4,7 @@ open GettextTypes;;
 (* For communication between gettextPo_parser / gettextPo *)
 exception InvalidIndex of string * int;;
 
-module MapString = Map.Make (struct
-  type t      = string
-  let compare = compare
-end)
-;;
-  
+ 
 let string_of_pos lexbuf = 
   let char_pos = lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol
   in

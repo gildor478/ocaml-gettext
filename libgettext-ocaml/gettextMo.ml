@@ -56,10 +56,6 @@ let string_of_exception exc =
       ""
 ;;
 
-let fail_or_continue failsafe exc cont_value =
-  fail_or_continue failsafe string_of_exception exc cont_value
-;;
-
 let input_mo_header chn = 
   let endianess = 
     let magic_number = seek_in chn 0; input_int32 chn BigEndian
@@ -147,10 +143,12 @@ let input_mo_translation failsafe chn mo_header number =
   | id :: id_plural :: [] -> Plural ( id, id_plural, translated )
   | id :: id_plural :: tl ->
       fail_or_continue failsafe 
+      string_of_exception
       (Junk (id, tl)) 
       (Plural (id, id_plural, translated))
   | [] ->
       fail_or_continue failsafe
+      string_of_exception
       EmptyEntry
       (Singular ( "", ""))
 ;;
@@ -160,8 +158,8 @@ let get_translated_value failsafe translation plural_number =
     ((Singular (_,str)), 0) ->
       str
   | ((Singular (_,str)), x) ->
-      fail_or_continue 
-      failsafe
+      fail_or_continue failsafe
+      string_of_exception
       (InvalidTranslationSingular(str,x))
       str
   | ((Plural (str,str_plural,[])),x) ->
@@ -172,8 +170,8 @@ let get_translated_value failsafe translation plural_number =
   | ((Plural (_,_,lst)), x) when x < List.length lst ->
       List.nth lst x 
   | ((Plural (_,_,lst)), x) ->
-      fail_or_continue 
-      failsafe
+      fail_or_continue failsafe
+      string_of_exception
       (InvalidTranslationPlural(lst,x))
       List.nth lst 0
 ;;
@@ -198,8 +196,8 @@ let input_mo_informations failsafe chn mo_header =
     with 
       Parsing.Parse_error 
     | Failure("lexing: empty token") ->
-        fail_or_continue 
-        failsafe 
+        fail_or_continue failsafe 
+        string_of_exception
         (InvalidOptions (lexbuf,empty_translation)) 
         []
   in
@@ -215,8 +213,8 @@ let input_mo_informations failsafe chn mo_header =
       with 
         Parsing.Parse_error 
       | Failure("lexing: empty token") ->
-          fail_or_continue 
-          failsafe 
+          fail_or_continue failsafe 
+          string_of_exception
           (InvalidPlurals(lexbuf,field_plural_forms))
           (2,germanic_plural)
     with Not_found ->
@@ -236,8 +234,8 @@ let input_mo_informations failsafe chn mo_header =
       with      
         Parsing.Parse_error 
       | Failure("lexing: empty token") ->
-          fail_or_continue
-          failsafe
+          fail_or_continue failsafe
+          string_of_exception
           (InvalidContentType(lexbuf,field_content_type))
           gettext_content
     with Not_found ->

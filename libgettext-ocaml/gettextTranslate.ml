@@ -4,6 +4,19 @@ open GettextTypes;;
 open GettextUtils;;
 open GettextMo;;
 
+exception GettextTranslateCouldNotOpenFile of string ;;
+exception GettextTranslateStringNotFound of string ;;
+
+let string_of_exception exc =
+  match exc with
+    GettextTranslateCouldNotOpenFile fln ->
+      "Could not open file "^fln
+  | GettextTranslateStringNotFound str ->
+      "Cannot find string "^str
+  | _ ->
+      ""
+;;
+          
 module type TRANSLATE_TYPE =
   functor ( Charset : GettextCharset.CHARSET_TYPE ) ->
   sig
@@ -25,8 +38,8 @@ module type TRANSLATE_TYPE =
     val translate : 
          t
       -> string 
-      -> ?plural_form: (string * int)
-      -> translated_type option 
+      -> (string * int) option
+      -> translation option 
   end
 ;;
 
@@ -37,22 +50,25 @@ module Dummy : TRANSLATE_TYPE =
 
     let create failsafe filename charset = charset
 
-    let translate charset str ?plural_form = 
+    let translate charset str plural_form = 
       match plural_form with
         None 
       | Some(_,0) ->
-          Some(Singular(str,Charset.recode str charset))
+          Some(Singular(str,Charset.recode charset str))
       | Some(str_plural,_) ->
-          Some(Plural(str,str_plural,[Charset.recode str charset ; Charset.recode charset str_plural]))
+          Some(Plural(str,str_plural,[Charset.recode charset str; Charset.recode
+          charset str_plural]))
   end
 ;;
 
 module Map : TRANSLATE_TYPE =
   functor ( Charset : GettextCharset.CHARSET_TYPE ) ->
   struct
+    module MapDummy = Dummy (Charset)
+    
     type t = {
-      dummy     : Dummy.t;
-      map       : translated_type MapString.t;
+      dummy     : MapDummy.t;
+      map       : translation MapString.t;
       failsafe  : failsafe;
     }
 
@@ -63,50 +79,43 @@ module Map : TRANSLATE_TYPE =
         try 
           let chn = open_in filename
           in
-          let mo_header = input_mo_header failsafe chn
+          let mo_header = input_mo_header chn
           in
-          for i = 0 to mo_header.number_of_strings
+          for i = 0 to Int32.to_int mo_header.number_of_strings
           do
             let new_translation = 
-              input_mo_translation failsafe chn mo_header count
+              input_mo_translation failsafe chn mo_header i
             in
-            let map :=
+            map :=
               match new_translation with
                 Singular(id,str) ->
                 MapString.add id 
                 (Singular(id, Charset.recode charset str)) 
                 !map
               | Plural(id,id_plural,lst) ->
-                MaPstring.add id 
-                (Plural (id, id_plural, List.map (Charset.recode charset) lst) 
+                MapString.add id 
+                (Plural (id, id_plural, List.map (Charset.recode charset) lst)) 
                 !map
-            in
-            ()
           done
-        with Sys_error ->
+        with (Sys_error _) ->
           fail_or_continue failsafe
           string_of_exception
           (GettextTranslateCouldNotOpenFile filename)
           ()
       in
       {
-        dummy    = Dummy.create failsafe filename charset;
+        dummy    = MapDummy.create failsafe filename charset;
         map      = !map;
         failsafe = failsafe;
       }
       
-    let translate t str ?plural_form =
+    let translate t str plural_form =
       try
-        MapString.find str t.map 
+        Some(MapString.find str t.map)
       with Not_found ->
         fail_or_continue t.failsafe
         string_of_exception
         (GettextTranslateStringNotFound str)
-        (
-          match plural_form with
-            None ->
-              Dummy.translate t.dummy str plural_form
-          | Some(x) ->
-              Dummy.translate t.dummy str x
-        )
+        (MapDummy.translate t.dummy str plural_form)
+  end
 ;;

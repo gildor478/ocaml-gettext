@@ -71,6 +71,7 @@ let create
           fun map (category,locale) -> 
             MapCategory.add category locale map 
           ) 
+        MapCategory.empty
         categories
     in
     let result =
