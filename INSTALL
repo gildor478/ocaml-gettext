@@ -1,5 +1,5 @@
 --------------
-libexif-ocaml.
+libgettext-ocaml.
 --------------
 
 Prerequisite :
@@ -11,9 +11,7 @@ In order to install you will need :
 	http://caml.inria.fr/camlidl/
 - ocamlfind ( <= 0.8 ) 
 	http://www.ocaml-programming.de/packages/
-- libexif ( <= 0.5.9 )
-	http://sourceforge.net/projects/libexif/
-- make, a C compiler
+- make, a C compiler, libintl.h ( which is bundle in libc6 )
 
 Installing :
 1) Go in the untared source directory

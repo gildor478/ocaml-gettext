@@ -1,0 +1,21 @@
+Source: libgettext-ocaml
+Section: devel
+Priority: optional
+Maintainer: Sylvain LE GALL <sylvain.le-gall@polytechnique.org> 
+Build-Depends: ocaml-3.06-1, debhelper, ocaml-findlib, camlidl, chrpath
+Standards-Version: 3.5.10
+
+Package: libgettext-ocaml
+Architecture: any
+Depends: ${shlibs:Depends},  ocaml-base-3.06-1
+Description: Gettext library for Ocaml
+ This library is used to provide gettext support to ocaml
+ program.
+
+Package: libgettext-ocaml-dev
+Architecture: any
+Depends: ${shlibs:Depends}, libgettext-ocaml (=0.1), ocaml-3.06-1
+Description: Gettext library for Ocaml ( development files )
+ This library is used to provide gettext support to ocaml
+ program.
+
