@@ -11,7 +11,11 @@ clean:
 	cd src && $(MAKE) clean
 	cd test && $(MAKE) clean
 
-distclean: clean
+distclean:
+	@if [ -e TopMakefile ]; then \
+	 cd src && $(MAKE) clean; \
+	 cd test && $(MAKE) clean; \
+	fi
 	$(RM) config.* TopMakefile
 	$(RM) -r .libs
 	$(RM) src/.depends
