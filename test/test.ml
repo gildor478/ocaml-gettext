@@ -1,46 +1,25 @@
-(*#include <stdio.h>
-#include <stdlib.h>
-#include "xsetenv.h"
-#define _(string) gettext (string)
-
-int main (argc, argv)
-  int argc;
-  char *argv[];
-{
-  int n = atoi (argv[2]);
-
-  xsetenv ("LC_ALL", argv[1], 1);
-  if (setlocale (LC_ALL, "") == NULL)
-    {
-      fprintf (stderr, "Couldn't set locale.\n");
-      exit (77);
-    }
-
-  textdomain ("prog");
-  bindtextdomain ("prog", ".");
-
-  printf (_("'Your command, please?', asked the waiter."));
-  printf ("\n");
-
-  printf (ngettext ("a piece of cake", "%d pieces of cake", n), n);
-  printf ("\n");
-
-  printf (_("%s is replaced by %s."), "FF", "EUR");
-  printf ("\n");
-
-  exit (0);
-}*)
-
 open Unix;;
 open Camlgettext;;
 
-let _ = putenv "LC_ALL" (Array.get Sys.argv 1)
+let _ = 
+	print_string "Putenv";
+	print_newline ();
+	putenv "LC_ALL" (Array.get Sys.argv 1)
 in
-let _ = setlocale LC_ALL ""
+let _ = 
+	print_string "Setlocale";
+	print_newline ();
+	setlocale LC_ALL ""
 in
-let _ = textdomain "prog"
+let _ = 
+	print_string "Textdomain";
+	print_newline ();
+	textdomain "prog"
 in
-let _ = bindtextdomain "prog" "."
+let _ = 
+	print_string "Bindtextdomain";
+	print_newline ();
+	bindtextdomain "prog" "."
 in
 print_string (_"'Your command, please?', asked the waiter.");
 print_newline ()

@@ -38,6 +38,20 @@ OCAMLMKLIB = @OCAMLMKLIB@
 CAMLIDL= @CAMLIDL@
 EXE = @EXE@
 
+ifdef REQUIRES
+CLI_REQUIRES = -package "$(REQUIRES)"
+endif
+
+ifdef PREDICATES
+CLI_PREDICATES = -predicates "$(PREDICATES)"
+endif
+
+ifdef SYNTAX 
+CLI_SYNTAX = -syntax $(SYNTAX)
+endif
+
+CLI_OCAMLFIND = $(CLI_REQUIRES) $(CLI_PREDICATES) $(CLI_SYNTAX)
+
 TEMPBUILDLIB=@TEMPLIB@
 OCAMLPATH:=$(TEMPBUILDLIB)/:$(OCAMLPATH)
 export OCAMLPATH
@@ -46,7 +60,7 @@ all: $(STUBSLIB) $(if $(LIBRARY), install-buildlib, $(OCAMLBEST))
 
 CMX = $(patsubst dll%.so, lib%.a, $(CMO:.cmo=.cmx))
 
-GENERATED = version.ml META
+GENERATED = version.ml 
 
 byte: $(if $(LIBRARY), $(NAME).cma, $(NAME).byte)
 opt: $(if $(LIBRARY), $(NAME).cmxa, $(NAME).opt)
@@ -110,16 +124,16 @@ META:
 	$(OCAMLC) $(INCLUDES) -c $<	
 
 .mli.cmi:
-	$(OCAMLC) $(INCLUDES) -package "$(REQUIRES)" -predicates "$(PREDICATES)" -c $<
+	$(OCAMLC) $(INCLUDES) $(CLI_OCAMLFIND) -c $<
 
 .ml.cmo:
-	$(OCAMLC) $(INCLUDES) -package "$(REQUIRES)" -predicates "$(PREDICATES)" -c $<
+	$(OCAMLC) $(INCLUDES) $(CLI_OCAMLFIND) -c $<
 
 .ml.o:
-	$(OCAMLOPT) $(INCLUDES) -package "$(REQUIRES)" -predicates "$(PREDICATES)" -c $<
+	$(OCAMLOPT) $(INCLUDES) $(CLI_OCAMLFIND) -c $<
 	
 .ml.cmx:
-	$(OCAMLOPT) $(INCLUDES) -package "$(REQUIRES)" -predicates "$(PREDICATES)" -c $<
+	$(OCAMLOPT) $(INCLUDES) $(CLI_OCAMLFIND) -c $<
 	
 .mll.ml:
 	$(OCAMLLEX) $<
@@ -145,6 +159,6 @@ dist-clean distclean:: clean
 
 .depend depend:: $(GENERATED)
 	rm -f .depend
-	$(OCAMLDEP) $(INCLUDES) *.ml *.mli > .depend
+	$(OCAMLDEP) $(INCLUDES) $(CLI_REQUIRES) $(CLI_SYNTAX) *.ml *.mli > .depend
 
 include .depend
