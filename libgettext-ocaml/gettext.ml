@@ -147,6 +147,16 @@ let fdcngettext =
 
 (* High level functions *)
 
+type global_type = {
+  failsafe   : failsafe;
+  categories : category list;
+  codesets   : (textdomain * codeset) list;
+  dirs       : (textdomain * dir) list;
+  codeset    : codeset
+  language   : language;
+}
+;;
+
 let global = ref []
 ;;
 
@@ -164,8 +174,7 @@ let set_global glb =
   )
 ;;
 
-let get_global_t' 
-      
+let get_
 
 module Library =
   functor ( Init : init ) ->
@@ -201,37 +210,54 @@ module Program =
         ( Arg.Symbol 
           (
             ["ignore"; "inform-stderr"; "raise-exception"],
-            ( fun s ->
-              let new_t = 
-                match s with
-                "ignore" ->  { get_global_t () with failsafe = Ignore }
-                | "inform-stderr" -> { get_global_t () with failsafe = InformStderr }
-                | "raise-exception" -> { get_global_t () with failsafe = RaiseException }
-              in
-              set_global_t new_t
+            ( fun 
+                  "ignore"          -> set_global { get_global () with failsafe = Ignore }
+                | "inform-stderr"   -> set_global { get_global () with failsafe = InformStderr }
+                | "raise-exception" -> set_global { get_global () with failsafe = RaiseException }
             )
           )
         ),
         "Choose how to handle failure in gettext ( ignore, stderr, exception )" 
       );
       (
+        "--gettext-disable",
+        ( Arg.Unit 
+          ( fun () -> set_global { get_global () with realize = XXX } 
+          )
+        ),
+        "Disable the translation perform by gettext"
+      );
+      (
         "--gettext-domain-dir",
-        (Arg.Tuple (Arg.String , Arg.String ))
+        ( Arg.Tuple 
+          (
+            Arg.String , Arg.String 
+          )
+        )
         "Set a dir to search gettext files for the specified domain"
       );
       (
         "--gettext-dir",
-        (Arg.String),
+        ( Arg.String
+          ( fun s -> set_global { get_global () with dir = s }
+          )
+        ),
         "Set the default dir to search gettext files"
       );
       (
         "--gettext-language",
-        (Arg.String),
+        ( Arg.String
+          ( fun s -> set_global { get_global () with language = s }
+          )
+        ),
         "Set the default language for gettext"
       );
       (
         "--gettext-codeset",
-        (Arg.String),
+        ( Arg.String
+          ( fun s -> set_global { get_global () with codeset = s }
+          )
+        ),
         "Set the default codeset for outputting string with gettext"
       );
       ]
