@@ -11,6 +11,13 @@ exception Junk of string * string list;;
 exception EmptyEntry;;
 exception InvalidMoFile;;
 
+let mo_sig_be = int32_of_byte (0x95, 0x04, 0x12, 0xde)
+;;
+
+let mo_sig_le = int32_of_byte (0xde, 0x12, 0x04, 0x95)
+;;
+
+
 let string_of_exception exc =   
   match exc with
     InvalidOptions (lexbuf,text) ->
@@ -65,15 +72,14 @@ let fail_or_continue failsafe exc cont_value =
 
 let input_mo_header chn = 
   let endianess = 
-    let magic_number = seek_in chn 0; input_int32 chn ArchEndian
+    let magic_number = seek_in chn 0; input_int32 chn BigEndian
     in
-    match Int32.to_int magic_number with
-      0x950412de ->
-        ArchEndian
-    | 0xde120495 ->
-        NotArchEndian
-    | _ ->
-          raise InvalidMoFile
+    if magic_number = mo_sig_be then
+      BigEndian
+    else if magic_number = mo_sig_le then
+      LittleEndian
+    else
+      raise InvalidMoFile
   in
   let seek_and_input x = seek_in chn x; input_int32 chn endianess
   in
@@ -91,7 +97,10 @@ let input_mo_header chn =
 let output_mo_header chn hdr = 
   let output = output_int32 chn hdr.endianess
   in
-  output (Int32.of_int 0x950412de); (* magic_number *)
+  (* magic_number : be is the native way to
+  * specify it, it will be translated through 
+  * the output_int32*)
+  output mo_sig_be;                  
   output hdr.file_format_revision; 
   output hdr.number_of_strings;
   output hdr.offset_table_strings;
@@ -290,7 +299,7 @@ let string_of_mo_translation ?(omit_translation=true) ?(compute_plurals=(0,3)) m
   Buffer.contents buff
 ;;
 
-let output_mo ?(endianess = ArchEndian) chn lst =
+let output_mo ?(endianess = LittleEndian) chn lst =
   let null_terminated lst = 
     List.map ( fun str -> str^"\000" ) lst
   in
@@ -306,13 +315,24 @@ let output_mo ?(endianess = ArchEndian) chn lst =
     in
     (final_pos, List.rev lst_rev)
   in
+  let sorted_lst = 
+    let compare_entry entry1 entry2 = 
+      let value_of_entry entry = 
+        match entry with 
+          Singular (id, _) -> id
+        | Plural (id, _, _) -> id
+      in
+      String.compare ( value_of_entry entry1) (value_of_entry entry2)
+    in
+    List.sort compare_entry lst
+  in
   let untranslated = 
     let to_string entry = 
       match entry with
         Singular (id, _) -> id
       | Plural (id, id_plural, _) -> id ^ "\000" ^ id_plural
     in
-    null_terminated (List.map to_string lst)
+    null_terminated (List.map to_string sorted_lst)
   in
   let translated = 
     let to_string entry = 
@@ -320,7 +340,7 @@ let output_mo ?(endianess = ArchEndian) chn lst =
         Singular (_,str) -> str
       | Plural (_, _, lst) -> String.concat "\000" lst
     in
-    null_terminated (List.map to_string lst)
+    null_terminated (List.map to_string sorted_lst)
   in
   let gN = List.length lst
   in
@@ -333,7 +353,7 @@ let output_mo ?(endianess = ArchEndian) chn lst =
   let gH = gT + 8 * gN
   in
   let (final_untranslated,untranslated_table) = 
-    compute_table (gH + (gS+1) * 4) untranslated
+    compute_table (gH + gS * 4) untranslated
   in
   let (_,translated_table) = 
     compute_table final_untranslated translated
@@ -349,10 +369,13 @@ let output_mo ?(endianess = ArchEndian) chn lst =
   }
   in
   output_mo_header chn header;
+  output_int32 chn endianess Int32.zero; (* Probably padding *)
   List.iter (
     List.iter (
       fun (a,b) -> 
-        output_int32_pair chn endianess (Int32.of_int a,Int32.of_int b) 
+        output_int32_pair chn endianess (Int32.of_int a,Int32.of_int b);
+        Printf.printf "Entry pos    : %x\n" a;
+        Printf.printf "Entry length : %x\n" b;
       ) 
   ) [ untranslated_table ; translated_table ];
   List.iter (output_string chn) untranslated;

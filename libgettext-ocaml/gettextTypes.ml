@@ -6,8 +6,8 @@ type failsafe =
 ;;
 
 type endianess = 
-    ArchEndian 
-  | NotArchEndian
+    BigEndian 
+  | LittleEndian
 ;;
 
 (* Specification of .MO file *)

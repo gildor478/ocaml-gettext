@@ -1,6 +1,6 @@
 open GettextTypes;;
 
-let int32_from_byte (a0,a1,a2,a3) = 
+let int32_of_byte (a0,a1,a2,a3) = 
   Int32.add 
     (Int32.shift_left (Int32.of_int a0) 24) 
     (Int32.of_int 
@@ -12,8 +12,8 @@ let int32_from_byte (a0,a1,a2,a3) =
     )
 ;;
 
-let byte_from_int32 i = 
-  let one_byte = Int32.of_int 0xF
+let byte_of_int32 i = 
+  let one_byte = Int32.of_int 0xFF
   in
   let extract_byte sb = 
     let mask = 
@@ -37,21 +37,21 @@ let input_int32 chn endian =
     )
   in
   match endian with 
-    ArchEndian ->
-      int32_from_byte (a0,a1,a2,a3)
-  | NotArchEndian ->
-      int32_from_byte (a3,a2,a1,a0)
+    BigEndian ->
+      int32_of_byte (a0,a1,a2,a3)
+  | LittleEndian ->
+      int32_of_byte (a3,a2,a1,a0)
 ;;
 
 let output_int32 chn endian vl =
   let (a0,a1,a2,a3) = 
-    byte_from_int32 vl
+    byte_of_int32 vl
   in
   let order = 
     match endian with
-      ArchEndian ->
+      BigEndian ->
         [a0;a1;a2;a3]
-    | NotArchEndian ->
+    | LittleEndian ->
         [a3;a2;a1;a0]
   in
   List.iter (output_byte chn) order
