@@ -9,7 +9,9 @@ module type LOCALE_TYPE =
     
     val create : unit -> t
     
-    val compare : category -> category -> int
+    val compare_category : category -> category -> int
+
+    val string_of_category : category -> string
 
     val set_locale : category -> locale -> t -> t 
     
@@ -18,5 +20,7 @@ module type LOCALE_TYPE =
     val default_charset : t -> encoding
 
     val messages : category
+
+    val all : category
   end
 ;;

@@ -1,5 +1,9 @@
 (** Signature of module for domain management *)
 
+open FilePath;;
+open FilePath.DefaultPath;;
+open FileUtil;;
+open FileUtil.StrUtil;;
 open GettextUtils;;
 
 module type DOMAIN_TYPE = 
@@ -14,7 +18,7 @@ module type DOMAIN_TYPE =
     (** create language locale : create a new binding for textdomain
         considering. Language is guessed from locale environnement.
     *)
-    val create : Locale.t -> t
+    val create : ?language : string -> Locale.t -> t
 
     (** add textdomain dir t : add the binding of textdomain to dir.
     *)
@@ -41,43 +45,61 @@ module Generic : DOMAIN_TYPE =
     type category    = Locale.category
 
     type t = {
-      locale : Locale.t;
-      map    : dir MapString.t;
+      locale   : Locale.t;
+      language : string option;
+      map      : dir MapString.t;
     }
 
-    let create locale = {
-      locale = locale;
-      map    = MapString.empty;
-    }
+    let guess_language domain category = 
+      (* http://www.gnu.org/software/gettext/manual/html_mono/gettext.html#SEC155
+       * In the function dcgettext at every call the current setting of the 
+       * highest priority environment variable is determined and used. 
+       * Highest priority means here the following list with decreasing priority:
+          1. LANGUAGE
+          2. LC_ALL
+          3. LC_xxx, according to selected locale
+          4. LANG 
+      *)
+      match domain.language with 
+          Some str ->
+            str
+        | None ->
+            Locale.get_locale Locale.messages domain.locale
+
+    
+    let create ?language locale = {
+        locale   = locale;
+        language = language; 
+        map      = MapString.empty;
+      }
 
     let add textdomain dir domain = {
-      locale = domain.locale;
-      map    = MapString.add textdomain dir 
-    }
+        locale   = domain.locale;
+        language = domain.language;
+        map      = MapString.add textdomain dir domain.map 
+      }
 
     let compute_path textdomain category domain = 
       let search_path = 
         try 
-          MaptString.find textdomain domain.map :: GettextConfig.default_paths
+          MapString.find textdomain domain.map :: GettextConfig.default_paths
         with Not_found ->
           GettextConfig.default_paths
       in
       (* http://www.gnu.org/software/gettext/manual/html_mono/gettext.html#SEC148 
         dir_name/locale/LC_category/domain_name.mo *)
       let end_path = 
-        (* BUG : that default language should be guessed using
-           LANGUAGE/LC_CTYPE... *)
         make_filename [ 
-          Locale.get_locale category;
+          guess_language domain category; 
           Locale.string_of_category category ; 
           (* BUG : should use add_extension *)
-          domain ^ ".mo" 
+          textdomain ^ ".mo" 
         ]
       in
       let compute_simple_path dir = 
         concat dir end_path
       in
-      List.find (test (And(Exists,Is_readable))
+      List.find (test (And(Exists,Is_readable)))
       (List.map compute_simple_path search_path)
           
   end

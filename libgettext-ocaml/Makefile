@@ -99,6 +99,7 @@ INSTALLIB +=           \
  gettextModules.cmi    
 
 CMO_EXTENSION=         \
+ gettextConfig.cmo     \
  gettextLocale.cmo     \
  gettextDomain.cmo     \
  gettextCharset.cmo    \

@@ -118,7 +118,7 @@ module Generic : META_GETTEXT_TYPE =
         
         let compare (d1,c1) (d2,c2) = 
           match String.compare d1 d2 with
-            0 -> Locale.compare c1 c2
+            0 -> Locale.compare_category c1 c2
           | x -> x
       end)
 
@@ -198,7 +198,7 @@ module Generic : META_GETTEXT_TYPE =
       in
       set_global_gettext {
         locale       = gtxt.locale;
-        domain       = Domain.add_textdomain textdomain dir gtxt.domain;
+        domain       = Domain.add textdomain dir gtxt.domain;
         textdomain   = gtxt.textdomain;
         translations = gtxt.translations;
       }

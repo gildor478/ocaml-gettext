@@ -18,13 +18,10 @@ module type CHARSET_TYPE =
 
 module Dummy : CHARSET_TYPE =
   struct
-    type in_enc  = string
-    type out_enc = string
+    type encoding = string
     type t = ()
 
     let create in_enc out_enc = ()
-
-    let create_default in_enc = ()
 
     let recode str () = str
   end
