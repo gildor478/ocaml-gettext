@@ -1,6 +1,7 @@
 open OUnit;;
 
 open FileUtil;;
+(* BUG: should be independant of Str *)
 open FileUtil.StrUtil;;
 open FilePath;;
 open FilePath.DefaultPath;;
@@ -129,7 +130,7 @@ let po_test tests =
       load_po_file tests fl_po
   in
   "PO processing test" >:::
-    List.map po_test_one ["test1.po"; "test2.po" ; "test3.po"]
+    List.map po_test_one ["test1.po"; "test2.po" ; "test3.po"; "test4.po"]
 ;;
 
 
@@ -205,16 +206,53 @@ let install_test tests =
         make_filename [ current_dir ; "fr" ; "LC_MESSAGES" ; "gettext-test1.mo" ]
       );
       (
-        "fr",LC_MESSAGES, "gettext-test2", "test2.mo", 
-        make_filename [ current_dir ; "fr" ; "LC_MESSAGES" ; "gettext-test2.mo"]
+        "fr_FR",LC_MESSAGES, "gettext-test2", "test2.mo", 
+        make_filename [ current_dir ; "fr_FR" ; "LC_MESSAGES" ; "gettext-test2.mo"]
       );
       (
-        "fr",LC_MESSAGES, "gettext-test3", "test3.mo", 
-        make_filename [ current_dir ; "fr" ; "LC_MESSAGES" ; "gettext-test3.mo" ]
+        "fr",LC_TIME, "gettext-test3", "test3.mo", 
+        make_filename [ current_dir ; "fr" ; "LC_TIME" ; "gettext-test3.mo" ]
+      );
+      (
+        "fr_FR@euro",LC_MESSAGES, "gettext-test4", "test4.mo",
+        make_filename [ current_dir ; "fr_FR@euro" ; "LC_MESSAGES" ; "gettext-test4.mo" ]
       );
     ]
 ;;
-        
+
+(************************)
+(* Test of POT/PO merge *)
+(************************)
+
+let merge_test tests = 
+  let merge_one (fl_pot,fl_po,backup_ext) = 
+    (fl_pot^"+"^fl_po) >:::
+      [
+        "Merging" >::
+          ( fun () ->
+            try
+              let fl_backup = 
+                (* BUG : should use add_extension *)
+                fl_po^"."^backup_ext
+              in
+              GettextCompile.merge fl_pot [fl_po] backup_ext;
+              match cmp fl_po fl_backup with
+                Some -1 -> 
+                  assert_failure (fl_po^" or "^fl_backup^" doesn't exist")
+              | Some x ->
+                  assert_failure (fl_po^" differs from "^fl_backup)
+              | None ->
+                  ()
+            with x ->
+              assert_failure ("Unexpected error while processing "^fl_po
+              ^" ( "^(Printexc.to_string x)^" )")
+          );
+      ]
+  in
+  "POT/PO file merge test" >:::
+    List.map merge_one [ ("test4.pot","test4.po", "bak") ]
+;;
+
 (*********************)
 (* Main test routine *)
 (*********************)
@@ -228,6 +266,7 @@ let all_test =
       compatibility_test tests;
       extract_test       tests;
       install_test       tests;
+      merge_test         tests;
     ]
 in
 let _ = 

@@ -163,7 +163,8 @@ let merge filename_pot filename_po_lst backup_extension =
     in
     let _ = 
       (* BUG: should use add_extension *)
-      mv filename_po (filename_po^"."^backup_extension)
+      (* BUG: should use mv *)
+      Sys.rename filename_po (filename_po^"."^backup_extension)
     in
     let chn = 
       open_out filename_po
