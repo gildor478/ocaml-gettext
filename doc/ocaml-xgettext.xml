@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+]>
+<refentry>
+  <refmeta>
+    <refentrytitle>OCAML-XGETTEXT</refentrytitle>
+    <manvolnum>1</manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname><command>ocaml-xgettext</command></refname>
+    <refpurpose>programs to extract translatable strings from OCaml source file.</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>ocaml-xgettext</command>
+      <arg>camlp4 arguments</arg>
+      <arg><replaceable>filename</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  
+  <refsect1>
+    <title>DESCRIPTION</title>
+
+    <para>
+      This manual page documents briefly the <command>ocaml-xgettext</command>
+    </para>
+      
+    <para>
+      <command>ocaml-xgettext</command> is a <command>camlp4</command> toplevel. This toplevel is compiled with the 
+      printer module <filename>pr_gettext.cmo</filename>. It outputs an OCaml marshalled data structure that can only
+      be understood by <command>ocaml-gettext</command>. The purpose of this program is to be a backend for OCaml source
+      code string extraction. You should not use it directly.
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>SEE ALSO</title>
+
+    <para><command>ocaml-gettext</command> <manvolnum>1</manvolnum></para>
+  </refsect1>
+</refentry>

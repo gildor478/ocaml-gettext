@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+]>
+<refentry>
+  <refmeta>
+    <refentrytitle>OCAML-GETTEXT-OPTIONS</refentrytitle>
+    <manvolnum>5</manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>common options for ocaml-gettext library</refname>
+    <refpurpose>common options to manage internationalization in OCaml program.</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <arg choice="opt">--gettext-failsafe
+        <group>
+          <arg choice="req">ignore</arg>
+          <arg choice="req">inform-stderr</arg>
+          <arg choice="req">raise-exception</arg>
+        </group>
+      </arg>
+      <arg choice="opt">--gettext-disable</arg>
+      <arg choice="opt">--gettext-domain-dir 
+        <arg choice="req"><replaceable>textdomain</replaceable></arg>
+        <arg choice="req"><replaceable>dir</replaceable></arg>
+      </arg>
+      <arg choice="opt">--gettext-dir <arg choice="req"><replaceable>dir</replaceable></arg></arg>
+      <arg choice="opt">--gettext-language <arg choice="req"><replaceable>language</replaceable></arg></arg>
+      <arg choice="opt">--gettext-codeset <arg choice="req"><replaceable>codeset</replaceable></arg></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>DESCRIPTION</title>
+
+    <para>
+      This manual page documents briefly the common options provided by programs using ocaml-gettext library.
+    </para>
+
+    <variablelist>
+      <varlistentry>
+        <term>
+          <cmdsynopsis>
+            <arg choice="opt">--gettext-failsafe 
+              <group>
+                <arg choice="req">ignore</arg>
+                <arg choice="req">inform-stderr</arg>
+                <arg choice="req">raise-exception</arg>
+              </group> 
+            </arg>
+          </cmdsynopsis>
+         </term>
+        <listitem>
+          <para>
+            Defines the behavior of ocaml-gettext regarding any errors that could be encounter during the
+            processing of string translation. By default, errors are ignored and the string returned is 
+            the original string untranslated. This behavior is consistent and allow to have a usable output,
+            even if it is not perfect. Choices are :
+            <itemizedlist>
+              <listitem>
+                <para>
+                  ignore : default behavior, return an untranslated string,
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  inform-stderr : same behavior as ignore, expect that a message is printed on stderr,
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  raise-exception : stop the program by raising an exception.
+                </para>
+              </listitem>
+            </itemizedlist>
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <cmdsynopsis>
+            <arg choice="opt">--gettext-disable</arg>
+          </cmdsynopsis>
+        </term>
+        <listitem>
+          <para>
+            Disable any translation made by ocaml-gettext. All translation returns the original string untranslated.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <cmdsynopsis>
+            <arg choice="opt">--gettext-domain-dir 
+              <arg choice="req"><replaceable>textdomain</replaceable></arg>
+              <arg choice="req"><replaceable>dir</replaceable></arg>
+            </arg>
+          </cmdsynopsis>
+        </term>
+        <listitem>
+          <para>
+            Defines a dir to search for a specific domain. This could be useful if MO file are stored in
+            a non standard directory.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <cmdsynopsis>
+            <arg choice="opt">--gettext-dir 
+              <arg choice="req"><replaceable>dir</replaceable></arg>
+            </arg>
+          </cmdsynopsis>
+        </term>
+        <listitem>
+          <para>
+            Add a directory to search for MO file.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <cmdsynopsis>
+            <arg choice="opt">--gettext-language 
+              <arg choice="req"><replaceable>language</replaceable></arg>
+            </arg>
+          </cmdsynopsis>
+        </term>
+        <listitem>
+          <para>
+            Set the language to use in ocaml-gettext library. The language should be POSIX compliant. The language should
+            follow the following convention : lang[_territory][.charset][@modifier]. The lang should be a two letter ISO code.
+            The territory should be also a two letter ISO code. Charset should be a valid ISO character set ( at least recognized
+            by the underlying charset recoding routine ). For example, valid language should be : fr_FR.ISO-8859-1@euro, de_DE.UTF-8.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <cmdsynopsis>
+            <arg choice="opt">--gettext-codeset 
+              <arg choice="req"><replaceable>codeset</replaceable></arg>
+            </arg>
+          </cmdsynopsis>
+        </term>
+        <listitem>
+          <para>
+            Set the codeset the default codeset for output.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para>
+      User should be aware that this command line option, only apply for strings after the initialization of the library. This means
+      that if the options initally guessed by ocaml-gettext, there should be some untranslated string, because these strings are
+      translated before parsing the option. This is particulary true for the usage message itself ( <option>--help</option> ) : 
+      even if the strings are  translated, they are translated before parsing the option ( because they describe the option to apply ).
+    </para>
+
+    <para>
+      Some options ( <option>--gettext-codeset</option> for example ) are overrided internaly for particular use. For example, it
+      should be required to always translate strings to UTF-8 in graphical user interface ( because GTK2 requires it ).
+    </para>
+  </refsect1>
+</refentry>
+

@@ -10,6 +10,7 @@ v 0.2.0 :
 - Reread the code to improve general layout ( naming scheme, exception name... ie better style )
 - Intercept problem when recoding string ( charset ), errors should be wrap inside a failsafe or
   at least raise a coherent exception.
+- Write a g_ function to translate strings of GUI
 
 v 0.3.0 :
 - Better parse comments, to keep licence et al 

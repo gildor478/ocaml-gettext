@@ -165,6 +165,7 @@ let do_compile t =
 ;;
 
 let guess_language_textdomain (language_option,textdomain_option) lst =
+  (* Rules for guessing language : language[.textdomain].mo *)
   match (language_option,textdomain_option,lst) with
     Some language, Some textdomain, [fl_mo] ->
       [(language,textdomain,fl_mo)]

@@ -19,6 +19,10 @@
 <!ENTITY library-gettext-ml  '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
 <!ENTITY program-ml          '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
 <!ENTITY program-gettext-ml  '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
+<!ENTITY program-xml         '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
+<!ENTITY gui-glade           '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
+<!ENTITY gui-ml              '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
+<!ENTITY makefile-gui        '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
 
 <!-- Links -->
 <!ENTITY download-ocaml             'http://caml.inria.fr/ocaml/release.en.html'>
@@ -298,6 +302,13 @@
         is important, especially for debugging purpose. If you encouter problems, you should first
         try to run this two command. They will give you good hints on what cause the problem.
       </para>
+      <note>
+        <para>
+          There is a <filename>patches</filename> directory in the source tree. This directory contains patches
+          against different programs that should be compatible with ocaml-gettext. Please have a look to the
+          <filename>README.patches</filename> of this directory, to know how to handle patching these programs.
+        </para>
+      </note>
     </section>
     <section>
       <title>Debian distribution</title>
@@ -635,10 +646,16 @@
       </example>
       <para>
         If you want to include a manpage ( or info file ), that describe the command line option of ocaml-gettext, you should use the Docbook 
-        XML fragment distributed with this application. Docbook should be enough generic to allow you to link it into your documentation 
-        ( how to this is left as an exercise to the reader ). If you don't want to link it with your documentation, you can refer to 
-        <link linkend="ocaml-gettext-options">ocaml-gettext-options manpage</link>.
+        XML fragment distributed with this application. Docbook should be enough generic to allow you to link it into your documentation. 
+        If you don't want to link it with your documentation, you can refer to <link linkend="ocaml-gettext-options">
+        ocaml-gettext-options manpage</link>.
       </para>
+      <example>
+        <title><filename>program.xml</filename> : Docbook manpage</title>
+        <programlisting>
+          &program-xml;
+        </programlisting>
+      </example>
       <para>
         You should take care of what implementation of ocaml-gettext you are using. In order to choose the right implementation
         you should consider your program and every characteristic of it ( how many strings does he need to fetch ? Does it use already
@@ -911,6 +928,46 @@
       <para>
         In the two case, you just have to add your GUI file ( in OCaml or native form ) to <filename>POTFILES</filename>.
       </para>
+      <para>
+        Graphical user interfaces are good candidate for settings a fixed <varname>Init.codeset</varname>. Typically, GTK2 interfaces require 
+        to have this parameters set to UTF-8.
+      </para>
+      <para>
+        Following the recommendation describe in <link linkend="gettext-documentation">gettext documentation</link>, a special function
+        <varname>g_</varname> permits to decode strings used in the interface. This strip the leading part of the strings, which should
+        begin with &quot;string_specific|string_to_translate&quot;. The returned string will be string_to_translate, but the search will
+        be performed on string_specific|string_to_translate, allowing to differentiate certain strings which can occurs in different
+        element of the interface, but that should be translated differently. The full string should be provided in the original GUI file.
+        Only the last part of the string, not containing any &quot;|&quot;, is returned.
+      </para>
+
+      <example>
+        <title><filename>gui.glade</filename> : original GUI file</title>
+        <programlisting>
+          &gui-glade;
+        </programlisting>
+      </example>
+
+      <example>
+        <title><filename>gui.ml</filename> : source file from the original GUI file</title>
+        <programlisting>
+          &gui-ml;
+        </programlisting>
+      </example>
+
+      <example>
+        <title><filename>Makefile</filename> : makefile for glade file</title>
+        <programlisting>
+          &makefile-gui;
+        </programlisting>
+      </example>
+
+      <note>
+        <para>
+          For now, generating OCaml source file out of glade file, requires to patch <command>lablgladecc2</command>. This patch
+          will be send to upstream author.
+        </para>
+      </note>
     </section>
   </chapter>
   <chapter>
@@ -997,311 +1054,13 @@
   <appendix>
     <title>Manpages</title>
     <refentry>
-      <refmeta>
-        <refentrytitle>OCAML-GETTEXT</refentrytitle>
-        <manvolnum>1</manvolnum>
-      </refmeta>
-      
-      <refnamediv>
-        <refname><command>ocaml-gettext</command> and <command>ocaml-xgettext</command></refname>
-        <refpurpose>programs to manage PO and MO file for OCaml source file.</refpurpose>
-      </refnamediv>
-
-      <refsynopsisdiv>
-        <cmdsynopsis>
-          <command>ocaml-xgettext</command>
-          <arg>camlp4 arguments</arg>
-          <arg><replaceable>filename</replaceable></arg>
-        </cmdsynopsis>
-        <cmdsynopsis>
-          <command>ocaml-gettext</command>
-          <group>
-            <arg choice="plain">--version</arg>
-            <arg choice="plain">--short-version</arg>
-            <arg choice="plain">-help</arg>
-            <arg choice="plain">--help</arg>
-            <sbr/>
-            <arg choice="req">--action 
-              <group>
-                <sbr/>
-                <arg choice="plain">extract
-                  <arg choice="opt">--extract-command         <arg choice="req"><replaceable>cmd</replaceable></arg></arg>
-                  <arg choice="opt">--extract-default-option  <arg choice="req"><replaceable>options</replaceable></arg></arg>
-                  <arg choice="opt">--extract-filename-option <arg choice="req"><replaceable>filename</replaceable></arg>
-                                                              <arg choice="req"><replaceable>options</replaceable></arg></arg>
-                  <arg choice="opt">--extract-pot             <arg choice="req"><replaceable>filename</replaceable></arg></arg>
-                </arg>
-                <sbr/>
-                <arg choice="plain">compile
-                  <arg choice="opt">--compile-output          <arg choice="req"><replaceable>filename</replaceable></arg></arg>
-                </arg>
-                <sbr/>
-                <arg choice="plain">install
-                  <arg choice="opt">--install-language        <arg choice="req"><replaceable>language</replaceable></arg></arg>
-                  <arg choice="opt">--install-category        <arg choice="req"><replaceable>category</replaceable></arg></arg>
-                  <arg choice="opt">--install-textdomain      <arg choice="req"><replaceable>textdomain</replaceable></arg></arg>
-                  <arg choice="opt">--install-destdir         <arg choice="req"><replaceable>dirname</replaceable></arg></arg>
-                </arg>
-                <sbr/>
-                <arg choice="plain">uninstall
-                  <arg choice="opt">--uninstall-language      <arg choice="req"><replaceable>language</replaceable></arg></arg>
-                  <arg choice="opt">--uninstall-category      <arg choice="req"><replaceable>category</replaceable></arg></arg>
-                  <arg choice="opt">--uninstall-textdomain    <arg choice="req"><replaceable>textdomain</replaceable></arg></arg>
-                  <arg choice="opt">--uninstall-orgdir        <arg choice="req"><replaceable>dirname</replaceable></arg></arg>
-                </arg>
-                <sbr/>
-                <arg choice="plain">merge
-                  <arg choice="req">--merge-pot               <arg choice="req"><replaceable>filename</replaceable></arg></arg>
-                  <arg choice="opt">--merge-backup-extension  <arg choice="req"><replaceable>extension</replaceable></arg></arg>
-                </arg>
-              </group>
-            </arg>
-          </group>
-          <sbr/>
-          <arg rep="repeat">file</arg>
-        </cmdsynopsis>
-      </refsynopsisdiv>
-
-      <refsect1>
-        <title>DESCRIPTION</title>
-
-        <para>
-          This manual page documents briefly the <command>ocaml-gettext</command> and <command>ocaml-xgettext</command> command.
-        </para>
-
-        <para>
-          <command>ocaml-xgettext</command> is a <command>camlp4</command> toplevel. This toplevel is compiled with the 
-          printer module <filename>pr_gettext.cmo</filename>. It outputs an OCaml marshalled data structure that can only
-          be understood by <command>ocaml-gettext</command>. The purpose of this program is to be a backend for OCaml source
-          code string extraction. You should not use it directly.
-        </para>
-        <variablelist>
-          <varlistentry>
-            <term>
-              <arg choice="plain">--action</arg> 
-              <group>
-                <arg choice="plain">extract</arg>
-                <arg choice="plain">compile</arg>
-                <arg choice="plain">install</arg>
-                <arg choice="plain">uninstall</arg>
-                <arg choice="plain">merge</arg>
-              </group>
-            </term> 
-            <listitem>
-              <para>
-                Action to execute :
-                <itemizedlist>
-                  <listitem>
-                    <para>
-                      <arg choice="plain">extract</arg> : all the file are considered to be OCaml source file and translatable strings
-                      are searched inside. The output of the command is a POT file. As a special case, if a file named 
-                      <filename>POTFILES</filename> is in the list of the file to search, the file is not searched but all
-                      the lines of this files are considered to be filename of file to search.
-                    </para>
-                  </listitem>
-                  <listitem>
-                    <para>
-                      <arg choice="plain">compile</arg> : all the file listed are considered to be PO file. The file are compiled in binary
-                      MO file,
-                    </para>
-                  </listitem>
-                  <listitem>
-                    <para>
-                      <arg choice="plain">install</arg> : all the file listed are considered to be MO file. They are installed in their
-                      respective directory considering language, textdomain and category,
-                    </para>
-                  </listitem>
-                  <listitem>
-                    <para>
-                      <arg choice="plain">uninstall</arg> : symetric command to install, but it uninstall the file found for the considered
-                      language, textdomain, category and filenames,
-                    </para>
-                  </listitem>
-                  <listitem>
-                    <arg choice="plain">merge</arg> : merge a POT file with a PO file.
-                  </listitem>
-                </itemizedlist>
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--extract-command <arg choice="req"><replaceable>cmd</replaceable></arg></arg></term>
-            <listitem>
-              <para>
-                Command to extract translatable strings from an OCaml source file. This command should output
-                the same marshalled structure as <command>ocaml-xgettext</command>. The best is to use the same
-                build version of <command>ocaml-gettext</command>.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--extract-default-option <arg choice="req"><replaceable>options</replaceable></arg></arg></term>
-            <listitem>
-              <para>
-                Default option used when extracting translatable strings. This option is a <command>camlp4</command> option and 
-                will be passed to <command>ocaml-xgettext</command> when processing all the file that don't have a specific 
-                <command>camlp4</command> option.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--extract-filename-option 
-                <arg choice="req"><replaceable>filename</replaceable></arg>
-                <arg choice="req"><replaceable>options</replaceable></arg></arg>
-            </term>
-            <listitem>
-              <para>
-                Per filename <command>camlp4</command>option. It is used when extracting strings from the specified filename. It
-                overrides default <command>camlp4</command> options.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--extract-pot <arg choice="req"><replaceable>filename</replaceable></arg></arg></term>
-            <listitem>
-              <para>
-                POT file to write when extracting translatable strings.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--compile-output <arg choice="req"><replaceable>filename</replaceable></arg></arg></term>
-            <listitem>
-              <para>
-                MO file to write when compiling a PO file. If not provided, the output will be the name of the PO file with 
-                &quot;.mo&quot; extension.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--install-language <arg choice="req"><replaceable>language</replaceable></arg></arg></term>
-            <listitem>
-              <para>
-                Language to use when installing a MO file.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--install-category <arg choice="req"><replaceable>category</replaceable></arg></arg></term>
-            <listitem>
-              <para>
-                Category to use when installing a MO file.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--install-textdomain <arg choice="req"><replaceable>textdomain</replaceable></arg></arg></term>
-            <listitem>
-              <para>
-                Textdomain to use when installing a MO file.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--install-destdir <arg choice="req"><replaceable>dirname</replaceable></arg></arg></term>
-            <listitem>
-              <para>
-                Base dir used when installing a MO file.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--uninstall-language <arg choice="req"><replaceable>language</replaceable></arg></arg></term>
-            <listitem>
-              <para>
-                Language to use when uninstalling a MO file.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--uninstall-category <arg choice="req"><replaceable>category</replaceable></arg></arg></term>
-            <listitem>
-              <para>
-                Category to use when uninstalling a MO file.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--uninstall-textdomain <arg choice="req"><replaceable>textdomain</replaceable></arg></arg></term>
-            <listitem>
-              <para>
-                Textdomain to use when uninstalling a MO file.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--uninstall-orgdir <arg choice="req"><replaceable>dirname</replaceable></arg></arg></term>
-            <listitem>
-              <para>
-                Base dir used when uninstalling a MO file.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--merge-pot <arg choice="req"><replaceable>filename</replaceable></arg></arg></term>
-            <listitem>
-              <para>
-                POT file to use as a master for merging PO file.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--merge-backup-extension <arg choice="req"><replaceable>extension</replaceable></arg></arg></term>
-            <listitem>
-              <para>
-                Backup extension to use when moving PO file which have been merged.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--version</arg></term>
-            <listitem>
-              <para>
-                Returns version information on ocaml-gettext.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><arg choice="plain">--short-version</arg></term>
-            <listitem>
-              <para>
-                Returns only the version string of ocaml-gettext. The return is made to be easily parseable by <command>configure</command>
-                script. The output of this command will always stay as the shortest version string, made of numeric characters ( 0-9 ) and 
-                &quot;.&quot;. The version strings should be compared considering that a version A is greater than a version B if there is a 
-                number between two &quot;.&quot; of A is greater than B beginning at the right of the string. For example: 0.14 is greater 
-                than 0.13.1.
-              </para>
-            </listitem>
-          </varlistentry>
-          <varlistentry>
-            <term><group><arg choice="plain">-help</arg><arg choice="plain">--help</arg></group></term>
-            <listitem>
-              <para>
-                Display the help about the <command>ocaml-gettext</command> command.
-              </para>
-            </listitem>
-          </varlistentry>
-        </variablelist>
-      </refsect1>
-      <refsect1>
-        <title>NOTES</title>
-        <para>
-          XXX : describes the mechanism for guessing things in install/uninstall.
-        </para>
-      </refsect1>
-      <refsect1>
-        <title>SEE ALSO</title>
-      
-        <para>ocaml-gettext-options <manvolnum>1</manvolnum></para>
-      </refsect1>
+      &ocaml-gettext-manual;
     </refentry>
-    <para id="ocaml-gettext-options">
-    --gettext-failsafe {ignore|inform-stderr|raise-exception}  Choose how to handle failure in ocaml-gettext.
-    --gettext-disable                  Disable the translation perform by ocaml-gettext.
-    --gettext-domain-dir textdomain    dir Set a dir to search ocaml-gettext files for the specified domain.
-    --gettext-dir dir                  Add a search dir for ocaml-gettext files.
-    --gettext-language language        Set the default language for ocaml-gettext.
-    --gettext-codeset codeset          Set the default codeset for outputting string with ocaml-gettext.
-    </para>
+    <refentry>
+      &ocaml-xgettext-manual;
+    </refentry>
+    <refentry id="ocaml-gettext-options">
+      &ocaml-gettext-options-manual;
+    </refentry>
   </appendix>
 </book>
