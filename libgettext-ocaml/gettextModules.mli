@@ -1,4 +1,14 @@
 (** Gettext functions *)
+(** This module defines all the function required to use gettext. The primary
+* design is to use applicative function. The "side effect" of such a choice is
+* that you must defines, before using any function, all the text domains,
+* codeset et al. When building a library, you should define a function
+* "gettext_init" that will bind all the required stuff.
+* The only function missing here is the "realize" function. This function is
+* defined in the real implementation library provided with this modules ( see
+* GettextCamomile and GettextStub ).
+* A REF_SIMPLE
+**)
 
 (** Exceptions *)
 
@@ -19,6 +29,8 @@ type category
 type t
 type t'
 
+type init = textdomain * (codeset option) * (dir option)
+
 (** Implementation of gettext functions *)
 
 (** init failsafe categories codesets dirs language textdomain : Initialize the library globally.
@@ -28,20 +40,25 @@ type t'
     to lookup string. You can define more category binding using categories.
     You can define codeset on a per domain basis.
 *)
-val init : 
+val create : 
      ?failsafe : failsafe  
   -> ?categories : (category * locale) list 
   -> ?codesets : (textdomain * codeset) list
   -> ?dirs : (textdomain * dir) list
+  -> ?textdomains : textdomain list
   -> ?language : locale
   -> textdomain 
   -> t
 
-(** textdomain domain : Set the current text domain.
+(** textdomain domain t : Set the current text domain.
 *)
 val textdomain : textdomain -> t -> t
 
-(** get_textdomain () : Returns the current text domain.
+(** add_textdomain domain t : Add a textdomain which could be used
+*)
+val add_textdomain : textdomain -> t -> t
+
+(** get_textdomain t : Returns the current text domain.
 *)
 val get_textdomain : t -> textdomain
 
@@ -54,7 +71,7 @@ val bindtextdomain : textdomain -> dir -> t -> t
     specified domain. codeset must be a valid codeset for the underlying
     character encoder/decoder ( iconv, camomile, extlib... )
 *)
-val bindtextdomain_codeset : textdomain -> codeset -> t -> t
+val bind_textdomain_codeset : textdomain -> codeset -> t -> t
      
 (** gettext t' str : Translate the string str.
 *)
@@ -96,7 +113,7 @@ val fngettext : t' -> string -> string -> int -> ('a, 'b, 'c, 'a) format4
 *)
 val dngettext : t' -> textdomain -> string -> string -> int -> string
 
-(** fdngettext t' textdomain str str_plural n : dngettext returning fformat.
+(** fdngettext t' textdomain str str_plural n : dngettext returning format.
 *)
 val fdngettext : t' -> textdomain -> string -> string -> int -> ('a, 'b, 'c, 'a) format4
 
@@ -110,32 +127,44 @@ val dcngettext : t' -> textdomain -> string -> string -> int -> category -> stri
 *)
 val fdcngettext : t' -> textdomain -> string -> string -> int -> category -> ('a, 'b, 'c, 'a) format4
 
-
-module type TRANSLATOR_TYPE = 
-  functor ( Locale    : GettextLocale.LOCALE_TYPE ) ->
-  functor ( Domain    : GettextDomain.DOMAIN_TYPE ) ->
-  functor ( Charset   : GettextCharset.CHARSET_TYPE ) ->
-  functor ( Translate : GettextTranslate.TRANSLATE_TYPE ) ->
+module type TRANSLATOR_TYPE =
   sig
     (** realize t : create a translator for all the value defined in t *)
     val realize : t -> t'
   end
 ;;
 
-module type SIMPLE_TYPE =
+module Library =
+  functor ( Init : init ) ->
   sig
-    val s_ : t' -> string -> string 
-    val f_ : t' -> string -> ('a, 'b, 'c, 'a) format4
-    val sn_ : t' -> string -> string -> int -> string
-    val fn_ : t' -> string -> string -> int -> ('a, 'b, 'c, 'a) format4
+    val init  : init
+    val s_    : string -> string 
+    val f_    : string -> ('a, 'b, 'c, 'a) format4
+    val sn_   : string -> string -> int -> string
+    val fn_   : string -> string -> int -> ('a, 'b, 'c, 'a) format4
+  end
+;;    
+
+module Program =
+  functor ( Init : init ) ->
+  functor ( Translator : TRANSLATOR_TYPE ) ->
+  sig
+    val init  : 
+      ?failsafe : failsafe
+      -> ?categories : (category * locale) list
+      -> ?language : locale
+      -> ?libraries : init list
+      -> ( (Arg.key * Arg.spec * Arg.doc ) list * string ) * ( unit -> unit )
+    val s_    : string -> string 
+    val f_    : string -> ('a, 'b, 'c, 'a) format4
+    val sn_   : string -> string -> int -> string
+    val fn_   : string -> string -> int -> ('a, 'b, 'c, 'a) format4
   end
 ;;
 
-module type REF_SIMPLE_TYPE =
-  sig
-    val s_ : string -> string 
-    val f_ : string -> ('a, 'b, 'c, 'a) format4
-    val sn_ : string -> string -> int -> string
-    val fn_ : string -> string -> int -> ('a, 'b, 'c, 'a) format4
-  end
-;;
+(*
+  functor ( Locale    : GettextLocale.LOCALE_TYPE ) ->
+  functor ( Domain    : GettextDomain.DOMAIN_TYPE ) ->
+  functor ( Charset   : GettextCharset.CHARSET_TYPE ) ->
+  functor ( Translate : GettextTranslate.TRANSLATE_TYPE ) ->
+*)
