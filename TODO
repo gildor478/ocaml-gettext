@@ -1,12 +1,15 @@
 - Correct the library generation for non opt platform
-- Add an option to pr_gettext/ocaml-xgettext to define a default domain
-- Test GettextCompile.installation 
 - Write GettextCompile.merge
 - Test GettextCompile.merge
+- Add test concerning mo file structure : check that each pointer are valid ( no table conflict, et all )
+- Write gettextFormat : check format of ocaml string ( concerning %s, %a... )
 - Test GettextCamomile
 - Write GettextTranslate.hashtable
 - Write GettextTranslate.open ( base on file opening when a translation is required )
 - Write an adaptor : binding of gettext -> GettextRealize.REALIZE_TYPE
+- Add gettextGettext : i18n/l10n for ocaml-gettext ( if it can bootstrap easily )
 - Test GettextStub
 - Benchmark GettextCamomile/GettextStub 
-- 
+- Add a header to each source code file concerning the licence ( LGPL + Ocaml + copyright )
+- Write a quick start manual
+- Generate a ocamldoc manual

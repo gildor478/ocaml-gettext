@@ -1,6 +1,7 @@
 
 open GettextTypes;;
 open FileUtil.StrUtil;;
+open FilePath.DefaultPath;;
 
 (** filename wich generates the error message str *)
 exception ProblemReadingFile of filename * string;;
@@ -131,10 +132,14 @@ let install destdir language category textdomain filename_mo_src =
   let filename_mo_dst = 
     GettextDomain.make_filename destdir language category textdomain
   in
+  let dirname_mo_dst =
+    dirname filename_mo_dst
+  in
+  mkdir ~parent:true dirname_mo_dst;
   cp [filename_mo_src] filename_mo_dst
 ;;
 
-(*let merge filename_pot filename_po_lst backup_extension =
+let merge filename_pot filename_po_lst backup_extension =
   let pot = 
     po_of_filename filename_pot
   in
@@ -146,6 +151,7 @@ let install destdir language category textdomain filename_mo_src =
       (* BUG: should use add_extension *)
       mv filename_po (filename_po^"."^backup_extension)
     in
-    
-      
-;;*)
+    merge_pot po pot
+  in
+
+;;

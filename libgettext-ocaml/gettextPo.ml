@@ -80,6 +80,13 @@ let merge_po po1 po2 =
   MapTextdomain.fold merge_one_domain po1.domain merge_no_domain
 ;;
 
+(** merge_pot po pot : merge a po with a pot. The rule for merging are the same
+    as defined in add_po_translation_no_domain. Only consider strings that
+    exists in the pot.
+  *)
+let merge_pot po pot =
+;;
+
 let empty_po = 
   GettextPo_utils.empty_po
 ;;

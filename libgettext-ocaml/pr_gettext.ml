@@ -25,6 +25,9 @@ open Format;;
 open GettextTypes;;
 open GettextPo;;
 
+let default_textdomain = ref None
+;;
+
 let add_translation t loc singular plural domain =
   let location =
     let (pos1,_) = loc
@@ -40,7 +43,13 @@ let add_translation t loc singular plural domain =
     Some domain -> 
       add_po_translation_domain domain t translation
   | None -> 
-      add_po_translation_no_domain t translation
+      (
+        match !default_textdomain with
+          Some domain ->
+            add_po_translation_domain domain t translation
+        | None ->
+            add_po_translation_no_domain t translation
+      )
 ;;
 
 module AstGettextMatch =
@@ -165,4 +174,9 @@ Pcaml.print_interf := gettext_interf
 ;;
 
 Pcaml.print_implem := gettext_implem
+;;
+
+Pcaml.add_option "-default-textdomain" 
+  (Arg.String ( fun textdomain -> default_textdomain := Some textdomain ) )
+  "<textdomain> Defines the default textdomain"
 ;;

@@ -5,9 +5,6 @@ open FileUtil.StrUtil;;
 open FilePath;;
 open FilePath.DefaultPath;;
 
-open GettextMo;;
-open GettextPo;;
-open GettextCompile;;
 open GettextTypes;;
 
 type tests = {
@@ -67,9 +64,9 @@ let load_mo_file tests fl_mo =
       try
         let mo = open_in_bin fl_mo
         in
-        let mo_header = input_mo_header mo
+        let mo_header = GettextMo.input_mo_header mo
         in
-        print_debug tests (string_of_mo_header mo_header);
+        print_debug tests (GettextMo.string_of_mo_header mo_header);
         close_in mo
       with x ->
         assert_failure (fl_mo^" doesn't load properly: "^(GettextMo.string_of_exception x))
@@ -80,12 +77,12 @@ let load_mo_file tests fl_mo =
       try
         let mo = open_in_bin fl_mo
         in
-        let mo_header = input_mo_header mo
+        let mo_header = GettextMo.input_mo_header mo
         in
-        let mo_informations = input_mo_informations
+        let mo_informations = GettextMo.input_mo_informations
           GettextTypes.RaiseException mo mo_header
         in
-        print_debug tests (string_of_mo_informations mo_informations);
+        print_debug tests (GettextMo.string_of_mo_informations mo_informations);
         close_in mo
       with x ->
         assert_failure (fl_mo^" doesn't load properly: "^(GettextMo.string_of_exception x))
@@ -103,7 +100,7 @@ let load_po_file tests fl_po =
         try 
           let chn = open_in fl_po
           in
-          ignore (input_po chn);
+          ignore (GettextPo.input_po chn);
           close_in chn
         with x ->
           assert_failure (fl_po^" doesn't parse correctly: "^(GettextPo.string_of_exception x))
@@ -112,7 +109,7 @@ let load_po_file tests fl_po =
       "Compiling" >::
       ( fun () ->
         try
-          let _ = compile fl_po fl_mo
+          let _ = GettextCompile.compile fl_po fl_mo
           in
           () 
         with x ->
@@ -132,7 +129,7 @@ let po_test tests =
       load_po_file tests fl_po
   in
   "PO processing test" >:::
-    List.map po_test_one ["test1.po"; "test2.po" ; (*"test3.po"*)]
+    List.map po_test_one ["test1.po"; "test2.po" ; "test3.po"]
 ;;
 
 
@@ -169,7 +166,7 @@ let extract_test tests =
         "Extracting" >::
           ( fun () ->
             try
-              extract tests.ocaml_xgettext default_options filename_options [fl_ml] fl_pot
+              GettextCompile.extract tests.ocaml_xgettext default_options filename_options [fl_ml] fl_pot
             with x ->
               assert_failure (fl_ml^" doesn't extract correctly: "^(GettextCompile.string_of_exception x))
           )
@@ -179,6 +176,44 @@ let extract_test tests =
     List.map extract_test_one [ "test4.ml" ]
 ;;
 
+(********************************)
+(* Test of MO file installation *)
+(********************************)
+
+let install_test tests =
+  let install_test_one (language, category, textdomain, fl_mo, fl_dst) =  
+    fl_mo >:::
+      [
+        "Installing" >::
+          ( fun () ->
+            try 
+              GettextCompile.install current_dir language category textdomain fl_mo;
+              if test Exists fl_dst then
+                ()
+              else
+                assert_failure (fl_mo^" is not installed at "^fl_dst)
+            with x ->
+              assert_failure ("Unexpected error while processing "^fl_mo
+              ^" ( "^(Printexc.to_string x)^" )")
+          )
+      ]
+  in
+  "MO file installation test" >:::
+    List.map install_test_one [
+      (
+        "fr",LC_MESSAGES, "gettext-test1", "test1.mo", 
+        make_filename [ current_dir ; "fr" ; "LC_MESSAGES" ; "gettext-test1.mo" ]
+      );
+      (
+        "fr",LC_MESSAGES, "gettext-test2", "test2.mo", 
+        make_filename [ current_dir ; "fr" ; "LC_MESSAGES" ; "gettext-test2.mo"]
+      );
+      (
+        "fr",LC_MESSAGES, "gettext-test3", "test3.mo", 
+        make_filename [ current_dir ; "fr" ; "LC_MESSAGES" ; "gettext-test3.mo" ]
+      );
+    ]
+;;
         
 (*********************)
 (* Main test routine *)
@@ -189,9 +224,10 @@ in
 let all_test = 
   "Test ocaml-gettext" >::: 
     [
-      po_test tests; 
+      po_test            tests; 
       compatibility_test tests;
-      extract_test tests;
+      extract_test       tests;
+      install_test       tests;
     ]
 in
 let _ = 
