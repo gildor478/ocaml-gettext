@@ -4,43 +4,85 @@ open GettextCompat;;
 (* Function the main global variable of gettext with/without thread *)
 
 type global_type = {
-  failsafe   : failsafe;
-  categories : category list;
-  codesets   : (textdomain * codeset) list;
-  dirs       : (textdomain * dir) list;
-  codeset    : codeset
-  language   : language;
+  t          : t option;
+  realize    : realize; 
+  t'         : t' option;
 }
 ;;
 
-let critical_section = ref ( fun x -> x () )
+(* Referenced function used to manage access to global variable, 
+*  in other word to be fullfiled with mutex locking/unlocking if 
+*  needed
+*)
+
+let global_lock = ref ( fun () -> () )
+;;
+
+let global_unlock = ref ( fun () -> () )
 ;;
 
 let global = ref {
-  failsafe   = Ignore;
-  categories = [];
-  codesets   = [];
-  dirs       = [];
-  codeset    = codeset;
-  language   = language;
+  t          = None;
+  realize    = (fun t textdomain str str_plural category -> str);
+  t'         = None;
 }
 ;;
 
-let get_global () = 
-  !critical_section ( 
+let get_global_t () = 
+  let t = 
+    global_lock ();
+    !global.t
+  in
+  global_unlock ();
+  t
+;;
+
+let set_global_t t = 
+  !critical_section (
     fun () ->
-      !global
+      global := { 
+        t       = Some t;
+        realize = !global.realize;
+        t'      = None;
+      }
   )
 ;;
 
-let set_global glb = 
+let get_global_realize () =
   !critical_section (
     fun () ->
-      global := glb
+      !global.realize
+  )
+;;
+
+let set_global_realize realize = 
+  !critical_section (
+    fun () ->
+      global := { !global with realize = realize }
   )
 ;;
 
 let get_global_t' () =
+  !critical_section (
+    fun () ->
+      match !global.t' with
+        None ->
+          (* Try to build t' out of the other value provided *)
+          let t = 
+            match !global.t with
+              Some t -> t
+            | None -> raise GettextUnitialized
+          in
+          let realize = 
+            !global.realize
+          in
+          !global := { !global with t' = Some t' };
+          t'
+      | Some t' ->
+          t'
+  )
+;;
+          
 
 (* High level functions *)
 
@@ -60,10 +102,7 @@ module Program =
   functor ( Init : Init ) ->
   functor ( Realize : realize ) ->
   struct
-    let textdomain = 
-      let (textdomain,_,_) = Init
-      in
-      textdomain
+    let textdomain = Init.textdomain
 
     let init = [  
       (
