@@ -20,7 +20,7 @@ clean:
 	-cd test                      && $(MAKE) clean
 	-cd examples                  && $(MAKE) clean
 
-distclean: 
+distclean: clean
 	-cd libgettext-ocaml          && $(MAKE) distclean
 	-cd libgettext-stub-ocaml     && $(MAKE) distclean
 	-cd libgettext-camomile-ocaml && $(MAKE) distclean
@@ -31,3 +31,4 @@ distclean:
 	-$(RM) src/.depend
 	-$(RM) test/.depend
 	-$(RM) -r autom4te.cache config.log config.cache config.status
+

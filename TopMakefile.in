@@ -84,7 +84,7 @@ opt:  $(if $(LIBRARY), install-buildlib, $(NAME).opt)
 	)
 
 $(BUILDLIB):
-	mkdir $(BUILDLIB)
+	mkdir -p $(BUILDLIB)
 
 install-buildlib: $(BUILDLIB) $(INSTALLIB)
 	-$(OCAMLFIND) remove -destdir $(BUILDLIB) $(NAME) 
