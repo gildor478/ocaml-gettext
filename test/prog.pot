@@ -1,0 +1,6 @@
+msgid "'Your command, please?', asked the waiter."
+msgstr ""
+
+#, c-format
+msgid "%s is replaced by %s."
+msgstr ""
