@@ -48,7 +48,7 @@ let po_parsing =
       )
   in
   "Po_parsing" >:::
-    List.map po_parse_one ["test1.po"]
+    List.map po_parse_one ["test1.po"; "test2.po"]
 in
 let all_test = po_parsing
 in
