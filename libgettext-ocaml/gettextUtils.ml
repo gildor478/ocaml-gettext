@@ -1,15 +1,9 @@
 open Lexing;;
+open GettextTypes;;
 
 (* For communication between gettextPo_parser / gettextPo *)
 exception InvalidIndex of string * int;;
 
-(* BUG : plus utile *)
-module SetInt = Set.Make (struct
-  type t      = int
-  let compare = compare
-end)
-;;
-  
 module MapString = Map.Make (struct
   type t      = string
   let compare = compare
@@ -42,3 +36,19 @@ let split_plural str =
   in
   split_plural_one 0
 ;;
+
+let fail_or_continue failsafe exc_printer exc cont_value =
+  match failsafe with
+    Ignore ->
+      cont_value
+  | InformStderr ->
+      (
+        prerr_string (exc_printer exc);
+        prerr_newline ();
+        cont_value
+      )
+  | RaiseException ->
+      raise exc
+;;
+
+

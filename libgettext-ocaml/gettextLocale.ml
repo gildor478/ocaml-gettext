@@ -1,5 +1,7 @@
 (** Implements different operation over locale/category *)
 
+open GettextTypes;;
+
 module type LOCALE_TYPE = 
   sig
     type locale   = string
@@ -9,7 +11,7 @@ module type LOCALE_TYPE =
     
     (** Create the locale structure.
     *)
-    val create : unit -> t
+    val create : failsafe -> t
     
     (** compare_category c1 c2 : Compare category c1 and c2.
     *)

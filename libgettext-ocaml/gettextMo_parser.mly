@@ -77,7 +77,7 @@ plural_forms:
 ;
 
 content_type:
-  STRING SEMICOLON CHARSET EQUAL STRING             { ($1,$5) }
+  STRING SEMICOLON CHARSET EQUAL STRING             { ($1,String.uppercase $5) }
 ;
 
 expr:

@@ -57,17 +57,7 @@ let string_of_exception exc =
 ;;
 
 let fail_or_continue failsafe exc cont_value =
-  match failsafe with
-    Ignore ->
-      cont_value
-  | InformStderr ->
-      (
-        prerr_string (string_of_exception exc);
-        prerr_newline ();
-        cont_value
-      )
-  | RaiseException ->
-      raise exc
+  fail_or_continue failsafe string_of_exception exc cont_value
 ;;
 
 let input_mo_header chn = 
@@ -121,7 +111,7 @@ let string_of_mo_header mo_header =
   Buffer.contents buff
 ;;
 
-let input_mo_untranslated ?(failsafe = Ignore) chn mo_header number = 
+let input_mo_untranslated failsafe chn mo_header number = 
   (* BUG : no bound check *)
   let offset_pair = 
     (Int32.to_int mo_header.offset_table_strings) + number * 8
@@ -133,7 +123,7 @@ let input_mo_untranslated ?(failsafe = Ignore) chn mo_header number =
   split_plural str
 ;;
 
-let input_mo_translated ?(failsafe = Ignore) chn mo_header number = 
+let input_mo_translated failsafe chn mo_header number = 
   (* BUG : no bound check *)
   let offset_pair = 
     (Int32.to_int mo_header.offset_table_translation) + number * 8
@@ -145,12 +135,12 @@ let input_mo_translated ?(failsafe = Ignore) chn mo_header number =
   split_plural str 
 ;;
 
-let input_mo_translation ?(failsafe = Ignore) chn mo_header number =
+let input_mo_translation failsafe chn mo_header number =
   let untranslated = 
-    input_mo_untranslated ~failsafe chn mo_header number
+    input_mo_untranslated failsafe chn mo_header number
   in
   let translated = 
-    input_mo_translated ~failsafe chn mo_header number
+    input_mo_translated failsafe chn mo_header number
   in
   match untranslated with
     [ id ] -> Singular ( id, String.concat "\000" translated )
@@ -165,7 +155,7 @@ let input_mo_translation ?(failsafe = Ignore) chn mo_header number =
       (Singular ( "", ""))
 ;;
 
-let get_translated_value ?(failsafe = Ignore) translation plural_number =
+let get_translated_value failsafe translation plural_number =
   match (translation, plural_number) with
     ((Singular (_,str)), 0) ->
       str
@@ -193,11 +183,11 @@ let germanic_plural =
   fun n -> if n = 1 then 1 else 0
 ;;
  
-let input_mo_informations ?(failsafe = Ignore) chn mo_header =
+let input_mo_informations failsafe chn mo_header =
   (* La position de "" est forcément 0 *)
   let empty_translation = 
-    get_translated_value ~failsafe 
-    (input_mo_translation ~failsafe chn mo_header 0)
+    get_translated_value failsafe 
+    (input_mo_translation failsafe chn mo_header 0)
     0
   in
   let field_value = 

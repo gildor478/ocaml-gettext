@@ -1,9 +1,25 @@
-exception GettextUninitialized;;
-
 open FileUtil;;
 open FileUtil.StrUtil;;
 open GettextMo;;
 open GettextTypes;;
+
+(** Exceptions *)
+
+exception GettextUninitialized;;
+exception GettextMoFileNotFound;;
+exception GettextNoTranslation of string;;
+
+let string_of_exception exc =
+  match exc with
+    GettextUninitialized -> 
+      "Gettext is not initialized"
+  | GettextMoFileNotFound -> 
+      "Gettext could not find the corresponding mo file"
+  | GettextNoTranslation str_id -> 
+      "Gettext could not find translation for string id \""^str_id^"\""
+  | _ ->
+      ""
+;;
 
 (** Signature of module implementing gettext functions *)
 
@@ -16,26 +32,27 @@ module type GETTEXT_TYPE =
     type codeset    = string
     type category 
     
-    (** init categories language textdomain : Initialize the library globally.
+    (** init failsafe categories language textdomain : Initialize the library globally.
         language should be a well formed ISO code one. If you don't set
         the language, a value should be guessed using environnement, falling
         back to C default if guess failed. textdomain is the default catalog used 
         to lookup string. You can define more category binding using categories.
     *)
     val init : 
-         ?categories : (category * locale) list 
+         ?failsafe : failsafe  
+      -> ?categories : (category * locale) list 
       -> ?language : locale
       -> textdomain 
       -> unit 
 
-    (** reinit categories language textdomain : Reinitialize the library 
+    (** reinit failsafe categories language textdomain : Reinitialize the library 
         globally. Argument have the same meaning as init
       *)
     val reinit : 
-           ?categories : (category * locale) list
-        -> ?language : locale
-        -> textdomain
-        -> unit
+         ?categories : (category * locale) list
+      -> ?language : locale
+      -> textdomain
+      -> unit
       
     (** close () : Close the current gettext working environnement.
     *)
@@ -156,6 +173,7 @@ module Generic : META_GETTEXT_TYPE =
       end)
 
     type t = {
+      failsafe     : failsafe;
       locale       : Locale.t;
       domain       : Domain.t;
       textdomain   : textdomain;
@@ -173,22 +191,26 @@ module Generic : META_GETTEXT_TYPE =
     let set_global_gettext gtxt = 
       global_gettext := Some gtxt
     
-    let init ?(categories = []) ?(language) textdomain =
+    let fail_or_continue failsafe exc cont_value =
+      GettextUtils.fail_or_continue failsafe string_of_exception exc cont_value
+      
+    let init ?(failsafe = Ignore) ?(categories = []) ?(language) textdomain =
       let locale =
           List.fold_left
           ( fun locales (cat,locale) -> Locale.set_locale cat locale locales ) 
-          (Locale.create ()) categories
+          (Locale.create failsafe) categories
       in
       let domain = 
         match language with 
           Some lang ->
             (* Explicit set of the language *)
-            Domain.create ~language:lang locale 
+            Domain.create ~language:lang failsafe locale 
         | None ->
             (* Try to guess the language *)
-            Domain.create locale
+            Domain.create failsafe locale
       in
       set_global_gettext {
+        failsafe     = failsafe;
         locale       = locale;
         domain       = domain;
         textdomain   = textdomain;
@@ -206,9 +228,9 @@ module Generic : META_GETTEXT_TYPE =
         let _ = 
           match language with
             Some lang ->
-              init ~language:lang ~categories:categories textdomain
+              init ~language:lang ~categories:categories ~failsafe:old_gtxt.failsafe textdomain
           | None ->
-              init ~categories:categories textdomain
+              init ~categories:categories ~failsafe:old_gtxt.failsafe textdomain
         in
         get_global_gettext ()
       in
@@ -232,16 +254,18 @@ module Generic : META_GETTEXT_TYPE =
                     close_in chn;
                     new_map
                   )
-              with GettextDomain.DomainFileDoesntExist _
+              with 
+                GettextDomain.DomainFileDoesntExist _ 
               | GettextDomain.DomainLanguageNotSet _ ->
                   (
                     close_in chn;
-                    new_map
+                    fail_or_continue old_gtxt.failsafe GettextMoFileNotFound new_map;
                   )
         in        
         MapDomainCategory.fold add_if_actual old_gtxt.translations new_gtxt.translations
       in
       set_global_gettext {
+        failsafe     = new_gtxt.failsafe;
         locale       = new_gtxt.locale;
         domain       = new_gtxt.domain;
         textdomain   = new_gtxt.textdomain;
@@ -258,6 +282,7 @@ module Generic : META_GETTEXT_TYPE =
       in
       MapDomainCategory.iter close_one gtxt.translations;
       set_global_gettext {
+        failsafe     = gtxt.failsafe;
         locale       = gtxt.locale;
         domain       = gtxt.domain;
         textdomain   = gtxt.textdomain;
@@ -268,6 +293,7 @@ module Generic : META_GETTEXT_TYPE =
       let gtxt = get_global_gettext ()
       in
       set_global_gettext {
+        failsafe     = gtxt.failsafe;
         locale       = gtxt.locale;
         domain       = gtxt.domain;
         textdomain   = textdomain;
@@ -283,6 +309,7 @@ module Generic : META_GETTEXT_TYPE =
       let gtxt = get_global_gettext ()
       in
       set_global_gettext {
+        failsafe     = gtxt.failsafe;
         locale       = gtxt.locale;
         domain       = Domain.add textdomain dir gtxt.domain;
         textdomain   = gtxt.textdomain;
@@ -294,6 +321,7 @@ module Generic : META_GETTEXT_TYPE =
       let gtxt = get_global_gettext ()
       in
       set_global_gettext {
+        failsafe     = gtxt.failsafe;
         locale       = gtxt.locale;
         domain       = gtxt.domain;
         textdomain   = gtxt.textdomain;
@@ -304,32 +332,43 @@ module Generic : META_GETTEXT_TYPE =
       let gtxt = get_global_gettext ()
       in
       (* First of all, try to find the translation type *)
+      let _ = print_endline "DEBUG 2" in
       let translation = 
         try 
+          let _ = print_endline "DEBUG 2.1" in
           MapDomainCategory.find (textdomain,category) gtxt.translations
         with Not_found ->
           try 
+            let _ = print_endline "DEBUG 2.2" in
             let new_mo_file = 
               Domain.compute_path textdomain category gtxt.domain
             in
+            let _ = print_endline "DEBUG 2.3" in
             let chn = open_in_bin new_mo_file 
             in
+            let _ = print_endline "DEBUG 2.4" in
             let mo_header = input_mo_header chn
             in
-            let mo_informations = input_mo_informations chn mo_header
+            let _ = print_endline "DEBUG 2.5" in
+            let mo_informations = input_mo_informations gtxt.failsafe chn mo_header
             in
             (* BUG : we don't check that there is a specific which could prevent
                recoding of string. *)
+            let _ = print_endline "DEBUG 2.6" in
+            let _ = print_endline ("DEBUG : encoding "^mo_informations.content_type_charset) in
             let charset = 
               Charset.create 
+              gtxt.failsafe
               mo_informations.content_type_charset
               (Locale.default_charset gtxt.locale)
             in
-            Some (new_mo_file, chn, mo_informations,Translate.create chn charset)
+            let _ = print_endline "DEBUG 2.7" in
+            Some (new_mo_file, chn, mo_informations,Translate.create gtxt.failsafe chn charset)
           with GettextDomain.DomainFileDoesntExist _ 
           | GettextDomain.DomainLanguageNotSet _ ->
-            None
+            fail_or_continue gtxt.failsafe GettextMoFileNotFound None
       in
+      let _ = print_endline "DEBUG 3" in
       (* Really translate *)
       let (result,new_translation) = 
         match (translation,str,plural_form) with
@@ -346,14 +385,18 @@ module Generic : META_GETTEXT_TYPE =
                 let (res,new_tbl) = Translate.translate str tbl
                 in
                 (
-                  get_translated_value res (info.fun_plural_forms n), 
+                  get_translated_value gtxt.failsafe res (info.fun_plural_forms n), 
                   Some(file, chn, info, new_tbl)
                 )
               with Not_found ->
-                if info.fun_plural_forms n = 0 then
-                  (str,translation)
-                else
-                  (str_plural,translation)
+                fail_or_continue gtxt.failsafe 
+                (GettextNoTranslation str)
+                (
+                  if info.fun_plural_forms n = 0 then
+                    (str,translation)
+                  else
+                    (str_plural,translation)
+                )
             )
         | (Some(file,chn,info,tbl),str,None) ->
             (
@@ -361,15 +404,19 @@ module Generic : META_GETTEXT_TYPE =
                 let (res,new_tbl) = Translate.translate str tbl
                 in
                 (
-                  get_translated_value res 0, 
+                  get_translated_value gtxt.failsafe res 0, 
                   Some(file, chn, info, new_tbl)
                 )
               with Not_found ->
+                fail_or_continue gtxt.failsafe
+                (GettextNoTranslation str)
                 (str,translation)
             )
       in
+      let _ = print_endline "DEBUG 4" in
       (* Reinject the changed entry *)
       set_global_gettext {
+          failsafe     = gtxt.failsafe;
           locale       = gtxt.locale;
           domain       = gtxt.domain;
           textdomain   = gtxt.textdomain;

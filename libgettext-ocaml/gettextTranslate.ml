@@ -15,7 +15,7 @@ module type TRANSLATE_TYPE =
         failed ( ie, if the asked elements is cached, it could not 
         failed, for example ).
     *)
-    val create : in_channel -> Charset.t -> t
+    val create : failsafe -> in_channel -> Charset.t -> t
 
     (** translate str (plural_form,number) tbl : translate the string 
         str using tbl. It is possible that the operation modify tbl, 
@@ -35,7 +35,7 @@ module Dummy : TRANSLATE_TYPE =
   struct
     type t = Charset.t
 
-    let create chn charset = charset
+    let create failsafe chn charset = charset
 
     let translate str ?plural_form charset = 
       match plural_form with
@@ -57,6 +57,7 @@ module Map : TRANSLATE_TYPE =
   functor ( Charset : GettextCharset.CHARSET_TYPE ) ->
   struct
     type t = {
+      failsafe  : failsafe;
       charset   : Charset.t;
       mo_header : mo_header_type;
       chn       : in_channel;
@@ -64,7 +65,8 @@ module Map : TRANSLATE_TYPE =
       last      : int;
     }
 
-    let create chn charset = {
+    let create failsafe chn charset = {
+      failsafe  = failsafe;
       charset   = charset;
       mo_header = input_mo_header chn;
       chn       = chn;
@@ -78,7 +80,7 @@ module Map : TRANSLATE_TYPE =
       with Not_found ->
         if mp.last < Int32.to_int mp.mo_header.number_of_strings then
           let new_translation = 
-            input_mo_translation mp.chn mp.mo_header (mp.last + 1)
+            input_mo_translation mp.failsafe mp.chn mp.mo_header (mp.last + 1)
           in
           let new_map =
             match new_translation with
@@ -96,6 +98,7 @@ module Map : TRANSLATE_TYPE =
           in
           let new_mp = 
             {
+              failsafe  = mp.failsafe;
               charset   = mp.charset;
               mo_header = mp.mo_header;
               chn       = mp.chn;

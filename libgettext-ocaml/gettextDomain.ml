@@ -4,6 +4,7 @@ open FilePath;;
 open FilePath.DefaultPath;;
 open FileUtil;;
 open FileUtil.StrUtil;;
+open GettextTypes;;
 open GettextUtils;;
 
 exception DomainFileDoesntExist of string * string;; 
@@ -21,7 +22,7 @@ module type DOMAIN_TYPE =
     (** create language locale : create a new binding for textdomain
         considering. Language is guessed from locale environnement.
     *)
-    val create : ?language : string -> Locale.t -> t
+    val create : ?language : string -> failsafe -> Locale.t -> t
 
     (** add textdomain dir t : add the binding of textdomain to dir.
     *)
@@ -48,6 +49,7 @@ module Generic : DOMAIN_TYPE =
     type category    = Locale.category
 
     type t = {
+      failsafe : failsafe;
       locale   : Locale.t;
       language : string option;
       map      : dir MapString.t;
@@ -108,13 +110,15 @@ module Generic : DOMAIN_TYPE =
       | lst ->
           lst
     
-    let create ?language locale = {
+    let create ?language failsafe locale = {
+        failsafe = failsafe;
         locale   = locale;
         language = language; 
         map      = MapString.empty;
       }
 
     let add textdomain dir domain = {
+        failsafe = domain.failsafe;
         locale   = domain.locale;
         language = domain.language;
         map      = MapString.add textdomain dir domain.map 

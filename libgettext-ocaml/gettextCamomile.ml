@@ -3,18 +3,21 @@
 *)
 
 open Camomile;;
+open GettextTypes;;
 
 module Charset : GettextCharset.CHARSET_TYPE =
   struct
     type encoding = string
     type t = {
-      in_enc  : CharEncoding.t;
-      out_enc : CharEncoding.t;
+      failsafe : failsafe;
+      in_enc   : CharEncoding.t;
+      out_enc  : CharEncoding.t;
     }
 
-    let create in_enc out_enc = {
-      in_enc  = CharEncoding.of_name in_enc;
-      out_enc = CharEncoding.of_name out_enc;
+    let create failsafe in_enc out_enc = {
+      failsafe = failsafe;
+      in_enc   = CharEncoding.of_name in_enc;
+      out_enc  = CharEncoding.of_name out_enc;
     }
 
     let recode str chrst = 
@@ -27,9 +30,9 @@ module Locale : GettextLocale.LOCALE_TYPE =
     type locale   = string
     type encoding = string
     type category = Locale.category
-    type t = unit 
+    type t = failsafe
 
-    let create () = ()
+    let create failsafe = failsafe
    
     let compare_category c1 c2 = 
       let category_value c = 
@@ -52,19 +55,20 @@ module Locale : GettextLocale.LOCALE_TYPE =
       | Locale.LC_TIME      -> "LC_TIME"
       | Locale.LC_MESSAGES  -> "LC_MESSAGES"
 
-    let set_locale cat locale () =
+    let set_locale cat locale failsafe =
       Locale.set_locale 
       cat 
       ~locale:locale 
-      ~enc:(CharEncoding.name_of CharEncoding.ascii)
+      ~enc:(CharEncoding.name_of CharEncoding.ascii);
+      failsafe
 
-    let get_locale cat () =
+    let get_locale cat failsafe =
       CharEncoding.recode_string 
       ~in_enc:CharEncoding.iso_c_locale
       ~out_enc:CharEncoding.ascii 
       (Locale.current_locale cat)
 
-    let default_charset () =
+    let default_charset failsafe =
       CharEncoding.current_encname ()
 
     let messages = Locale.LC_MESSAGES

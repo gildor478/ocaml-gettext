@@ -1,5 +1,7 @@
 (** Signature of module for charset conversion *)
 
+open GettextTypes;;
+
 module type CHARSET_TYPE = 
   sig
     type encoding = string
@@ -8,7 +10,7 @@ module type CHARSET_TYPE =
     (** create in_enc out_enc : create a new charset converter from charset 
         in_enc to out_enc.
     *)
-    val create : encoding -> encoding -> t
+    val create : failsafe -> encoding -> encoding -> t
 
     (** recode str enc : return a transcoded string according to enc.
     *)
@@ -21,7 +23,7 @@ module Dummy : CHARSET_TYPE =
     type encoding = string
     type t = ()
 
-    let create in_enc out_enc = ()
+    let create failsafe in_enc out_enc = ()
 
     let recode str () = str
   end
