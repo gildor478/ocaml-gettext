@@ -7,6 +7,9 @@ INSTALLIB  = META
 
 all:
 
+distclean::
+	-$(RM) META
+
 ##############################
 # Stub library               #
 ##############################

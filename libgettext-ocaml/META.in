@@ -1,29 +1,29 @@
-version = "0.1"
+version = "@VERSION@"
 predicates = ""
 
-# requires = "camlp4" 
-# archive(syntax,toplevel) = "pa_gettext.cma" 
-# archive(syntax,preprocessor) = "pa_gettext.cma" 
-
 package "base" (
+  version = "@VERSION@"
   requires = "fileutils"
   archive(byte) = "gettextBase.cma"
   archive(native) = "gettextBase.cmxa"
 )
 
 package "compile" (
+  version = "@VERSION@"
   requires = "gettext.base"
   archive(byte) = "gettextCompile.cma"
   archive(native) = "gettextCompile.cmxa"
 )
 
 package "extension" (
+  version = "@VERSION@"
   requires = "gettext.base"
   archive(byte) = "gettextExtension.cma"
   archive(native) = "gettextExtension.cmxa"
 )
 
 package "extract" (
+  version = "@VERSION@"
   requires = "ast-analyze"
   archive(syntax,toplevel) = "pr_gettext.cmo" 
   archive(syntax,preprocessor) = "pr_gettext.cmo"

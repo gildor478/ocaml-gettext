@@ -1,4 +1,4 @@
-version = "0.1"
+version = "@VERSION@"
 predicates = ""
 archive(byte) = "gettextStub.cma"
 archive(native) = "gettextStub.cmxa"

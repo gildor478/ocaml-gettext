@@ -1,4 +1,4 @@
-version = "0.1"
+version = "@VERSION@"
 predicates = ""
 requires = "gettext.extension camomile"
 archive(byte) = "gettextCamomile.cma"

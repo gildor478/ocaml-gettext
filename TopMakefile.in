@@ -39,7 +39,9 @@ CAMLIDL      = @CAMLIDL@
 OCAMLYACC    = @OCAMLYACC@
 OCAMLLEX     = @OCAMLLEX@
 EXE          = @EXE@
+MKCAMLP4     = @MKCAMLP4@
 CP           = cp -f
+TOUCH        = touch
 ifdef REQUIRES
 CLI_REQUIRES = -package "$(REQUIRES)"
 endif
@@ -61,13 +63,22 @@ BUILDDOC=$(BUILDDIR)/doc
 OCAMLPATH:=$(BUILDLIB)/:$(OCAMLPATH)
 export OCAMLPATH
 
-all: $(STUBSLIB) $(OCAMLBEST)
+all: $(STUBSLIB) all-$(OCAMLBEST)
+all-byte: $(if $(LIBRARY), install-buildlib-byte, install-buildprog-byte)
+all-opt:  $(if $(LIBRARY), install-buildlib-byte, install-buildprog-opt)
+
+install: all install-$(OCAMLBEST)
+install-byte: $(if $(LIBRARY), install-lib-byte, install-prog-byte)
+install-opt:  $(if $(LIBRARY), install-lib-byte, install-prog-byte)
+
+uninstall: $(if $(LIBRARY), uninstall-lib, uninstall-prog)
+
 clean:: $(if $(LIBRARY), clean-lib, clean-prog)
+
+distclean::
 
 CMX = $(patsubst dll%.so, lib%.a, $(CMO:.cmo=.cmx))
 
-byte: $(if $(LIBRARY), install-buildlib, $(NAME).byte)
-opt:  $(if $(LIBRARY), install-buildlib, $(NAME).opt)
 
 # Build the lib
 
@@ -86,11 +97,13 @@ opt:  $(if $(LIBRARY), install-buildlib, $(NAME).opt)
 $(BUILDLIB):
 	mkdir -p $(BUILDLIB)
 
-install-buildlib: $(BUILDLIB) $(INSTALLIB)
+# BUG : need a serious rewrite 
+install-buildlib-byte install-buildlib-opt: $(BUILDLIB) $(INSTALLIB)
 	-$(OCAMLFIND) remove -destdir $(BUILDLIB) $(NAME) 
 	$(OCAMLFIND)  install -ldconf ignore -destdir $(BUILDLIB) $(NAME) $(INSTALLIB)
 
-install-lib: $(INSTALLIB) 
+# BUG : need a serious rewrite 
+install-lib-byte install-lib-opt: $(INSTALLIB) 
 	$(OCAMLFIND) install -destdir $(LIBDIR) $(NAME) $(INSTALLIB)
 
 uninstall-lib:
@@ -108,17 +121,25 @@ $(BUILDBIN):
 
 BLIBS = $(addsuffix .cma,$(LIBS))
 
-$(NAME).byte: $(BUILDBIN) $(CMO)
-	$(OCAMLC) -o $(NAME).byte $(INCLUDES) -package "$(REQUIRES)" -linkpkg \
+install-buildprog-byte: $(BUILDBIN) $(CMO)
+	$(OCAMLC) -o $(NAME) $(INCLUDES) -package "$(REQUIRES)" -linkpkg \
 	-predicates "$(PREDICATES)" $(BLIBS) $(CMO)
-	$(CP) $(NAME).byte $(BUILDBIN)
+	$(CP) $(NAME) $(BUILDBIN)
+	$(TOUCH) $@
+
+install-prog-byte: install-buildprog-byte
+	$(CP) $(NAME) $(BINDIR)
 
 OLIBS = $(addsuffix .cmxa,$(LIBS))
 
-$(NAME).opt: $(BUILDBIN) $(CMX)
-	$(OCAMLOPT) -o $(NAME).opt $(INCLUDES) -package "$(REQUIRES)" -linkpkg \
+install-buildprog-opt: $(BUILDBIN) $(CMX)
+	$(OCAMLOPT) -o $(NAME) $(INCLUDES) -package "$(REQUIRES)" -linkpkg \
 	-predicates "$(PREDICATES)" $(OLIBS) $(CMX)
-	$(CP) $(NAME).opt $(BUILDBIN)
+	$(CP) $(NAME) $(BUILDBIN)
+	$(TOUCH) $@
+
+install-prog-opt: install-buildprog-opt
+	$(CP) $(NAME) $(BINDIR)
 
 clean-prog:
 	-$(RM) $(NAME).byte $(NAME).opt
@@ -127,16 +148,6 @@ clean-prog:
 	-$(if $(wildcard $(BUILDDIR)/*), ,$(RM) -r $(BUILDDIR))
 
 # Extra files
-
-VERSION=0.1
-
-META:
-	echo "requires = \""$(REQUIRES)"\"" > META
-	echo "version = \""$(VERSION)"\"" >> META
-	echo "predicates = \""$(PREDICATES)"\"" >> META
-	echo "archive(byte) = \""$(NAME).cma"\"" >> META
-	echo "archive(native) = \""$(NAME).cmxa"\"" >> META
-	
 
 .SUFFIXES: .mli .ml .cmi .cmo .cmx .mll .mly .zog .idl .h .o
 

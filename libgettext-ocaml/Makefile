@@ -9,6 +9,7 @@ all:
 
 distclean::
 	-$(RM) gettextConfig.ml
+	-$(RM) META
 
 ##############################
 # Ocaml Gettext base library #
