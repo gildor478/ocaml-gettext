@@ -8,20 +8,20 @@ open GettextTypes;;
 module Charset : GettextCharset.CHARSET_TYPE =
   struct
     type encoding = string
-    type t = {
+    type u = {
       failsafe : failsafe;
       in_enc   : CharEncoding.t;
       out_enc  : CharEncoding.t;
     }
 
-    let create failsafe in_enc out_enc = {
-      failsafe = failsafe;
+    let create t in_enc out_enc = {
+      failsafe = t.GettextTypes.failsafe;
       in_enc   = CharEncoding.of_name in_enc;
       out_enc  = CharEncoding.of_name out_enc;
     }
 
-    let recode chrst str = 
-      CharEncoding.recode_string chrst.in_enc chrst.out_enc str
+    let recode u str = 
+      CharEncoding.recode_string u.in_enc u.out_enc str
   end
 ;;
 

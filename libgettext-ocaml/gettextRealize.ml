@@ -9,10 +9,13 @@ module type REALIZE_TYPE =
   end
 ;;
 
-module Generic : REALIZE_TYPE =
+module Generic : (
+    functor ( Translate : GettextTranslate.TRANSLATE_TYPE ) ->
+    functor ( Charset : GettextCharset.CHARSET_TYPE ) ->
+    functor ( Locale : GettextLocale.LOCALE_TYPE ) ->  REALIZE_TYPE ) =
   functor ( Translate : GettextTranslate.TRANSLATE_TYPE ) ->
   functor ( Charset : GettextCharset.CHARSET_TYPE ) ->
-  functor ( Locale : GettextLocale.LOCALE_TYPE ) ->
+  functor ( Locale : GettextLocale.LOCALE_TYPE ) -> 
   struct
 
     module MapTranslate = Map.Make(struct
@@ -91,6 +94,6 @@ module Generic : REALIZE_TYPE =
             dummy_translate
             str plural_form
         )
-  end
+  end 
 ;;
       

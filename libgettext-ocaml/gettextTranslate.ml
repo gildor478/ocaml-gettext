@@ -37,7 +37,7 @@ module type TRANSLATE_TYPE =
          u
       -> string 
       -> (string * int) option
-      -> translation option 
+      -> string 
   end
 ;;
 
@@ -49,11 +49,10 @@ module Dummy : TRANSLATE_TYPE =
 
     let translate charset str plural_form = 
       match plural_form with
-        None 
-      | Some(_,0) ->
-          Some(Singular(str,charset str))
-      | Some(str_plural,_) ->
-          Some(Plural(str,str_plural,[charset str;charset str_plural]))
+        None ->
+          charset str
+      | Some(str_plural,x) ->
+          charset (get_translated_value Ignore (Plural(str,str_plural,[])) (germanic_plural x))
   end
 ;;
 
@@ -61,19 +60,27 @@ module Map : TRANSLATE_TYPE =
   struct
     
     type u = {
-      dummy     : Dummy.u;
-      map       : translation MapString.t;
-      failsafe  : failsafe;
+      dummy            : Dummy.u;
+      map              : translation MapString.t;
+      failsafe         : failsafe;
+      fun_plural_forms : int -> int;
     }
 
     let create t filename charset =
       let map = ref MapString.empty
       in
-      let () = 
+      let fun_plural_forms = 
         try 
+          (* Processing of the file *)
           let chn = open_in filename
           in
           let mo_header = input_mo_header chn
+          in
+          let fun_plural_forms = 
+            let informations = 
+              input_mo_informations t.GettextTypes.failsafe chn mo_header
+            in
+            informations.GettextTypes.fun_plural_forms
           in
           for i = 0 to Int32.to_int mo_header.number_of_strings
           do
@@ -90,22 +97,31 @@ module Map : TRANSLATE_TYPE =
                 MapString.add id 
                 (Plural (id, id_plural, List.map charset lst)) 
                 !map
-          done
+          done;
+          fun_plural_forms
         with (Sys_error _) ->
           fail_or_continue t.GettextTypes.failsafe
           string_of_exception
           (GettextTranslateCouldNotOpenFile filename)
-          ()
+          germanic_plural
       in
       {
-        dummy    = Dummy.create t filename charset;
-        map      = !map;
-        failsafe = t.GettextTypes.failsafe;
+        dummy            = Dummy.create t filename charset;
+        map              = !map;
+        failsafe         = t.GettextTypes.failsafe;
+        fun_plural_forms = fun_plural_forms;
       }
       
     let translate u str plural_form =
       try
-        Some(MapString.find str u.map)
+        let plural_number = 
+          u.fun_plural_forms (
+            match plural_form with
+              Some(_,x) -> x
+              | None -> 0
+          )
+        in
+        get_translated_value u.failsafe (MapString.find str u.map) plural_number
       with Not_found ->
         fail_or_continue u.failsafe
         string_of_exception
