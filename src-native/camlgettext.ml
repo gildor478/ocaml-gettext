@@ -1,128 +1,6 @@
-
-type endianess = ArchEndian | NotArchEndian ;;
-
-exception Bad_mo_file ;;
-
-let int32_from_byte (a0,a1,a2,a3) = 
-	Int32.add 
-	  (Int32.shift_left (Int32.of_int a0) 24) 
-	  (Int32.of_int 
-	    ( 
-	      (a1 lsl 16) + 
-	      (a2 lsl  8) +
-	      a3
-	    )
-	  )
-;;
-
-let input_int32 chn endian = 
-  let (a0,a1,a2,a3) = 
-    (
-      input_byte chn, 
-      input_byte chn, 
-      input_byte chn, 
-      input_byte chn 
-    )
-  in
-  match endian with 
-    ArchEndian ->
-      int32_from_byte (a0,a1,a2,a3)
-  | NotArchEndian ->
-      int32_from_byte (a3,a2,a1,a0)
-;;
-
-
-let input_int32_pair chn endian =  
-   let a = input_int32 endian chn
-   in
-   let b = input_int32 endian chn
-   in
-   (a, b)
-;;
-
-let input_int32_pair_table chn endian number =
-   let rec input_int32_pair_table_aux number lst = 
-     match number with 
-       0 -> lst
-     | x -> input_int32_pair_table_aux 
-       (x-1) 
-       ((input_int32_pair endian chn) :: lst)
-   in
-   input_int32_pair_table_aux number []
-;;
-	
-(*
-   From GNU Gettext documentation 
-   ( http://www.gnu.org/software/gettext/manual/html_mono/gettext.html#SEC136 ).
-
-   Format of MO file :
-
-        byte
-             +------------------------------------------+
-          0  | magic number = 0x950412de                |
-             |                                          |
-          4  | file format revision = 0                 |
-             |                                          |
-          8  | number of strings                        |  == N
-             |                                          |
-         12  | offset of table with original strings    |  == O
-             |                                          |
-         16  | offset of table with translation strings |  == T
-             |                                          |
-         20  | size of hashing table                    |  == S
-             |                                          |
-         24  | offset of hashing table                  |  == H
-             |                                          |
-             .                                          .
-             .    (possibly more entries later)         .
-             .                                          .
-             |                                          |
-          O  | length & offset 0th string  ----------------.
-      O + 8  | length & offset 1st string  ------------------.
-              ...                                    ...   | |
-O + ((N-1)*8)| length & offset (N-1)th string           |  | |
-             |                                          |  | |
-          T  | length & offset 0th translation  ---------------.
-      T + 8  | length & offset 1st translation  -----------------.
-              ...                                    ...   | | | |
-T + ((N-1)*8)| length & offset (N-1)th translation      |  | | | |
-             |                                          |  | | | |
-          H  | start hash table                         |  | | | |
-              ...                                    ...   | | | |
-  H + S * 4  | end hash table                           |  | | | |
-             |                                          |  | | | |
-             | NUL terminated 0th string  <----------------' | | |
-             |                                          |    | | |
-             | NUL terminated 1st string  <------------------' | |
-             |                                          |      | |
-              ...                                    ...       | |
-             |                                          |      | |
-             | NUL terminated 0th translation  <---------------' |
-             |                                          |        |
-             | NUL terminated 1st translation  <-----------------'
-             |                                          |
-              ...                                    ...
-             |                                          |
-             +------------------------------------------+
-
-*)
-
-type mo_header_type = {
-  endianess                : endianess;
-  file_format_revision     : int32;
-  number_of_strings        : int32;
-  offset_table_strings     : int32;
-  offset_table_translation : int32;
-  size_of_hashing_table    : int32;
-  offset_of_hashing_table  : int32;
-}
-;;
-
-type mo_translation_type = {
-  translation_from_string : (string, string) Hashtbl.t;
-}
-;;
-
+open Camlgettext_types;;
+open Camlgettext_int32;;
+ 
 let input_mo_header chn = 
   let endianess = 
     let magic_number = seek_in chn 0; input_int32 chn ArchEndian
@@ -171,10 +49,10 @@ let input_mo_translation chn mo_header =
     in
     List.map input_one_string
       (
-        input_int32_pair_table 
-	  chn 
-          mo_header.endianess 
-	  (Int32.to_int mo_header.number_of_strings) 
+        input_int32_pair_table
+        chn 
+        mo_header.endianess 
+    (Int32.to_int mo_header.number_of_strings) 
       )
    in
    let list_strings = 
@@ -185,33 +63,177 @@ let input_mo_translation chn mo_header =
      seek_in chn (Int32.to_int mo_header.offset_table_translation);
      input_strings_list ()
    in
-   let translations = Hashtbl.create (Int32.to_int mo_header.number_of_strings)
+   let translations = 
+     Hashtbl.create (Int32.to_int mo_header.number_of_strings)
    in
-   let _ = List.iter2 
-     ( fun s t -> Hashtbl.add translations s t ) 
-     list_strings list_translations
+   let empty_translation = 
+     List.iter2 ( fun s t -> Hashtbl.add translations s t ) list_strings
+     list_translations;
+     try
+       let res = Hashtbl.find translations ""
+       in
+       Hashtbl.remove translations "";
+       res
+     with Not_found ->
+       ""
    in
+   let string_of_pos lexbuf = 
+     "line "^(string_of_int lexbuf.Lexing.lex_curr_p.Lexing.pos_lnum)
+     ^" character "
+     ^(string_of_int (lexbuf.Lexing.lex_curr_p.Lexing.pos_cnum - lexbuf.Lexing.lex_curr_p.Lexing.pos_bol))
+   in
+   let field_value = 
+     let lexbuf = Lexing.from_string empty_translation
+     in
+     try
+       Camlgettext_parser.main Camlgettext_lexer.token_field_name lexbuf
+     with 
+       Parsing.Parse_error 
+     | Failure("lexing: empty token") ->
+       (
+         prerr_string "Error while processing parsing of options : ";
+         prerr_newline ();
+         prerr_string (string_of_pos lexbuf);
+         prerr_newline ();
+         prerr_string empty_translation;
+         prerr_newline ();
+         []
+       )
+   in
+   let (nplurals,fun_plural_forms) = 
+     let germanic_plural = 
+       (* The germanic default *)
+       (2,fun n -> if n = 1 then 1 else 0)
+     in
+     try 
+       let field_plural_forms = List.assoc "Plural-Forms" field_value
+       in
+       let lexbuf = Lexing.from_string field_plural_forms
+       in
+       try
+         Camlgettext_parser.plural_forms
+         Camlgettext_lexer.token_field_plural_value lexbuf 
+       with 
+         Parsing.Parse_error 
+       | Failure("lexing: empty token") ->
+         (
+           prerr_string "Error while processing parsing of plural : ";
+           prerr_newline ();
+           prerr_string (string_of_pos lexbuf);
+           prerr_newline ();
+           prerr_string field_plural_forms;
+           prerr_newline ();
+           germanic_plural
+         ) 
+     with Not_found ->
+       germanic_plural 
+   in
+   let (content_type, content_type_charset) = 
+     let gettext_content = ("text/plain", "UTF-8")
+     in
+     try 
+       let field_content_type = List.assoc "Content-Type" field_value
+       in
+       let lexbuf = Lexing.from_string field_content_type
+       in
+       try
+         Camlgettext_parser.content_type 
+         Camlgettext_lexer.token_field_content_type lexbuf
+       with      
+         Parsing.Parse_error 
+       | Failure("lexing: empty token") ->
+         (
+           prerr_string "Error while processing parsing of content-type : ";
+           prerr_newline ();
+           prerr_string (string_of_pos lexbuf);
+           prerr_newline ();
+           prerr_string field_content_type;
+           prerr_newline ();
+           gettext_content
+         )
+     with Not_found ->
+       gettext_content 
+   in
+   let extract_field_string name = 
+     try 
+       Some (List.assoc name field_value)
+     with Not_found ->
+       None
+   in
+
    {
-     translation_from_string = translations;
+     translation_from_string   = translations;
+     project_id_version        = extract_field_string "Project-Id-Version";
+     report_msgid_bugs_to      = extract_field_string "Report-Msgid-Bugs-To";
+     pot_creation_date         = extract_field_string "POT-Creation-Date"; 
+     po_revision_date          = extract_field_string "PO-Revision-Date";
+     last_translator           = extract_field_string "Last-Translator";
+     language_tream            = extract_field_string "Language-Team";
+     mime_version              = extract_field_string "MIME-Version";
+     content_type              = extract_field_string "Content-Type";
+     content_transfer_encoding = extract_field_string "Content-Transfer-Encoding";
+     plural_forms              = extract_field_string "Plural-Forms";
+     content_type_charset      = content_type_charset;
+     nplurals                  = nplurals;
+     fun_plural_forms          = fun_plural_forms;
    }
 ;;
 
-let string_of_mo_translation mo_translation = 
+let string_of_mo_translation ?(omit_translation=true) ?(compute_plurals=(0,3)) mo_translation = 
   let buff = Buffer.create 1024
   in
-  Printf.bprintf buff "Translations : \n";
-  Hashtbl.iter ( fun s t -> Printf.bprintf buff "%s -> %s\n" s t ) mo_translation.translation_from_string;
+  let p = Printf.bprintf 
+  in
+  let extract_string x = 
+    match x with
+      Some s ->
+        s
+    | None ->
+        ""
+  in
+  p buff "Translations              : \n";
+  if omit_translation then
+    p buff "omited\n"
+  else
+    Hashtbl.iter ( fun s t -> p buff "\"%s\" -> \"%s\"\n" s t ) mo_translation.translation_from_string
+  ;
+  p buff "Project-Id-Version        : %s\n" (extract_string mo_translation.project_id_version);
+  p buff "Report-Msgid-Bugs-To      : %s\n" (extract_string mo_translation.report_msgid_bugs_to);
+  p buff "POT-Creation-Date         : %s\n" (extract_string mo_translation.pot_creation_date); 
+  p buff "PO-Revision-Date          : %s\n" (extract_string mo_translation.po_revision_date);
+  p buff "Last-Translator           : %s\n" (extract_string mo_translation.last_translator);
+  p buff "Language-Team             : %s\n" (extract_string mo_translation.language_tream);
+  p buff "MIME-Version              : %s\n" (extract_string mo_translation.mime_version);
+  p buff "Content-Type              : %s\n" (extract_string mo_translation.content_type);
+  p buff "Plurals-Forms             : %s\n" (extract_string mo_translation.plural_forms);
+  p buff "Content-Transfer-Encoding : %s\n" (extract_string mo_translation.content_transfer_encoding);
+  p buff "Content-Type-Charsert     : %s\n" mo_translation.content_type_charset;
+  p buff "NPlurals                  : %d\n" mo_translation.nplurals;
+  p buff "Fun plural                : \n";
+  let (a,b) = compute_plurals
+  in
+  for i = a to b do 
+    p buff "%d -> %d\n" i (mo_translation.fun_plural_forms i);
+  done;
   Buffer.contents buff
 ;;
 
-let mo_file = open_in_bin "messages.mo"
+
+let file = ref "messages.mo"
+in
+let _ = 
+  Arg.parse [] 
+  (fun str -> file := str )
+  "Camlgettext v0.2 Sylvain Le Gall"
+in
+let mo_file = open_in_bin !file
 in
 let header = input_mo_header mo_file
 in
 let translation = input_mo_translation mo_file header
 in
-print_string (string_of_mo_header header);
+(*print_string (string_of_mo_header header);
 print_newline ();
 print_string (string_of_mo_translation translation);
-print_newline ()
+print_newline *)()
 ;;

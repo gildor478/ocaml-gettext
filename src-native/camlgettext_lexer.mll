@@ -2,29 +2,51 @@
 
 open Camlgettext_parser;;
 
-let base = Int32.of_int 256
-;;
-
-let bendian_to_int c1 c2 c3 c4 =
-	List.fold_left 
-		(fun accu x -> Int32.add (Int32.mul accu base) (Int32.of_int (Char.code x))) 
-		Int32.zero [c1;c2;c3;c4]
-;;
-	
-let lendian_to_int c1 c2 c3 c4 =
-	bendian_to_int c4 c3 c2 c1
-;;
 }
 
 rule
-token_header = parse
-  '\x95' '\x04' '\x12' '\xde'  { BENDIAN }
-| '\xde' '\x12' '\x04' '\x95'  { LENDIAN } 
+token_field_name = parse
+  "Content-Type" [' ''\t']* ':'      { CONTENT_TYPE(token_field_value lexbuf) }
+| "Plural-Forms" [' ''\t']* ':'      { PLURAL_FORMS(token_field_value lexbuf) } 
+| ([^'\n''\r''\t'' ']+ as id) [' ''\t']* ':' { FIELD_NAME(id, token_field_value lexbuf) }
+| ['\n''\r''\t'' ']                  { token_field_name lexbuf}
+| eof                                { EOF }
 and
-token_number str_to_int = parse
- (. as c1) (. as c2) (. as c3) (. as c4)  { (INT (str_to_int c1 c2 c3 c4)) }
-   
+token_field_value = parse
+  [^'\n''\r']* as str           { str }
 and
-token_string = parse
-  [^'\000']* as str            { (STRING str) }
-| '\000'                       { NUL }  
+token_field_plural_value = parse
+  "nplurals"                    { NPLURALS }
+| ';'                           { SEMICOLON }
+| "plural"                      { PLURAL }
+|  "?"                          { QUESTION_MARK }
+| ":"                           { COLON }
+| "||"                          { OR }
+| "&&"                          { AND }
+| "=="                          { EQ }
+| '='                           { EQUAL }
+| "!="                          { NEQ }
+| "<="                          { LE }
+| "<"                           { L }
+| ">="                          { GE }
+| ">"                           { G }
+| "+"                           { PLUS }
+| "-"                           { MINUS }
+| "*"                           { MUL }
+| "/"                           { DIV }
+| "%"                           { MOD }
+| "!"                           { NOT }
+| '('                           { LPAREN }
+| ')'                           { RPAREN }
+| "n"                           { ID }
+| ['0'-'9']+ as nbr             { (NUMBER (int_of_string nbr) ) }
+| eof                           { EOF }
+| [' ''\t']                     { token_field_plural_value lexbuf }
+and
+token_field_content_type = parse
+  "charset"                     { CHARSET }
+| ';'                           { SEMICOLON }
+| '='                           { EQUAL }
+| [^' ''\t'';''=']+ as str      { (STRING str) }
+| [' ''\t']                     { token_field_content_type lexbuf }
+| eof                           { EOF }
