@@ -23,35 +23,29 @@ fdcngettext   _          domain     singular   plural     _          _
 open MLast;;
 open Format;;
 open GettextTypes;;
-
-type translations = po_content 
-;;
-
-let empty_translations = { no_domain = []; domain = [] }
-;;
+open GettextPo;;
 
 let add_translation t loc singular plural domain =
+  let location =
+    let (pos1,_) = loc
+    in
+    (!Pcaml.input_file,pos1.Lexing.pos_lnum)
+  in
   let translation =
     match plural with 
-      Some plural -> Plural(singular,plural,["";""])
-    | None -> Singular(singular,"")
+      Some plural -> ([location],Plural(singular,plural,["";""]))
+    | None -> ([location],Singular(singular,""))
   in
   match domain with 
     Some domain -> 
-      (
-        match t.domain with 
-         (last_domain,lst) :: tl when last_domain = domain ->
-           { t with domain = (domain,translation :: lst) :: tl }
-        | lst ->
-           { t with domain = (domain,[translation]) :: lst }
-      )
+      add_po_translation_domain domain t translation
   | None -> 
-      { t with no_domain = translation :: t.no_domain }
+      add_po_translation_no_domain t translation
 ;;
 
 module AstGettextMatch =
   struct
-    type t = translations
+    type t = po_content
     
     let s_functions = ref [ "s_"; "f_" ]
 
@@ -158,11 +152,11 @@ let output_translations m =
     
 
 let gettext_interf lst =
-  output_translations (AstGettext.interf empty_translations lst)
+  output_translations (AstGettext.interf empty_po lst)
 ;;
 
 let gettext_implem lst = 
-  output_translations (AstGettext.implem empty_translations lst)
+  output_translations (AstGettext.implem empty_po lst)
 ;;
 
 (* Register Pcaml printer *)

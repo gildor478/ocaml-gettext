@@ -134,30 +134,19 @@ type mo_translation = {
 }
 ;;
 
-type translation = 
-  Singular of string * string
-| Plural of string * string * string list
-;;
-
-type po_content = {
-  no_domain :  translation list;
-  domain    :  (textdomain * (translation list)) list;
-}
-;;
-
 
 module MapString = Map.Make (struct
   type t      = string
-  let compare = compare
+  let compare = String.compare
 end)
 ;;
  
 module MapTextdomain = Map.Make (struct
-  type t      = string
-  let compare = compare
+  type t      = textdomain
+  let compare = String.compare
 end)
 ;;
-  
+
 module MapCategory = Map.Make (struct 
   type t      = category
   let compare a b = 
@@ -173,6 +162,23 @@ module MapCategory = Map.Make (struct
     in
     compare (val_category a) (val_category b)
 end)
+;;
+
+type location = filename * int
+;;
+
+type translation = 
+  Singular of string * string
+| Plural of string * string * string list
+;;
+
+type translations = (location list * translation) MapString.t
+;;
+
+type po_content = {
+  no_domain :  translations;
+  domain    :  translations MapTextdomain.t;
+}
 ;;
 
 (** Core types of ocaml-gettext library *)

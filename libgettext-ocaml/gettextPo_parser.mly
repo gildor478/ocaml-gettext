@@ -2,6 +2,7 @@
 
 open GettextTypes;;
 open GettextUtils;;
+open GettextPo_utils;;
 
 let check_string_format ref str =
   str
@@ -17,11 +18,13 @@ let check_plural id id_plural lst =
     | [] ->
         []
   in
-  Plural(id, (check_string_format id id_plural), (check_plural_one 0 lst))
+  (* No location, since i won't parse comments to find the previous one *)
+  ([],Plural(id, (check_string_format id id_plural), (check_plural_one 0 lst)))
 ;;
   
 let check_singular id str =
-  Singular(id, check_string_format id str)
+  (* No location, since i won't parse comments to find the previous one *)
+  ([],Singular(id, check_string_format id str))
 ;;
 
 %}
@@ -42,11 +45,11 @@ let check_singular id str =
 %%
 
 msgfmt:
-  msgfmt domain        { { $1 with domain = $2 :: $1.domain } } 
-| domain               { { no_domain = []; domain = [$1] } }
-| msgfmt message_list  { { $1 with no_domain = $2 @ $1.no_domain } }
-| message_list         { { no_domain = $1; domain = [] } }
-| EOF                  { { no_domain = []; domain = [] } }
+  msgfmt domain        { let (d,l) = $2 in List.fold_left (add_po_translation_domain d) $1 l } 
+| domain               { let (d,l) = $1 in List.fold_left (add_po_translation_domain d) empty_po l }
+| msgfmt message_list  { List.fold_left add_po_translation_no_domain $1 $2 }
+| message_list         { List.fold_left add_po_translation_no_domain empty_po $1 }
+| EOF                  { empty_po }
 ;
 
 domain:

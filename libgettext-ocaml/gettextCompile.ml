@@ -31,51 +31,6 @@ let string_of_exception exc =
     be written using module Format to the formatter ppf. The result of the
     extraction should be used as a po template file.
   *)
-type domain_key = 
-    KeyDomain of string
-  | KeyNoDomain
-;;
-
-module MapDomain = Map.Make(struct
-  type t = domain_key
-  let compare k1 k2 = 
-    match (k1,k2) with
-      KeyDomain s1, KeyDomain s2 -> compare s1 s2
-    | KeyDomain s1, KeyNoDomain -> -1
-    | KeyNoDomain, KeyDomain s2 -> 1
-    | KeyNoDomain, KeyNoDomain -> 0
-end);;
-
-let add_po map po =
-  let add_po_one key value map =
-    let old_value = 
-      try 
-        MapDomain.find key map 
-      with Not_found ->
-        []
-    in
-    MapDomain.add key (List.rev_append value old_value) map
-  in
-  let map = 
-    add_po_one KeyNoDomain po.no_domain map 
-  in
-  List.fold_left ( 
-    fun map (domain,lst) -> 
-      add_po_one (KeyDomain domain) lst map 
-    ) map po.domain
-;;
-
-let to_po map =
-  MapDomain.fold ( 
-    fun key value t -> 
-      match key with 
-        KeyNoDomain ->
-          { t with no_domain = value @ t.no_domain }
-      | KeyDomain domain ->
-          { t with domain = (domain,value) :: t.domain }
-    ) map { no_domain = []; domain = [] }
-;;
-  
 let po_of_filename filename = 
   let chn = 
     try
@@ -94,7 +49,7 @@ let extract command default_options filename_options filename_lst filename_pot =
   let make_command options filename = 
     command^" "^options^" "^filename
   in
-  let extract_one map filename =
+  let extract_one po filename =
     let options = 
       try
         MapString.find filename filename_options 
@@ -112,7 +67,7 @@ let extract command default_options filename_options filename_lst filename_pot =
     in
     match Unix.close_process_in chn with
     | Unix.WEXITED 0 ->
-        add_po map value
+        GettextPo.merge_po po value
     | Unix.WEXITED exit_code -> 
         raise (ExtractionFailed(filename,real_command,exit_code))
     | Unix.WSIGNALED signal
@@ -120,7 +75,7 @@ let extract command default_options filename_options filename_lst filename_pot =
         raise (ExtractionInterrupted(filename,real_command,signal))
   in
   let extraction = 
-    List.fold_left extract_one MapDomain.empty filename_lst
+    List.fold_left extract_one GettextPo.empty_po filename_lst
   in
   let chn = 
     open_out filename_pot
@@ -146,7 +101,7 @@ msgstr \"\"
 \"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\\n\"
 
 ";
-  GettextPo.output_po chn (to_po extraction);
+  GettextPo.output_po chn extraction;
   close_out chn
 ;;
 
@@ -155,24 +110,21 @@ let compile filename_po filename_mo =
   let po = 
     po_of_filename filename_po
   in
-  let output_domain key value =
-    let real_filename_mo =
-      match key with
-        KeyDomain str ->
-        str^"."^filename_mo
-      | KeyNoDomain ->
-        filename_mo
+  let output_one_map filename map = 
+    let lst = 
+      MapString.fold ( fun _ (_,e) lst -> e :: lst ) map []
     in
     let chn = 
-      open_out_bin real_filename_mo
+      open_out_bin filename
     in
-    GettextMo.output_mo chn value;
+    GettextMo.output_mo chn lst;
     close_out chn
   in
-  let domain_merged = 
-    add_po MapDomain.empty po
-  in
-  MapDomain.iter output_domain domain_merged
+  output_one_map filename_mo po.no_domain;
+  MapTextdomain.iter ( 
+    fun domain map -> 
+      output_one_map (domain^"."^filename_mo) map 
+    ) po.domain
 ;;
 
 let install destdir language category textdomain filename_mo_src =

@@ -30,9 +30,9 @@ all: ocaml-xgettext
 ocaml-xgettext:
 	$(MKCAMLP4)                                                                         \
            -I +camlp4 pa_o.cmo                                                              \
-          `$(OCAMLFIND) query -r -predicates preprocessor,syntax gettext.extract -i-format` \
-          `$(OCAMLFIND) query -r -predicates preprocessor,syntax gettext.extract -a-format` \
-          `$(OCAMLFIND) query -r -predicates preprocessor,syntax gettext.extract -o-format` \
+          `$(OCAMLFIND) query -r -predicates byte gettext.extract -i-format` \
+          `$(OCAMLFIND) query -r -predicates byte gettext.extract -a-format` \
+          `$(OCAMLFIND) query -r -predicates byte gettext.extract -o-format` \
           -o $@
 	$(CP) $@ $(BUILDBIN)
 

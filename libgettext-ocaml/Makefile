@@ -75,6 +75,7 @@ CMO_EXTENSION=         \
  gettextCharset.cmo    \
  gettextTranslate.cmo  \
  gettextRealize.cmo    \
+ gettextPo_utils.cmo   \
  gettextPo_parser.cmo  \
  gettextPo_lexer.cmo   \
  gettextPo.cmo         \
