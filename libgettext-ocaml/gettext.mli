@@ -14,7 +14,13 @@
 val string_of_exception : exn -> string
 ;;
 
-(** High level functions *)
+(** High level interfaces *)
+
+(** Value of the dependencies for the initialization of the library 
+    Gettext ( for translating exception and help message 
+*)
+val init : GettextTypes.dependencies
+;;
 
 (** Module to handle typical library requirement *)
 module Library :

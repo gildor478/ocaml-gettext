@@ -1,5 +1,9 @@
 open GettextTypes;;
 
+let string_of_list lst = 
+    "[ "^(String.concat "; " (List.map (fun str -> Printf.sprintf "%S" str) lst))^" ]"
+;;
+
 let split_plural str =
   let rec split_plural_one start =
     let next_sep = 

@@ -1,5 +1,7 @@
 open GettextTypes;;
 open GettextCompat;;
+open GettextUtils;;
+open GettextModules;;
 open Lexing;;
 
 (* Function the main global variable of gettext with/without thread *)
@@ -54,27 +56,22 @@ let set_global_t t =
   let () = 
     !global_lock ();
     global := { 
+      !global with
       t       = Some t;
-      realize = !global.realize;
       t'      = None;
     }
   in
   !global_unlock ()
 ;;
 
-let get_global_realize () =
-  let t = 
-    !global_lock ();
-    !global.realize
-  in
-  !global_unlock ();
-  t
-;;
-
 let set_global_realize realize = 
   let () = 
     !global_lock (); 
-    global := { !global with realize = realize }
+    global := { 
+      !global with 
+      realize = realize; 
+      t' = None 
+    }
   in
   !global_unlock ()
 ;;
@@ -84,7 +81,7 @@ let get_global_t' () =
     !global_lock ();
     match !global.t' with
       None ->
-        (* Try to build t' out of the other value provided *)
+        (* Try to build it out of the other value provided *)
         let t = 
           match !global.t with
             Some t -> t
@@ -93,7 +90,10 @@ let get_global_t' () =
         let t' = 
           !global.realize t
         in
-        global := { !global with t' = Some t' };
+        global := { 
+          !global with 
+          t' = Some t' 
+        };
         t'
     | Some t' ->
         t'
@@ -127,6 +127,11 @@ module GettextGettext = Library(struct
   end)
 ;;
 
+(* Initialization of gettext library *)
+
+let init = GettextGettext.init
+;;
+
 (* Exception *)
 
 let string_of_exception exc = 
@@ -140,9 +145,6 @@ let string_of_exception exc =
   in
   let spf x = 
     Printf.sprintf x
-  in
-  let string_of_list lst = 
-    "[ "^(String.concat "; " (List.map (fun str -> spf "%S" str) lst))^" ]"
   in
   let string_of_pos lexbuf = 
     let char_pos = lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol
@@ -236,6 +238,8 @@ module Program =
   struct
     let textdomain = Init.textdomain
 
+    let dependencies = (Init.textdomain, Init.codeset, Init.dir) :: Init.dependencies
+    
     let init = 
       (* Initialization from all the known textdomain/codeset/dir provided 
          by library linked with the program *)
@@ -251,7 +255,18 @@ module Program =
         Printf.sprintf x
       in
       let () = 
-        set_global_t (create textdomain)
+        set_global_t (GettextModules.create textdomain)
+      in
+      let () = 
+        set_global_t (
+          List.fold_left ( 
+            fun t (textdomain,codeset_opt,dir_opt) ->
+              upgrade_textdomain t textdomain (codeset_opt,dir_opt)
+          ) (get_global_t ()) dependencies
+        )
+      in
+      let () = 
+        set_global_realize (Init.realize) 
       in      
       [  
           (
@@ -283,11 +298,14 @@ module Program =
             ( fun () -> set_global_realize dummy_realize 
             )
           ),
-          (s_ "Disable the translation perform by gettext")
+          (s_ "Disable the translation perform by gettext. Default: enable")
         );
         (
           "--gettext-domain-dir",
-          ( Arg.Tuple 
+          ( 
+	    let current_textdomain = ref textdomain 
+	    in
+	    Arg.Tuple 
             [
               Arg.String ( fun textdomain -> current_textdomain := textdomain );
               Arg.String ( fun dir -> 
@@ -296,8 +314,17 @@ module Program =
               );
             ]
           ),
-          "Set a dir to search gettext files for the specified domain. Default: "
-          ...
+          spf (f_ "Set a dir to search gettext files for the specified domain. Default: %s")
+          (
+            string_of_list 
+            (
+              MapTextdomain.fold ( fun textdomain (_,dir_opt) lst -> 
+                match dir_opt with
+                  Some dir -> (spf ("%s: %s") textdomain dir) :: lst
+                | None -> lst
+              ) (get_global_t ()).textdomains []
+            )
+          )
         );
         (
           "--gettext-dir",
@@ -308,7 +335,8 @@ module Program =
               }
             )
           ),
-          "Add a search dir for gettext files"
+          spf (f_ "Add a search dir for gettext files. Default: %s") 
+          (string_of_list (get_global_t ()).path)
         );
         (
           "--gettext-language",
@@ -316,7 +344,13 @@ module Program =
             ( fun s -> set_global_t { (get_global_t ()) with language = Some s }
             )
           ),
-          "Set the default language for gettext"
+          spf (f_ "Set the default language for gettext. Default: %s")
+          (
+            ( function 
+                Some s -> s
+              | None -> "(none)"
+            ) (get_global_t ()).language
+          )
         );
         (
           "--gettext-codeset",
@@ -324,7 +358,8 @@ module Program =
             ( fun s -> set_global_t { (get_global_t ()) with codeset = s }
             )
           ),
-          "Set the default codeset for outputting string with gettext"
+          spf (f_ "Set the default codeset for outputting string with gettext. Default: %s")
+          (get_global_t ()).codeset
         );
       ], GettextConfig.copyright
       

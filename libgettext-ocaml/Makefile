@@ -26,10 +26,10 @@ INSTALLIB +=              \
 CMO_BASE  =               \
  gettextConfig.cmo        \
  gettextTypes.cmo         \
+ gettextUtils.cmo         \
  gettextModules.cmo       \
  gettextCompat.cmo        \
  gettext.cmo              \
- gettextUtils.cmo         \
  gettextFormat_parser.cmo \
  gettextFormat_lexer.cmo  \
  gettextFormat.cmo        \

@@ -1,5 +1,4 @@
 v 0.2.0 : 
-- Add gettextGettext : i18n/l10n for ocaml-gettext ( if it can bootstrap easily )
 - Complete ocaml-gettext executable
 - Benchmark GettextCamomile/GettextStub 
 - Remove \t in all the code, find a the good settings to work with vim and use a tags in each file to made it clear
