@@ -1,5 +1,7 @@
 (** Signature of module for translation storage / access *)
 
+open GettextTypes;;
+
 module type TRANSLATE_TYPE =
   functor ( Charset : GettextCharset.CHARSET_TYPE ) ->
   sig
@@ -22,7 +24,7 @@ module type TRANSLATE_TYPE =
          string 
       -> ?plural_form: (string * int)
       -> t 
-      -> string * t
+      -> translated_type * t
   end
 ;;
 
@@ -37,8 +39,14 @@ module Dummy : TRANSLATE_TYPE =
       match plural_form with
         None 
       | Some(_,0) ->
-          ( Charset.recode str charset, charset )
+          ( Singular(str,Charset.recode str charset), charset )
       | Some(str_plural,_) ->
-          ( Charset.recode str_plural charset, charset)
+          ( Plural
+            (
+              str,str_plural,
+              [Charset.recode str charset ; Charset.recode str_plural charset]
+            ), 
+            charset
+          )
   end
 ;;

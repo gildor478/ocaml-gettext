@@ -28,6 +28,15 @@ module type GETTEXT_TYPE =
       -> textdomain 
       -> unit 
 
+    (** reinit categories language textdomain : Reinitialize the library 
+        globally. Argument have the same meaning as init
+      *)
+    val reinit : 
+           ?categories : (category * locale) list
+        -> ?language : locale
+        -> textdomain
+        -> unit
+      
     (** close () : Close the current gettext working environnement.
     *)
     val close : unit -> unit
@@ -54,32 +63,56 @@ module type GETTEXT_TYPE =
     (** gettext str : Translate the string str.
     *)
     val gettext : string -> string
+    
+    (** fgettext str : gettext returning format.
+    *)
+    val fgettext : string -> ('a, 'b, 'c, 'a) format4
 
     (** dgettext textdomain str : Translate the string str for the specified domain.
     *)
     val dgettext : textdomain -> string -> string
 
+    (** fdgettext textdomain str : dgettext returning fformat.
+    *)
+    val fdgettext : textdomain -> string -> ('a, 'b, 'c, 'a) format4
+    
     (** dcgettext textdomain str category : Translate the string str for the specified
         domain and category.
     *)
     val dcgettext : textdomain -> string -> category -> string
 
+    (** fdcgettext textdomain str category : dcgettext returning fformat.
+    *)
+    val fdcgettext : textdomain -> string -> category -> ('a, 'b, 'c, 'a) format4
+    
     (** ngettext str str_plural n : Translate the string str using a plural form.
         str_plural is the default english plural. n is the relevant number for plural
         ( ie the number of objects deals with the string ).
     *)
     val ngettext : string -> string -> int -> string
 
+    (** fngettext str str_plural n : ngettext returning fformat.
+    *)
+    val fngettext : string -> string -> int -> ('a, 'b, 'c, 'a) format4
+    
     (** dngettext textdomain str str_plural n : Translate the string str using a plural
         form for the specified domain.
     *)
     val dngettext : textdomain -> string -> string -> int -> string
 
+    (** fdngettext textdomain str str_plural n : dngettext returning fformat.
+    *)
+    val fdngettext : textdomain -> string -> string -> int -> ('a, 'b, 'c, 'a) format4
+    
     (** dcngettext textdomain str str_plural n category : Translate the string str
         using a plural form for the specified domain and category.
     *)
     val dcngettext : textdomain -> string -> string -> int -> category -> string 
 
+    (** fdcngettext textdomain str str_plural n category : dcngettext returning
+        fformat.
+    *)
+    val fdcngettext : textdomain -> string -> string -> int -> category -> ('a, 'b, 'c, 'a) format4
   end
 ;;
 
@@ -110,7 +143,7 @@ module Generic : META_GETTEXT_TYPE =
     type category   = Locale.category
     
     (* Hide type *)
-    type translation = (in_channel * Translate.t) option
+    type translation = (string * in_channel * mo_translation_type * Translate.t) option
     
     module MapDomainCategory = Map.Make(
       struct
@@ -160,14 +193,67 @@ module Generic : META_GETTEXT_TYPE =
         domain       = domain;
         textdomain   = textdomain;
         translations = MapDomainCategory.empty;
-      }      
+      }
+
+    let reinit ?(categories = []) ?(language) textdomain =
+      (* BUG : the reinit could imply that the output charset
+         has also changed, it should be checked ! ( for example
+         before, the output charset was UTF-8 now it has switch
+         to UTF-16... We should recode translations. *)
+      let old_gtxt = get_global_gettext ()
+      in
+      let new_gtxt = 
+        let _ = 
+          match language with
+            Some lang ->
+              init ~language:lang ~categories:categories textdomain
+          | None ->
+              init ~categories:categories textdomain
+        in
+        get_global_gettext ()
+      in
+      let still_actual_files = 
+        let add_if_actual (textdomain,category) value new_map = 
+          match value with
+            None ->
+              new_map
+          | Some (old_file,chn,mo_informations,translate) ->
+              try
+                let new_file = 
+                  Domain.compute_path textdomain category new_gtxt.domain
+                in
+                let already_there = 
+                  MapDomainCategory.mem (textdomain,category) new_map 
+                in
+                if new_file = old_file && not already_there then
+                  MapDomainCategory.add (textdomain,category) value new_map
+                else
+                  (
+                    close_in chn;
+                    new_map
+                  )
+              with GettextDomain.DomainFileDoesntExist _
+              | GettextDomain.DomainLanguageNotSet _ ->
+                  (
+                    close_in chn;
+                    new_map
+                  )
+        in        
+        MapDomainCategory.fold add_if_actual old_gtxt.translations new_gtxt.translations
+      in
+      set_global_gettext {
+        locale       = new_gtxt.locale;
+        domain       = new_gtxt.domain;
+        textdomain   = new_gtxt.textdomain;
+        translations = still_actual_files;
+      }
 
     let close () = 
       let gtxt = get_global_gettext ()
       in
       let close_one k v = 
         match v with
-          Some(chn,_) -> close_in chn
+          Some(_,chn,_,_) -> close_in chn
         | None        -> ()
       in
       MapDomainCategory.iter close_one gtxt.translations;
@@ -222,45 +308,65 @@ module Generic : META_GETTEXT_TYPE =
         try 
           MapDomainCategory.find (textdomain,category) gtxt.translations
         with Not_found ->
-          let new_translation = 
+          try 
             let new_mo_file = 
               Domain.compute_path textdomain category gtxt.domain
             in
-            if test (And(Exists,Is_readable)) new_mo_file then
-              let chn = open_in_bin new_mo_file 
-              in
-              let mo_header = input_mo_header chn
-              in
-              let mo_informations = input_mo_informations chn mo_header
-              in
-              (* BUG : we don't check that there is a specific which could prevent
-                 recoding of string. *)
-              let charset = 
-                Charset.create 
-                mo_informations.content_type_charset
-                (Locale.default_charset gtxt.locale)
-              in
-              Some (chn, Translate.create chn charset)
-            else
-              None
-          in
-          new_translation
+            let chn = open_in_bin new_mo_file 
+            in
+            let mo_header = input_mo_header chn
+            in
+            let mo_informations = input_mo_informations chn mo_header
+            in
+            (* BUG : we don't check that there is a specific which could prevent
+               recoding of string. *)
+            let charset = 
+              Charset.create 
+              mo_informations.content_type_charset
+              (Locale.default_charset gtxt.locale)
+            in
+            Some (new_mo_file, chn, mo_informations,Translate.create chn charset)
+          with GettextDomain.DomainFileDoesntExist _ 
+          | GettextDomain.DomainLanguageNotSet _ ->
+            None
       in
       (* Really translate *)
       let (result,new_translation) = 
         match (translation,str,plural_form) with
-          (None,res,None)     
-        | (None,res,Some(_,0)) 
-        | (None,_,Some(res,_)) -> 
+          (None,res,None) ->
             (res,None)
-        | (Some(chn,tbl),str,None) -> 
-            let (res,new_tbl) = Translate.translate str tbl
-            in
-            (res, Some(chn,new_tbl))
-        | (Some(chn,tbl),str,Some(str_plural,n)) -> 
-            let (res,new_tbl) = Translate.translate str ~plural_form:(str_plural,n) tbl
-            in
-            (res, Some(chn,new_tbl))
+        | (None,str,Some(str_plural,n)) ->
+            if germanic_plural n = 0 then 
+              (str,None)
+            else 
+              (str_plural,None)
+        | (Some(file,chn,info,tbl),str,Some(str_plural,n)) -> 
+            (
+              try
+                let (res,new_tbl) = Translate.translate str tbl
+                in
+                (
+                  get_translated_value res (info.fun_plural_forms n), 
+                  Some(file, chn, info, new_tbl)
+                )
+              with Not_found ->
+                if info.fun_plural_forms n = 0 then
+                  (str,translation)
+                else
+                  (str_plural,translation)
+            )
+        | (Some(file,chn,info,tbl),str,None) ->
+            (
+              try
+                let (res,new_tbl) = Translate.translate str tbl
+                in
+                (
+                  get_translated_value res 0, 
+                  Some(file, chn, info, new_tbl)
+                )
+              with Not_found ->
+                (str,translation)
+            )
       in
       (* Reinject the changed entry *)
       set_global_gettext {
@@ -269,25 +375,42 @@ module Generic : META_GETTEXT_TYPE =
           textdomain   = gtxt.textdomain;
           translations = MapDomainCategory.add (textdomain,category) new_translation gtxt.translations;
       };
-      result
+      result 
           
     let gettext str =
       translate (get_textdomain ()) str Locale.messages
 
+    let fgettext (str : string) =
+      format_of_string "" (*(gettext str)*)
+      
     let dgettext domain str =
       translate domain str Locale.messages
 
+    let fdgettext domain str =
+      format_of_string "" (*(dgettext domain str)*)
+      
     let dcgettext domain str category = 
       translate domain str category
 
+    let fdcgettext domain str category =
+      format_of_string "" (*(dcgettext domain str category)*)
+      
     let ngettext str str_plural n =
       translate (get_textdomain ()) str ~plural_form:(str_plural,n) Locale.messages
 
+    let fngettext str str_plural n =
+      format_of_string "" (*(ngettext str str_plural n)*)
+      
     let dngettext domain str str_plural n =
       translate domain str ~plural_form:(str_plural,n) Locale.messages
 
+    let fdngettext domain str str_plural n =
+      format_of_string ""(*(dngettext domain str str_plural n)*)
+      
     let dcngettext domain str str_plural n category = 
       translate domain str ~plural_form:(str_plural,n) category
       
+    let fdcngettext domain str str_plural n category =
+      format_of_string ""(*(dcngettext domain str str_plural n category)*)
   end
 ;;

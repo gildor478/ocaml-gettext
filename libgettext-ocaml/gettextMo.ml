@@ -172,6 +172,11 @@ let get_translated_value ?(failsafe = Ignore) translation plural_number =
       failsafe
       (InvalidTranslationSingular(str,x))
       str
+  | ((Plural (str,str_plural,[])),x) ->
+      if x = 0 then
+        str
+      else
+        str_plural
   | ((Plural (_,_,lst)), x) when x < List.length lst ->
       List.nth lst x 
   | ((Plural (_,_,lst)), x) ->
@@ -181,6 +186,11 @@ let get_translated_value ?(failsafe = Ignore) translation plural_number =
       List.nth lst 0
 ;;
 
+let germanic_plural = 
+  (* The germanic default *)
+  fun n -> if n = 1 then 1 else 0
+;;
+ 
 let input_mo_informations ?(failsafe = Ignore) chn mo_header =
   (* La position de "" est forcément 0 *)
   let empty_translation = 
@@ -202,10 +212,6 @@ let input_mo_informations ?(failsafe = Ignore) chn mo_header =
         []
   in
   let (nplurals,fun_plural_forms) = 
-    let germanic_plural = 
-      (* The germanic default *)
-      (2,fun n -> if n = 1 then 1 else 0)
-    in
     try 
       let field_plural_forms = List.assoc "Plural-Forms" field_value
       in
@@ -220,9 +226,9 @@ let input_mo_informations ?(failsafe = Ignore) chn mo_header =
           fail_or_continue 
           failsafe 
           (InvalidPlurals(lexbuf,field_plural_forms))
-          germanic_plural
+          (2,germanic_plural)
     with Not_found ->
-      germanic_plural 
+      (2,germanic_plural)
   in
   let (content_type, content_type_charset) = 
     let gettext_content = ("text/plain", "UTF-8")

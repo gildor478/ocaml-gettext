@@ -6,6 +6,9 @@ open FileUtil;;
 open FileUtil.StrUtil;;
 open GettextUtils;;
 
+exception DomainFileDoesntExist of string * string;; 
+exception DomainLanguageNotSet of string;;
+
 module type DOMAIN_TYPE = 
   functor ( Locale : GettextLocale.LOCALE_TYPE ) ->
   sig
@@ -28,10 +31,10 @@ module type DOMAIN_TYPE =
         mo file corresponding to textdomain and category. Language is 
         guessed from category binding. If the textdomain is not found,
         it tries to use the build default to find the file. The file 
-        returned exists and is readable. If the file is not readable, 
-        an exception GettextDomainFileUnreadable is thrown, if file 
-        doesn't exists an exception GettextDomainFileDoesntExist is 
-        thrown.
+        returned exists and is readable. If such a file doesn't exists 
+        an exception DomainFileDoesntExist is thrown. If the function is 
+        unable to guess the current language an exception 
+        DomainLanguageNotSet is thrown.
     *)
     val compute_path : textdomain -> category -> t -> dir
   end
@@ -50,6 +53,8 @@ module Generic : DOMAIN_TYPE =
       map      : dir MapString.t;
     }
 
+    open Locale
+
     let guess_language domain category = 
       (* http://www.gnu.org/software/gettext/manual/html_mono/gettext.html#SEC155
        * In the function dcgettext at every call the current setting of the 
@@ -64,8 +69,20 @@ module Generic : DOMAIN_TYPE =
           Some str ->
             str
         | None ->
-            Locale.get_locale Locale.messages domain.locale
-
+            try
+              Sys.getenv "LANGUAGE" 
+            with Not_found ->
+              try
+                get_locale all domain.locale
+              with Not_found ->
+                try 
+                  get_locale category domain.locale
+                with Not_found ->
+                  try
+                    Sys.getenv "LANG"
+                  with Not_found ->
+                    raise 
+                    (DomainLanguageNotSet(string_of_category category))
     
     let create ?language locale = {
         locale   = locale;
@@ -91,7 +108,7 @@ module Generic : DOMAIN_TYPE =
       let end_path = 
         make_filename [ 
           guess_language domain category; 
-          Locale.string_of_category category ; 
+          string_of_category category ; 
           (* BUG : should use add_extension *)
           textdomain ^ ".mo" 
         ]
@@ -99,8 +116,11 @@ module Generic : DOMAIN_TYPE =
       let compute_simple_path dir = 
         concat dir end_path
       in
-      List.find (test (And(Exists,Is_readable)))
-      (List.map compute_simple_path search_path)
+      try
+        List.find (test (And(Exists,Is_readable)))
+        (List.map compute_simple_path search_path)
+      with Not_found ->
+        raise (DomainFileDoesntExist(textdomain,string_of_category category))
           
   end
 ;;
