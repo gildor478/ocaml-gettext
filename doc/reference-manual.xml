@@ -1,28 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
-"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
-<!-- Source code -->
-<!--
-<!ENTITY po-makefile 'Not included' >
-<!ENTITY LINGUAS     'Not included' >
-<!ENTITY POTFILES    'Not included' >
-<!ENTITY makefile    'Not included' >
-<!ENTITY library-ml  'Not included' >
-<!ENTITY program-ml  'Not included' >
--->
+"/usr/share/xml/schema/dtd/4.3/docbookx.dtd" [
+<!--"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd"-->
 
-<!ENTITY po-makefile         '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
-<!ENTITY LINGUAS             '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
-<!ENTITY POTFILES            '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
-<!ENTITY makefile            '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
-<!ENTITY library-ml          '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
-<!ENTITY library-gettext-ml  '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
-<!ENTITY program-ml          '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
-<!ENTITY program-gettext-ml  '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
-<!ENTITY program-xml         '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
-<!ENTITY gui-glade           '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
-<!ENTITY gui-ml              '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
-<!ENTITY makefile-gui        '<xi:include href="XXX" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude"/>' >
+<!-- Source code -->
+<!ENTITY expl                          '../examples'>
+<!ENTITY xi                            'http://www.w3.org/2001/XInclude'>
+<!ENTITY fbk                           '<xi:fallback xmlns:xi="&xi;">TODO</xi:fallback>'> 
+<!ENTITY po-makefile                   '<xi:include href="&expl;/po/Makefile"                parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
+<!ENTITY LINGUAS                       '<xi:include href="&expl;/po/LINGUAS"                 parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
+<!ENTITY POTFILES                      '<xi:include href="&expl;/po/POTFILES"                parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
+<!ENTITY makefile                      '<xi:include href="&expl;/Makefile"                   parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
+<!ENTITY library-ml                    '<xi:include href="&expl;/library/library.ml"         parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
+<!ENTITY library-gettext-ml            '<xi:include href="&expl;/library/libraryGettext.ml"  parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
+<!ENTITY program-ml                    '<xi:include href="&expl;/program/program.ml"         parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
+<!ENTITY program-gettext-ml            '<xi:include href="&expl;/program/programGettext.ml"  parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
+<!ENTITY program-xml                   '<xi:include href="&expl;/doc/program.xml"            parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
+<!ENTITY gui-glade                     '<xi:include href="&expl;/gui/gui.glade"              parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
+<!ENTITY gui-ml                        '<xi:include href="&expl;/gui/gui.ml"                 parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
+<!ENTITY makefile-gui                  '<xi:include href="&expl;/gui/Makefile"               parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
+<!ENTITY ocaml-gettext-manual          '<xi:include href="ocaml-gettext.xml"         xmlns:xi="&xi;"/>' >
+<!ENTITY ocaml-xgettext-manual         '<xi:include href="ocaml-xgettext.xml"        xmlns:xi="&xi;"/>' >
+<!ENTITY ocaml-gettext-options-manual  '<xi:include href="ocaml-gettext-options.xml" xmlns:xi="&xi;"/>' >
 
 <!-- Links -->
 <!ENTITY download-ocaml             'http://caml.inria.fr/ocaml/release.en.html'>
@@ -568,15 +567,17 @@
           <listitem>
             <para>
               <varname>fn_</varname> : for translating plural strings which will be used with <varname>Printf</varname>
-              function<footnoteref linked="printf-strings"/>,
+              function<footnoteref linkend="printf-strings"/>,
             </para>
           </listitem>
         </itemizedlist>
       </para>
       <warning>
-        You must keep the function name <varname>s_</varname>, <varname>f_</varname>, <varname>sn_</varname> and <varname>fn_</varname>.
-        The extraction of translatable strings are based on these names. If you don't keep it, the extraction of translatable strings
-        will fail.
+        <para>
+          You must keep the function name <varname>s_</varname>, <varname>f_</varname>, <varname>sn_</varname> and <varname>fn_</varname>.
+          The extraction of translatable strings are based on these names. If you don't keep it, the extraction of translatable strings
+          will fail.
+        </para>
       </warning>
       <example>
         <title><filename>library.ml</filename></title>
@@ -601,9 +602,11 @@
         is localized ).
       </para>
       <warning>
-        If you distribute your library, don't forget to mention that ocaml-gettext will only be able to translate
-        the string defined in your library, if and only if the MO file provided is also installed. If not installed
-        ocaml-gettext is useless.
+        <para>
+          If you distribute your library, don't forget to mention that ocaml-gettext will only be able to translate
+          the string defined in your library, if and only if the MO file provided is also installed. If not installed
+          ocaml-gettext is useless.
+        </para>
       </warning>
     </section>
     <section>
@@ -1054,7 +1057,7 @@
   <appendix>
     <title>Manpages</title>
     <refentry>
-      &ocaml-gettext-manual;
+      &ocaml-xgettext-manual;
     </refentry>
     <refentry>
       &ocaml-xgettext-manual;

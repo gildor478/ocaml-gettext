@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
-"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+"/usr/share/xml/schema/dtd/4.3/docbookx.dtd" [
+<!--"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd"-->
 ]>
 <refentry>
   <refmeta>
@@ -39,6 +40,11 @@
   <refsect1>
     <title>SEE ALSO</title>
 
-    <para><command>ocaml-gettext</command> <manvolnum>1</manvolnum></para>
+    <para>
+      <citerefentry>
+        <refentrytitle><command>ocaml-gettext</command></refentrytitle>
+        <manvolnum>1</manvolnum>
+      </citerefentry>
+    </para>
   </refsect1>
 </refentry>

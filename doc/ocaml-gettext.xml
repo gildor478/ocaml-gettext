@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
-"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+"/usr/share/xml/schema/dtd/4.3/docbookx.dtd" [
+<!--"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd"-->
 ]>
 <refentry>
   <refmeta>
@@ -90,7 +91,7 @@
             <itemizedlist>
               <listitem>
                 <para>
-                  <arg choice="plain">extract</arg> : all the file are considered to be OCaml source file and translatable strings
+                  <option>extract</option> : all the file are considered to be OCaml source file and translatable strings
                   are searched inside. The output of the command is a POT file. As a special case, if a file named 
                   <filename>POTFILES</filename> is in the list of the file to search, the file is not searched but all
                   the lines of this files are considered to be filename of file to search.
@@ -98,24 +99,26 @@
               </listitem>
               <listitem>
                 <para>
-                  <arg choice="plain">compile</arg> : all the file listed are considered to be PO file. The file are compiled in binary
+                  <option>compile</option> : all the file listed are considered to be PO file. The file are compiled in binary
                   MO file,
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <arg choice="plain">install</arg> : all the file listed are considered to be MO file. They are installed in their
+                  <option>install</option> : all the file listed are considered to be MO file. They are installed in their
                   respective directory considering language, textdomain and category,
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <arg choice="plain">uninstall</arg> : symetric command to install, but it uninstall the file found for the considered
+                  <option>uninstall</option> : symetric command to install, but it uninstall the file found for the considered
                   language, textdomain, category and filenames,
                 </para>
               </listitem>
               <listitem>
-                <arg choice="plain">merge</arg> : merge a POT file with a PO file.
+                <para>
+                  <option>merge</option> : merge a POT file with a PO file.
+                </para>
               </listitem>
             </itemizedlist>
           </para>
@@ -386,8 +389,8 @@
   <refsect1>
     <title>NOTES</title>
     <para>
-      The options <arg choice="plain">--uninstall-language</arg>, <arg choice="plain">--uninstall-textdomain</arg>,
-      <arg choice="plain">--install-language</arg> and <arg choice="plain">--install-textdomain</arg> could be 
+      The options <option>--uninstall-language</option>, <option>--uninstall-textdomain</option>,
+      <option>--install-language</option> and <option>--install-textdomain</option> could be 
       guessed from the filename provided. You must be aware that this option can conflict with the fact that you 
       provide several files to install. For example, if you provide a textdomain, you should either install several 
       MO file which filenames only reflect the language or only one MO file if you also provide a language. For
@@ -414,7 +417,17 @@
   <refsect1>
     <title>SEE ALSO</title>
   
-    <para><command>ocaml-xgettext</command> <manvolnum>1</manvolnum></para>
-    <para>ocaml-gettext-options <manvolnum>5</manvolnum></para>
+    <para>
+      <citerefentry>
+        <refentrytitle><command>ocaml-xgettext</command></refentrytitle>
+        <manvolnum>1</manvolnum>
+      </citerefentry>
+    </para>
+    <para>
+      <citerefentry>
+        <refentrytitle>ocaml-gettext-options</refentrytitle>
+        <manvolnum>5</manvolnum>
+      </citerefentry>
+    </para>
   </refsect1>
 </refentry>
