@@ -58,12 +58,13 @@ INSTALLIB +=           \
  gettextCompile.cma    \
  gettextCompile.cmxa   \
  gettextCompile.a      \
- gettextPo.cmi         
+ gettextCompile.cmi         
 
 CMO_COMPILE =          \
  gettextPo_parser.cmo  \
  gettextPo_lexer.cmo   \
- gettextPo.cmo
+ gettextPo.cmo         \
+ gettextCompile.cmo
 
 gettextPo_parser.cmo: gettextPo_parser.cmi
 gettextPo_parser.cmx: gettextPo_parser.cmi

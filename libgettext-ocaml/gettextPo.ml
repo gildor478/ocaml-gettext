@@ -24,34 +24,6 @@ let string_of_exception exc =
       raise exc
 ;;
 
-let input_po chn =
-  let lexbuf = Lexing.from_channel chn
-  in
-  let po = 
-    try 
-      GettextPo_parser.msgfmt GettextPo_lexer.token lexbuf
-    with 
-      Parsing.Parse_error 
-    | Failure("lexing: empty token") ->
-        raise (PoFileInvalid (lexbuf,chn))
-    | InvalidIndex(id,i) ->
-        raise (PoFileInvalidIndex(id,i))
-  in
-  po
-;;
-
-let po_of_file fl =
-  if test Exists fl then
-    let chn = open_in fl
-    in
-    let po = input_po chn
-    in
-    close_in chn;
-    po
-  else
-    raise (PoFileDoesntExist fl)
-;;
-  
 let string_of_po po = 
   let buffer = Buffer.create 256
   in
@@ -95,21 +67,22 @@ let string_of_po po =
   Buffer.contents buffer
 ;; 
 
-let compile_po ?(default_domain = "messages.mo") ?(output_dir = current_dir) po = 
-  let merge_domain map domain =
-    match domain with
-      (* BUG : utiliser add_extension *)
-      Domain(str,lst) -> MapString.add (str^".mo") lst map
-      (* BUG : probleme de typage *)
-    | NoDomain lst -> MapString.add (default_domain^"") lst map
+let input_po chn =
+  let lexbuf = Lexing.from_channel chn
   in
-  let merged_domain = List.fold_left merge_domain MapString.empty po
+  let po = 
+    try 
+      GettextPo_parser.msgfmt GettextPo_lexer.token lexbuf
+    with 
+      Parsing.Parse_error 
+    | Failure("lexing: empty token") ->
+        raise (PoFileInvalid (lexbuf,chn))
+    | InvalidIndex(id,i) ->
+        raise (PoFileInvalidIndex(id,i))
   in
-  let output_domain domain lst = 
-    let chn = open_out_bin (make_filename [output_dir;domain])
-    in
-    output_mo chn lst;
-    close_out chn
-  in
-  MapString.iter output_domain merged_domain
+  po
+;;
+
+let output_po chn po =
+  output_string chn (string_of_po po)
 ;;
