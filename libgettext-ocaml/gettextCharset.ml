@@ -14,7 +14,7 @@ module type CHARSET_TYPE =
 
     (** recode str enc : return a transcoded string according to enc.
     *)
-    val recode : string -> t -> string
+    val recode : t -> string  -> string
   end
 ;;
 
@@ -25,6 +25,6 @@ module Dummy : CHARSET_TYPE =
 
     let create failsafe in_enc out_enc = ()
 
-    let recode str () = str
+    let recode () str = str
   end
 ;;

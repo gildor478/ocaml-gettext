@@ -15,7 +15,7 @@ module type TRANSLATE_TYPE =
         failed ( ie, if the asked elements is cached, it could not 
         failed, for example ).
     *)
-    val create : failsafe -> in_channel -> Charset.t -> t
+    val create : failsafe -> filename -> Charset.t -> t
 
     (** translate str (plural_form,number) tbl : translate the string 
         str using tbl. It is possible that the operation modify tbl, 
@@ -23,10 +23,10 @@ module type TRANSLATE_TYPE =
         form of the translated string using plural_form and number.
     *)
     val translate : 
-         string 
+         t
+      -> string 
       -> ?plural_form: (string * int)
-      -> t 
-      -> translated_type option * t
+      -> translated_type option 
   end
 ;;
 
@@ -35,21 +35,15 @@ module Dummy : TRANSLATE_TYPE =
   struct
     type t = Charset.t
 
-    let create failsafe chn charset = charset
+    let create failsafe filename charset = charset
 
-    let translate str ?plural_form charset = 
+    let translate charset str ?plural_form = 
       match plural_form with
         None 
       | Some(_,0) ->
-          ( Some (Singular(str,Charset.recode str charset)), charset )
+          Some(Singular(str,Charset.recode str charset))
       | Some(str_plural,_) ->
-          ( Some(Plural
-            (
-              str,str_plural,
-              [Charset.recode str charset ; Charset.recode str_plural charset]
-            )), 
-            charset
-          )
+          Some(Plural(str,str_plural,[Charset.recode str charset ; Charset.recode charset str_plural]))
   end
 ;;
 
@@ -57,79 +51,62 @@ module Map : TRANSLATE_TYPE =
   functor ( Charset : GettextCharset.CHARSET_TYPE ) ->
   struct
     type t = {
-      failsafe  : failsafe;
-      charset   : Charset.t;
-      mo_header : mo_header_type;
-      chn       : in_channel;
+      dummy     : Dummy.t;
       map       : translated_type MapString.t;
-      last      : int;
+      failsafe  : failsafe;
     }
 
-    let create failsafe chn charset = {
-      failsafe  = failsafe;
-      charset   = charset;
-      mo_header = input_mo_header chn;
-      chn       = chn;
-      map       = MapString.empty;
-      last      = 0;
-    }
-
-    let rec translate str ?plural_form mp = 
-      try 
-        let new_translation = MapString.find str mp.map
-        in
-        (Some new_translation, mp)
+    let create failsafe filename charset =
+      let map = ref MapString.empty
+      in
+      let () = 
+        try 
+          let chn = open_in filename
+          in
+          let mo_header = input_mo_header failsafe chn
+          in
+          for i = 0 to mo_header.number_of_strings
+          do
+            let new_translation = 
+              input_mo_translation failsafe chn mo_header count
+            in
+            let map :=
+              match new_translation with
+                Singular(id,str) ->
+                MapString.add id 
+                (Singular(id, Charset.recode charset str)) 
+                !map
+              | Plural(id,id_plural,lst) ->
+                MaPstring.add id 
+                (Plural (id, id_plural, List.map (Charset.recode charset) lst) 
+                !map
+            in
+            ()
+          done
+        with Sys_error ->
+          fail_or_continue failsafe
+          string_of_exception
+          (GettextTranslateCouldNotOpenFile filename)
+          ()
+      in
+      {
+        dummy    = Dummy.create failsafe filename charset;
+        map      = !map;
+        failsafe = failsafe;
+      }
+      
+    let translate t str ?plural_form =
+      try
+        MapString.find str t.map 
       with Not_found ->
-        if mp.last < Int32.to_int mp.mo_header.number_of_strings then
-          let new_translation = 
-            input_mo_translation mp.failsafe mp.chn mp.mo_header (mp.last + 1)
-          in
-          let new_map =
-            match new_translation with
-              Singular(id,str) ->
-                MapString.add 
-                id 
-                (Singular(id,Charset.recode str mp.charset)) 
-                mp.map
-            | Plural(id,id_plural,lst) ->
-                MapString.add
-                id
-                (Plural(id,id_plural,
-                List.map (fun x -> Charset.recode x mp.charset) lst))
-                mp.map
-          in
-          let new_mp = 
-            {
-              failsafe  = mp.failsafe;
-              charset   = mp.charset;
-              mo_header = mp.mo_header;
-              chn       = mp.chn;
-              map       = new_map;
-              last      = mp.last + 1;
-            }
-          in
-          (* DEBUG *) print_endline ( "Comparing \""
-            ^str
-            ^"\" with \""
-            ^(match new_translation with Singular(id,_) | Plural(id,_,_) -> id )
-            ^"\"");
-          match new_translation with
-            Singular(id,_) when id = str ->
-              (Some new_translation,new_mp)
-          | Plural(id,_,_) when id = str ->
-              (Some new_translation,new_mp)
-          | _ ->
-              (
-                match plural_form with
-                  Some x ->
-                    translate str ~plural_form:x new_mp
-                | None ->
-                    translate str new_mp
-              )
-        else
-          (* BUG : on ne retient pas la mémorisation des chaines parcourue
-          * pendant la recherche *)
-          (None, mp)
-            
-  end
+        fail_or_continue t.failsafe
+        string_of_exception
+        (GettextTranslateStringNotFound str)
+        (
+          match plural_form with
+            None ->
+              Dummy.translate t.dummy str plural_form
+          | Some(x) ->
+              Dummy.translate t.dummy str x
+        )
 ;;

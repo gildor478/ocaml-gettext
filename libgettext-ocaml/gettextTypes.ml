@@ -128,3 +128,21 @@ type po_content_type =
   Domain of string * (translated_type list)
 | NoDomain of translated_type list
 ;;
+
+(** Core types of ocaml-gettext library *)
+
+module MapTextdomain = MapString;;
+module MapCategory = Map.Make();;
+
+type t = {
+  failsafe    = failsafe;
+  textdomains = ((codeset option) * (dir option)) MapTextdomain.t;
+  categories  = locale MapCategory.t;
+  language    = locale option;
+  codeset     = codeset option;
+  default     = textdomain;
+}
+;;
+  
+type t' = textdomain option -> string -> (string * int) option -> category -> string
+;;
