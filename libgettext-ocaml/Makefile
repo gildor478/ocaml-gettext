@@ -35,6 +35,8 @@ CMO_BASE  =            \
  gettextCompat.cmo     \
  gettext.cmo           
 
+gettext.cmi: gettext.mli
+gettext.cmo: gettext.cmi
 gettextMo_parser.cmo: gettextMo_parser.cmi
 gettextMo_parser.cmx: gettextMo_parser.cmi
 gettextCompat.cmo: gettextCompat.cmi

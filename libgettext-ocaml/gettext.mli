@@ -12,8 +12,6 @@
 (** Exceptions *)
 
 exception GettextUninitialized;;
-exception GettextMoFileNotFound;;
-exception GettextNoTranslation of string;;
 
 val string_of_exception : exn -> string
 
@@ -40,21 +38,20 @@ val string_of_exception : exn -> string
 (** High level functions *)
 
 (** Module to handle typical library requirement *)
-module Library =
-  functor ( Init : Init ) ->
+module Library :
+  functor ( Init : GettextTypes.Init ) ->
   sig
-    val init  : init list
+    val init  : GettextTypes.dependencies
     val s_    : string -> string 
-    val f_    : string -> ('a, 'b, 'c, 'a) format4
+    val f_    : string -> ('_a, 'b, 'c, 'a) format4
     val sn_   : string -> string -> int -> string
     val fn_   : string -> string -> int -> ('a, 'b, 'c, 'a) format4
   end
 ;;    
 
 (** Module to handle typical program requirement *)
-module Program =
-  functor ( Init : Init ) ->
-  functor ( Realize : realize ) ->
+module Program :
+  functor ( Init : GettextTypes.InitProgram ) ->
   sig
     val init  : (Arg.key * Arg.spec * Arg.doc ) list * string 
     val s_    : string -> string 

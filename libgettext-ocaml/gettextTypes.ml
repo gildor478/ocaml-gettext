@@ -189,15 +189,26 @@ type t = {
 type t' = textdomain option -> string -> (string * int) option -> category -> string
 ;;
 
+type dependencies = (textdomain * (codeset option) * (dir option)) list
+;;
+
 module type Init = 
   sig
     val textdomain : textdomain
     val codeset    : codeset option
     val dir        : dir option
-    val dependencies : (textdomain * (codeset option) * (dir option)) list
+    val dependencies : dependencies
   end
 ;;
   
 type realize = t -> t'
+;;
+
+module type InitProgram =
+  sig
+    include Init
+
+    val realize : realize
+  end
 ;;
 
