@@ -8,39 +8,81 @@ open FilePath.DefaultPath;;
 open GettextMo;;
 open GettextPo;;
 
-(*
-let read_one_mo file = 
-  try 
-    let _ = print_endline file 
-    in
-    let mo_file = open_in_bin file
-    in
-    let header = input_mo_header mo_file
-    in
-    let translation = input_mo_translation mo_file header
-    in
-    close_in mo_file 
-  with GettextTypes.Bad_mo_file ->
-    print_endline "Bad mo file"
-in
-Arg.parse 
-[
-  ("-search", (Arg.String( fun s -> 
-      print_string ("Searching "^s);
-      print_newline ();
-      find (Has_extension "mo") s (fun () fln -> read_one_mo fln) ()
-      )
-    ), "Search the directory for .mo file")
-] 
-(fun str -> read_one_mo str )
-"Camlgettext v0.2 Sylvain Le Gall"
-;;
-*)
-
-let verbose = ref false 
+type tests = {
+  verbose     : bool;
+  search_path : string list;
+}
 ;;
 
-let po_test = 
+let parse_arg () = 
+  let tests = ref { verbose = false; search_path = [] }
+  in
+  Arg.parse [
+    (
+      "-search", Arg.String ( 
+        fun dir -> 
+          tests := { !tests with search_path = dir :: !tests.search_path }
+        )
+      ,"Search the specified directory for .mo file"
+    );
+    (
+      "-verbose", Arg.Unit (
+        fun () ->
+          tests := { !tests with verbose = true }
+        )
+      ,"Processs with a lot of message"
+    )
+  ]
+  (fun str -> () )
+  ("Test utility for ocaml-gettext v"^(GettextConfig.version)^" by Sylvain Le Gall\n"^
+  "Copyright 2004,2005. Licensed under LGPL v2.1 with Ocaml exception");
+  !tests
+;;
+
+let print_debug tests str =
+  if tests.verbose then
+    (print_string str; print_newline ())
+  else
+    ()
+;;
+
+let load_mo_file tests fl = 
+  [
+    "Loading ( header )" >::
+    ( fun () ->
+      try
+        let mo = open_in_bin fl
+        in
+        let mo_header = input_mo_header mo
+        in
+        print_debug tests (string_of_mo_header mo_header);
+        close_in mo
+      with x ->
+        assert_failure (fl^" doesn't load properly: "^(GettextMo.string_of_exception x))
+    );
+
+    "Loading ( informations )" >::
+    ( fun () ->
+      try
+        let mo = open_in_bin fl
+        in
+        let mo_header = input_mo_header mo
+        in
+        let mo_informations = input_mo_informations
+          GettextTypes.RaiseException mo mo_header
+        in
+        print_debug tests (string_of_mo_informations mo_informations);
+        close_in mo
+      with x ->
+        assert_failure (fl^" doesn't load properly: "^(GettextMo.string_of_exception x))
+    );
+  ]
+;;
+
+(*************************)
+(* Test of PO processing *)
+(*************************)
+let po_test tests = 
   let po_test_one fl = 
     (* BUG : should use extension *)
     let fl_mo = ((chop_extension fl)^".mo")
@@ -54,8 +96,7 @@ let po_test =
             in
             ()
           with x ->
-            print_endline (GettextPo.string_of_exception x);
-            assert_failure (fl^" doesn't parse correctly")
+            assert_failure (fl^" doesn't parse correctly: "^(GettextPo.string_of_exception x))
         );
 
         "Compiling" >::
@@ -67,56 +108,41 @@ let po_test =
             in
             () 
           with x ->
-            print_endline (GettextPo.string_of_exception x);
-            assert_failure (fl^" doesn't compile correctly")
+            assert_failure (fl^" doesn't compile correctly"^(GettextPo.string_of_exception x))
         );
 
-        "Loading ( header )" >::
-        ( fun () ->
-          try
-            let mo = open_in_bin fl_mo
-            in
-            let mo_header = input_mo_header mo
-            in
-            (
-              if !verbose then
-                print_endline (string_of_mo_header mo_header)
-              else
-                ()
-            );
-            close_in mo
-          with x ->
-            print_endline (GettextMo.string_of_exception x);
-            assert_failure (fl_mo^" doesn't load properly");
-        );
-
-        "Loading ( informations ) " >::
-        ( fun () ->
-          try
-            let mo = open_in_bin fl_mo
-            in
-            let mo_header = input_mo_header mo
-            in
-            let mo_informations = input_mo_informations
-              GettextTypes.RaiseException mo mo_header
-            in
-            (
-              if !verbose then
-                print_endline (string_of_mo_informations mo_informations)
-              else
-                ()
-            );
-            close_in mo
-          with x ->
-            print_endline (GettextMo.string_of_exception x);
-            assert_failure (fl_mo^" doesn't load properly");
-        );
-      ]
+      ] @ (load_mo_file tests fl_mo)
   in
   "Self test" >:::
     List.map po_test_one ["test1.po"; "test2.po" ; (*"test3.po"*)]
+;;
+
+(****************************************************)
+(* Test compatibility with already produced mo file *)
+(****************************************************)
+let compatibility_test tests =
+  let test_one_mo fl =
+    fl >::: (load_mo_file tests fl)
+  in
+  "Test compatibility" >:::
+    List.fold_left ( 
+      fun lst dir -> 
+        find (Has_extension "mo") dir (fun lst fln -> (test_one_mo fln) :: lst ) lst
+    ) [] tests.search_path
+;;
+
+
+(*********************)
+(* Main test routine *)
+(*********************)
+let tests = parse_arg ()
 in
-let all_test = po_test
+let all_test = 
+  "Test ocaml-gettext" >::: 
+    [
+      po_test tests; 
+      compatibility_test tests;
+    ]
 in
 let _ = 
   print_endline ("Test            : ocaml-gettext "^(GettextConfig.version));
@@ -124,6 +150,5 @@ let _ =
   print_endline ("OS              : "^(Sys.os_type));
   print_endline ("Running...")
 in
-run_test_tt_main all_test
-
+run_test_tt all_test
 
