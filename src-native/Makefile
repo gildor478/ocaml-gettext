@@ -4,8 +4,9 @@ CMO = \
 	camlgettext_int32.cmo  \
 	camlgettext_parser.cmo \
 	camlgettext_lexer.cmo  \
-	camlgettext.cmo 
-REQUIRES =
+	camlgettext.cmo        \
+	test.cmo
+REQUIRES = fileutils
 PREDICATES =
 INSTALLIB = \
 	camlgettext.cmi\

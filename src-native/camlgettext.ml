@@ -217,23 +217,3 @@ let string_of_mo_translation ?(omit_translation=true) ?(compute_plurals=(0,3)) m
   done;
   Buffer.contents buff
 ;;
-
-
-let file = ref "messages.mo"
-in
-let _ = 
-  Arg.parse [] 
-  (fun str -> file := str )
-  "Camlgettext v0.2 Sylvain Le Gall"
-in
-let mo_file = open_in_bin !file
-in
-let header = input_mo_header mo_file
-in
-let translation = input_mo_translation mo_file header
-in
-(*print_string (string_of_mo_header header);
-print_newline ();
-print_string (string_of_mo_translation translation);
-print_newline *)()
-;;

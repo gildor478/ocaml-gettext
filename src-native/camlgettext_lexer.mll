@@ -9,8 +9,8 @@ token_field_name = parse
   "Content-Type" [' ''\t']* ':'      { CONTENT_TYPE(token_field_value lexbuf) }
 | "Plural-Forms" [' ''\t']* ':'      { PLURAL_FORMS(token_field_value lexbuf) } 
 | ([^'\n''\r''\t'' ']+ as id) [' ''\t']* ':' { FIELD_NAME(id, token_field_value lexbuf) }
-| ['\n''\r''\t'' ']                  { token_field_name lexbuf}
 | eof                                { EOF }
+| _                                  { token_field_name lexbuf}
 and
 token_field_value = parse
   [^'\n''\r']* as str           { str }
