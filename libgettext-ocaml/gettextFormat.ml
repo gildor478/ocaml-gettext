@@ -1,73 +1,24 @@
 (** Implements functions helping check that two strings are equivalent, regarding printf use *)
 
-module SetTupleString = Set.Make(struct
-  type t = string * string
-  let compare (s11,s12) (s21,s22) = 
-    match compare s11 s21 with
-      0 ->
-        compare s12 s22
-    | x ->
-        x
-end)
-;;
-
-let set_congruence =
-  let  lst_congruence = [
-      [ "d"; "i"; "n"; "N" ];
-      [ "u"; "x"; "X" ];
-      [ "o" ];
-      [ "s" ];
-      [ "S" ];
-      [ "c" ];
-      [ "C" ];
-      [ "f"; "F"; "e"; "E"; "g"; "G" ];
-      [ "B"; "b" ];
-      [ "ld"; "li" ];
-      [ "lu" ];
-      [ "lx"; "lX" ];
-      [ "lo" ];
-      [ "nd"; "ni" ];
-      [ "nu" ];
-      [ "nx"; "nX" ];
-      [ "no" ];
-      [ "Ld"; "Li" ];
-      [ "Lu" ];
-      [ "Lx"; "LX" ];
-      [ "Lo" ];
-      [ "a" ];
-      [ "t" ];
-      [ "%" ]
-    ]
+(** check_format failsafe translation : returns a translation structure
+    if all the string contained in the translation are equivalent of
+    str_id, regarding printf format. If not, replace each string which conflict
+    by str_id, in the result *)
+let check_format failsafe translation = 
+  let format_lst_of_string str =
+    let lexbuf = Lexing.from_string str
+    in
+    GettextFormat_parser.main GettextFormat_lexer.token lexbuf 
   in
-  let rec add_tuple t lst =
-    let add_tuple_string_string elem1 t elem2 = 
-      print_endline ("("^elem1^", "^elem2^")");
-      SetTupleString.add (elem1,elem2) t
+  let check_format_lst_str lst1 lst2 = 
+    let check_format_aux fc1 fc2 = 
+      if fc1 = fc2 then
+        ()
+      else
+        raise FormatInconsistent(fc1,fc2) 
     in
-    let add_tuple_string_lst elem1 lst t =
-      List.fold_left (add_tuple_string_string elem1) t lst
-    in
-    match lst with
-      hd :: tl ->
-        add_tuple (
-          add_tuple_string_lst hd lst t
-        ) tl
-    | [] ->
-        t
+    List.iter2 check_format_aux lst1 lst2
   in
-  List.fold_left add_tuple SetTupleString.empty lst_congruence
-;;
- 
-
-let split_format str = 
-  let rec split_format_aux n = 
-    let index = 
-      String.index_from str n '%'
-    in
-  
-
-
-(** check_format str1 str2 : returns str2 if str2 is equivalent of str1. If not,
-    returns str1. Equivalence is checked regarding printf format *)
-(*let check_format str1 str2 = 
-;;*)
+  match translation with
+    Singular (str_id,str) ->
+  | Plural (str
