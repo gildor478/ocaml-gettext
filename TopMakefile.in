@@ -39,7 +39,7 @@ CAMLIDL      = @CAMLIDL@
 OCAMLYACC    = @OCAMLYACC@
 OCAMLLEX     = @OCAMLLEX@
 EXE          = @EXE@
-
+CP           = cp -f
 ifdef REQUIRES
 CLI_REQUIRES = -package "$(REQUIRES)"
 endif
@@ -54,26 +54,22 @@ endif
 
 CLI_OCAMLFIND = $(CLI_REQUIRES) $(CLI_PREDICATES) $(CLI_SYNTAX)
 
-TEMPBUILDLIB=@TEMPLIB@
-OCAMLPATH:=$(TEMPBUILDLIB)/:$(OCAMLPATH)
+BUILDDIR=@BUILDDIR@
+BUILDLIB=$(BUILDDIR)/lib
+BUILDBIN=$(BUILDDIR)/bin
+BUILDDOC=$(BUILDDIR)/doc
+OCAMLPATH:=$(BUILDLIB)/:$(OCAMLPATH)
 export OCAMLPATH
 
 all: $(STUBSLIB) $(OCAMLBEST)
+clean:: $(if $(LIBRARY), clean-lib, clean-prog)
 
 CMX = $(patsubst dll%.so, lib%.a, $(CMO:.cmo=.cmx))
-
-GENERATED = version.ml 
 
 byte: $(if $(LIBRARY), install-buildlib, $(NAME).byte)
 opt:  $(if $(LIBRARY), install-buildlib, $(NAME).opt)
 
 # Build the lib
-
-#%.cmxa %.a %.cma: 
-#	$(if $(STUBSOBJS), \
-#	 $(OCAMLMKLIB) -o $* $^ $(STUBSOBJS))
-#	$(if $(filter %.cmo,$^), $(OCAMLC)   -a -o $*.cma  $(filter %.cmo,$^))
-#	$(if $(filter %.cmx,$^), $(OCAMLOPT) -a -o $*.cmxa $(filter %.cmx,$^))
 
 %.cmxa %.a %.so:
 	$(if $(STUBSOBJS),                     \
@@ -87,12 +83,12 @@ opt:  $(if $(LIBRARY), install-buildlib, $(NAME).opt)
 	 $(OCAMLC)  -a -o $*.cma $^            \
 	)
 
-$(TEMPBUILDLIB):
-	mkdir $(TEMPBUILDLIB)
+$(BUILDLIB):
+	mkdir $(BUILDLIB)
 
-install-buildlib: $(TEMPBUILDLIB) $(INSTALLIB)
-	-$(RM) -r $(TEMPBUILDLIB)/$(NAME) 
-	$(OCAMLFIND)  install -ldconf ignore -destdir $(TEMPBUILDLIB) $(NAME) $(INSTALLIB)
+install-buildlib: $(BUILDLIB) $(INSTALLIB)
+	-$(OCAMLFIND) remove -destdir $(BUILDLIB) $(NAME) 
+	$(OCAMLFIND)  install -ldconf ignore -destdir $(BUILDLIB) $(NAME) $(INSTALLIB)
 
 install-lib: $(INSTALLIB) 
 	$(OCAMLFIND) install -destdir $(LIBDIR) $(NAME) $(INSTALLIB)
@@ -100,28 +96,39 @@ install-lib: $(INSTALLIB)
 uninstall-lib:
 	-$(OCAMLFIND) remove -destdir $(LIBDIR) $(NAME)
 
+clean-lib:
+	-$(OCAMLFIND) remove -destdir $(BUILDLIB) $(NAME)
+	-$(if $(wildcard $(BUILDLIB)/*), ,$(RM) -r $(BUILDLIB))
+	-$(if $(wildcard $(BUILDDIR)/*), ,$(RM) -r $(BUILDDIR))
+
 # Build the executable
+
+$(BUILDBIN): 
+	mkdir -p $(BUILDBIN)
 
 BLIBS = $(addsuffix .cma,$(LIBS))
 
-$(NAME).byte: $(CMO)
+$(NAME).byte: $(BUILDBIN) $(CMO)
 	$(OCAMLC) -o $(NAME).byte $(INCLUDES) -package "$(REQUIRES)" -linkpkg \
 	-predicates "$(PREDICATES)" $(BLIBS) $(CMO)
+	$(CP) $(NAME).byte $(BUILDBIN)
 
 OLIBS = $(addsuffix .cmxa,$(LIBS))
 
-$(NAME).opt: $(CMX)
+$(NAME).opt: $(BUILDBIN) $(CMX)
 	$(OCAMLOPT) -o $(NAME).opt $(INCLUDES) -package "$(REQUIRES)" -linkpkg \
 	-predicates "$(PREDICATES)" $(OLIBS) $(CMX)
+	$(CP) $(NAME).opt $(BUILDBIN)
 
+clean-prog:
+	-$(RM) $(NAME).byte $(NAME).opt
+	-$(RM) $(BUILDBIN)/$(NAME).byte $(BUILDBIN)/$(NAME).opt
+	-$(if $(wildcard $(BUILDBIN)/*), ,$(RM) -r $(BUILDBIN))
+	-$(if $(wildcard $(BUILDDIR)/*), ,$(RM) -r $(BUILDDIR))
 
 # Extra files
 
 VERSION=0.1
-
-version.ml: 
-	echo "let version = \""$(VERSION)"\"" > version.ml
-	echo "let date = \""`date`"\"" >> version.ml
 
 META:
 	echo "requires = \""$(REQUIRES)"\"" > META
@@ -166,12 +173,10 @@ META:
 clean::
 	rm -f *.cm[ioxa] *.o *.cmxa *.a *.so
 	rm -f $(GENERATED) parser.output
-	rm -f $(NAME).byte $(NAME).opt
 
-dist-clean distclean:: clean
-	rm -f TopMakefile Makefile config.cache config.log config.status
+distclean:: clean
 
-.depend depend:: $(GENERATED)
+.depend:: $(GENERATED)
 	rm -f .depend
 	$(OCAMLDEP) $(INCLUDES) $(CLI_REQUIRES) $(CLI_SYNTAX) *.ml *.mli > .depend
 

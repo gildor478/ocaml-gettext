@@ -7,6 +7,9 @@ INSTALLIB  = META
 
 all:
 
+distclean::
+	-$(RM) gettextConfig.ml
+
 ##############################
 # Ocaml Gettext base library #
 ##############################

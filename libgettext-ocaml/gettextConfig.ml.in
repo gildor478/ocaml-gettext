@@ -1,0 +1,9 @@
+
+let default_paths = [ @LOCALEDIR@ ]
+;;
+
+let version = "@VERSION@"
+;;
+
+let build_date = "@DATE@"
+;;

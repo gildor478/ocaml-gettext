@@ -1,7 +1,19 @@
 AC_INIT()
 
-TEMPLIB=`pwd`/.libs
-echo "temporary building library in $TEMPLIB"
+AC_ARG_WITH(docdir,
+	AC_HELP_STRING([--with-docdir=dir], [Location of documentation ( default is ${datadir}/doc )]),
+	DOCDIR=$withval, DOCDIR=${datadir}/doc)
+
+AC_ARG_WITH(builddir,
+	AC_HELP_STRING([--with-builddir=dir], [Location of the build ( default is ${topdir}/build )]),
+	BUILDDIR=$withval, BUILDDIR=`pwd`/build)
+
+AC_ARG_WITH(localedir,
+	AC_HELP_STRING([--with-localedir=dir], [Location of the locale dir ( default is /usr/share/locale and /usr/local/share/locale )]),
+	LOCALEDIR=$LOCALEDIR "\"$withval\";", LOCALEDIR="\"/usr/share/locale\"; \"/usr/local/share/locale\"")
+
+VERSION=0.1
+DATE=`date`
 
 # Check for Ocaml compilers
 
@@ -122,7 +134,7 @@ fi
 
 
 # substitutions to perform
-AC_SUBST(TEMPLIB)
+AC_SUBST(BUILDDIR)
 AC_SUBST(OCAMLC)
 AC_SUBST(OCAMLOPT)
 AC_SUBST(OCAMLDEP)
@@ -138,6 +150,9 @@ AC_SUBST(OCAMLP4)
 AC_SUBST(CAMLIDL)
 AC_SUBST(OCAMLMKLIB)
 AC_SUBST(EXE)
+AC_SUBST(LOCALEDIR)
+AC_SUBST(DATE)
+AC_SUBST(VERSION)
 
 # Finally create the Makefile from Makefile.in
-AC_OUTPUT([TopMakefile], [chmod a-w TopMakefile])
+AC_OUTPUT([TopMakefile libgettext-ocaml/gettextConfig.ml], [chmod a-w TopMakefile libgettext-ocaml/gettextConfig.ml])
