@@ -1,3 +1,4 @@
+open GettextUtils;;
 open GettextTypes;;
 open GettextMo_int32;;
  
@@ -9,11 +10,6 @@ exception InvalidTranslationPlural of (string list) * int;;
 exception InvalidMoFile;;
 
 let string_of_exception exc =   
-  let string_of_pos lexbuf = 
-    "line "^(string_of_int lexbuf.Lexing.lex_curr_p.Lexing.pos_lnum)
-    ^" character "
-    ^(string_of_int (lexbuf.Lexing.lex_curr_p.Lexing.pos_cnum - lexbuf.Lexing.lex_curr_p.Lexing.pos_bol))
-  in
   match exc with
     InvalidOptions (lexbuf,text) ->
       "Error while processing parsing of options : \n"

@@ -21,7 +21,9 @@ open GettextTypes;;
 
 msgfmt:
   msgfmt domain        { let (a,b) = $2 in Domain (a,b) :: $1 } 
+| domain               { let (a,b) = $1 in [Domain (a,b)] }
 | msgfmt message       { $2 :: $1 }
+| message              { [$1] }
 | EOF                  { [] }
 ;
 
@@ -37,7 +39,7 @@ message_list:
 
 message:
   MSGID string_list MSGSTR string_list               { SingularEntry($2,$4) } 
-| MSGID string_list msgid_pluralform pluralform_list { PluralEntry($2,$4)   }
+| MSGID string_list msgid_pluralform pluralform_list { PluralEntry($2,$3,$4) }
 ;
 
 msgid_pluralform:

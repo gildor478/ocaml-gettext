@@ -1,7 +1,12 @@
+open OUnit;;
+
 open FileUtil;;
 open FileUtil.StrUtil;;
-open GettextMo;;
 
+open GettextMo;;
+open GettextPo;;
+
+(*
 let read_one_mo file = 
   try 
     let _ = print_endline file 
@@ -28,3 +33,31 @@ Arg.parse
 (fun str -> read_one_mo str )
 "Camlgettext v0.2 Sylvain Le Gall"
 ;;
+*)
+
+let po_parsing = 
+  let po_parse_one fl = 
+    fl >:: ( fun () -> 
+      try 
+        let _ = po_of_file "test1.po"
+        in
+        ()
+      with x ->
+        print_string (GettextPo.string_of_exception x);
+        assert_failure (fl^" doesn't parse correctly")
+      )
+  in
+  "Po_parsing" >:::
+    List.map po_parse_one ["test1.po"]
+in
+let all_test = po_parsing
+in
+let _ = 
+  print_endline ("Test            : gettext "^(Version.version));
+  print_endline ("Test build date : "^(Version.date));
+  print_endline ("OS              : "^(Sys.os_type));
+  print_endline ("Running...")
+in
+run_test_tt_main all_test
+
+

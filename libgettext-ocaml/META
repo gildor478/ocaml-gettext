@@ -13,3 +13,9 @@ package "base" (
   archive(byte) = "gettextBase.cma"
   archive(native) = "gettextBase.cmxa"
 )
+
+package "compile" (
+  require = "gettext.base"
+  archive(byte) = "gettextCompile.cma"
+  archive(native) = "gettextCompile.cmxa"
+)

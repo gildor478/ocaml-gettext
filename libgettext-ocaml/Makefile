@@ -1,7 +1,7 @@
 NAME       = gettext
 CMO        =       
 LIBRARY    = true
-REQUIRES   =
+REQUIRES   = fileutils
 PREDICATES =
 INSTALLIB  = META
 
@@ -39,6 +39,7 @@ INSTALLIB +=         \
  gettextMo.cmi    
 
 CMO_BASE  =            \
+ gettextUtils.cmo      \
  gettextTypes.cmo      \
  gettextMo_int32.cmo   \
  gettextMo_parser.cmo  \

@@ -118,5 +118,5 @@ type translation_type =
 type po_content_type =
   Domain of string * (po_content_type list)
 | SingularEntry of string * string
-| PluralEntry of string * ((int * string) list)
+| PluralEntry of string * string * ((int * string) list)
 ;;
