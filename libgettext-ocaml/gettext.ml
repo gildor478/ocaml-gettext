@@ -119,10 +119,10 @@ module Library =
   struct
     let init = (Init.textdomain, Init.codeset, Init.dir) :: Init.dependencies
 
-    let s_   = dgettext (get_global_t' ()) Init.textdomain 
-    let f_   = fdgettext (get_global_t' ()) Init.textdomain
-    let sn_  = dngettext (get_global_t' ()) Init.textdomain
-    let fn_  = fdngettext (get_global_t' ()) Init.textdomain
+    let s_  str = dgettext (get_global_t' ()) Init.textdomain str
+    let f_  str = fdgettext (get_global_t' ()) Init.textdomain str
+    let sn_ str = dngettext (get_global_t' ()) Init.textdomain str
+    let fn_ str = fdngettext (get_global_t' ()) Init.textdomain str
   end
 ;;
 
@@ -200,12 +200,12 @@ module Program =
           ),
           "Set the default codeset for outputting string with gettext"
         );
-      ]
+      ], GettextConfig.copyright
       
-    let s_   = dgettext (get_global_t' ()) textdomain 
-    let f_   = fdgettext (get_global_t' ()) textdomain
-    let sn_  = dngettext (get_global_t' ()) textdomain
-    let fn_  = fdngettext (get_global_t' ()) textdomain
+    let s_  str = dgettext (get_global_t' ()) textdomain str
+    let f_  str = fdgettext (get_global_t' ()) textdomain str
+    let sn_ str = dngettext (get_global_t' ()) textdomain str
+    let fn_ str = fdngettext (get_global_t' ()) textdomain str
 
   end
 ;;

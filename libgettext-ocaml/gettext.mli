@@ -43,7 +43,7 @@ module Library :
   sig
     val init  : GettextTypes.dependencies
     val s_    : string -> string 
-    val f_    : string -> ('_a, 'b, 'c, 'a) format4
+    val f_    : string -> ('a, 'b, 'c, 'a) format4
     val sn_   : string -> string -> int -> string
     val fn_   : string -> string -> int -> ('a, 'b, 'c, 'a) format4
   end

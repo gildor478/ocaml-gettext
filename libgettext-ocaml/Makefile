@@ -22,6 +22,7 @@ INSTALLIB +=         \
  gettextMo.cmi       \
  gettextModules.cmi  \
  gettextCompat.cmi   \
+ gettextConfig.cmi   \
  gettext.cmi         
 
 CMO_BASE  =            \
@@ -33,6 +34,7 @@ CMO_BASE  =            \
  gettextMo.cmo         \
  gettextModules.cmo    \
  gettextCompat.cmo     \
+ gettextConfig.cmo     \
  gettext.cmo           
 
 gettext.cmi: gettext.mli
@@ -82,16 +84,14 @@ INSTALLIB +=           \
  gettextLocale.cmi     \
  gettextDomain.cmi     \
  gettextCharset.cmi    \
- gettextTranslate.cmi  \
- gettextModules.cmi    
+ gettextTranslate.cmi  
 
 CMO_EXTENSION=         \
  gettextConfig.cmo     \
  gettextLocale.cmo     \
  gettextDomain.cmo     \
  gettextCharset.cmo    \
- gettextTranslate.cmo  \
- gettextModules.cmo    
+ gettextTranslate.cmo  
 
 gettextExtension.cma: $(CMO_EXTENSION)
 gettextExtension.cmxa: $(CMO_EXTENSION:.cmo=.cmx)

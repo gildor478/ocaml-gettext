@@ -7,3 +7,8 @@ let version = "@VERSION@"
 
 let build_date = "@DATE@"
 ;;
+
+let copyright = 
+  "ocaml-gettext v @VERSION@ ( build on @DATE@ ) "
+  ^"by Sylvain Le Gall <sylvain@le-gall.net>"
+;;
