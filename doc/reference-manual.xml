@@ -1,6 +1,30 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
 "/usr/share/xml/schema/dtd/4.3/docbookx.dtd" [
+<!--**********************************************************************-->
+<!-- Ocaml-gettext : a library to translate messages                      -->
+<!--                                                                      -->
+<!-- Copyright (C) 2003, 2004, 2005 Sylvain Le Gall <sylvain@le-gall.net> -->
+<!--                                                                      -->
+<!-- This library is free software; you can redistribute it and/or        -->
+<!-- modify it under the terms of the GNU Lesser General Public           -->
+<!-- License as published by the Free Software Foundation; either         -->
+<!-- version 2.1 of the License, or (at your option) any later version;   -->
+<!-- with the OCaml static compilation exception.                         -->
+<!--                                                                      -->
+<!-- This library is distributed in the hope that it will be useful,      -->
+<!-- but WITHOUT ANY WARRANTY; without even the implied warranty of       -->
+<!-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU    -->
+<!-- Lesser General Public License for more details.                      -->
+<!--                                                                      -->
+<!-- You should have received a copy of the GNU Lesser General Public     -->
+<!-- License along with this library; if not, write to the Free Software  -->
+<!-- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  -->
+<!-- USA                                                                  -->
+<!--                                                                      -->
+<!-- Contact: sylvain@le-gall.net                                         -->
+<!--**********************************************************************-->
+
 <!--"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd"-->
 
 <!-- Source code -->
@@ -10,12 +34,13 @@
 <!ENTITY po-makefile                   '<xi:include href="&expl;/po/Makefile"                parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
 <!ENTITY LINGUAS                       '<xi:include href="&expl;/po/LINGUAS"                 parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
 <!ENTITY POTFILES                      '<xi:include href="&expl;/po/POTFILES"                parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
-<!ENTITY makefile                      '<xi:include href="&expl;/Makefile"                   parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
+<!ENTITY makefile                      '<xi:include href="&expl;/program/Makefile"           parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
 <!ENTITY library-ml                    '<xi:include href="&expl;/library/library.ml"         parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
 <!ENTITY library-gettext-ml            '<xi:include href="&expl;/library/libraryGettext.ml"  parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
 <!ENTITY program-ml                    '<xi:include href="&expl;/program/program.ml"         parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
 <!ENTITY program-gettext-ml            '<xi:include href="&expl;/program/programGettext.ml"  parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
 <!ENTITY program-xml                   '<xi:include href="&expl;/doc/program.xml"            parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
+<!ENTITY makefile-doc                  '<xi:include href="&expl;/doc/Makefile"               parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
 <!ENTITY gui-glade                     '<xi:include href="&expl;/gui/gui.glade"              parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
 <!ENTITY gui-ml                        '<xi:include href="&expl;/gui/gui.ml"                 parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
 <!ENTITY makefile-gui                  '<xi:include href="&expl;/gui/Makefile"               parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
@@ -49,8 +74,8 @@
   <bookinfo>
     <legalnotice>
       <para>
-        This user manual is considered as a source code and is licensed under the GNU Library Public 
-        License v2.1.
+        This user manual is considered as a source code and is licensed under the GNU Lesser General Public 
+        License v2.1 with OCaml static compilation exception.
       </para>
     </legalnotice>
     <author>
@@ -75,8 +100,8 @@
       <title>What is ocaml-gettext ?</title>
       <para>
         Ocaml-gettext is a library to support string translation in OCaml. It provides a simple interface 
-        to help programmer's and translator to create programs that can support different languages. This
-        permits the internationalization of programs.
+        to help programmers and translators to create programs that can support different languages. This
+        allows the internationalization of programs.
       </para>
       <para>
         OCaml-gettext provides two main functionnalities : 
@@ -93,7 +118,7 @@
           </listitem>
         </itemizedlist>
       </para>
-      <para>The library is build according to three point of view :
+      <para>The library is build according three point of view :
         <itemizedlist>
           <listitem>
             <para>
@@ -120,7 +145,7 @@
         OCaml ( such as <command>camlp4</command> ). 
       </para>
       <para>
-        As a result of the effort of porting gettext to ocaml-gettext, we have :
+        As a result of porting gettext to ocaml-gettext, we have :
         <itemizedlist>
           <listitem>
             <para>
@@ -145,26 +170,26 @@
     <section>
       <title>How is ocaml-gettext related to gettext ?</title>
       <para>
-        Ocaml-gettext is the nearby cousin of gettext. In fact, the API is based on gettext. Everything 
+        Ocaml-gettext is the nearby cousin of gettext. In fact, the API is based on gettext. Almost everything 
         in ocaml-gettext is compatible with gettext :
         <itemizedlist>
           <listitem>
-            <para>the function provided in the API are very near to the gettext one,</para>
+            <para>functions provided in the API are very near to the gettext one,</para>
           </listitem>
           <listitem>
             <para>the library contains a binding of the gettext library,</para>
           </listitem>
           <listitem>
             <para>
-              all the file outputed are gettext compatible : the library use PO file for translator 
+              all the file used are gettext compatible : the library use PO file for translator 
               and MO file for translation,
             </para>
           </listitem>
           <listitem>
             <para>
               the library try to use the same initialization sequence as gettext :
-              it uses the same environment variable, try to find MO file in the
-              same place...
+              it uses the same environment variable, try to find MO files in the
+              same places...
             </para>
           </listitem>
         </itemizedlist>
@@ -182,8 +207,7 @@
     <title>Installing ocaml-gettext</title>
     <section>
       <title>Using source</title>
-      <para>For compiling ocaml-gettext, you need to download all the
-        prerequisite :
+      <para>For compiling ocaml-gettext, you need to install the following prerequisites :
         <itemizedlist>
           <!-- BUG: complete the right URL -->
           <listitem>
@@ -242,7 +266,7 @@
         the command line tool <command>ocaml-getttext</command>. 
       </para>
       <para>
-        After having build and install all the prerequisite, extract the source
+        After having build and install all prerequisites, extract the source
         code of ocaml-gettext to a directory. Go to the source directory and type :
         <itemizedlist>
           <listitem>
@@ -251,7 +275,7 @@
               <footnote>
                 <para>
                   If needed, you can use <command>./configure <option>--help</option></command> 
-                  to have a complete help on the different option you can use to tweak the 
+                  to have a complete help on every options you can use to tweak the 
                   installation of ocaml-gettext.
                 </para>
               </footnote>
@@ -326,7 +350,7 @@
     <section>
       <title>Other distribution</title>
       <para>
-        Actually, there is no plan to release packages for other distribution. If you have any skill
+        There is no plan to release packages for other distribution. If you have any skill
         concerning the packaging of ocaml-gettext for any other distribution, please contact me.
       </para>
     </section>
@@ -341,9 +365,9 @@
         really useful at the time the code was written.
       </para>
       <para>
-        The library suppose that all the <varname>textdomain</varname> that will be used during 
-        translation, are declared before using it. It is a real constraint, but it is permits more
-        optimisation. Moreover, this permits to have a more &quot;functional&quot; use. 
+        The library supposes that all the <varname>textdomain</varname> that will be used during 
+        translation, are declared before using it. It is a real constraint, but it permits more
+        optimization. Moreover, it allows having a more &quot;functional&quot; use. 
       </para>
       <para>
         <!-- Description of the parameter t -->
@@ -372,7 +396,7 @@
             </para>
           </listitem>
         </itemizedlist>
-        This parameters is build and updated through internal functions. You don't have direct access
+        This parameter is build and updated through internal functions. You don't have direct access
         to it.
       </para>
       <para>
@@ -388,12 +412,12 @@
         not provided in the base package. It is build out of real implementation of ocaml-gettext ( such as
         <varname>gettext-camomile</varname> or <varname>gettext-stub</varname> ). This function could handle
         all the parameters in different way. Concerning <varname>gettext-camomile</varname>, it build a 
-        translation table for all the file found which correspond to a declared domain.
+        translation table for all the file found which correspond to a declared <varname>textdomaine</varname>.
       </para>
       <para>
         <!-- Justification of the global variable -->
         Since, it should be very hard to pass a parameter <varname>t</varname> or <varname>t'</varname> in 
-        all the function that should use translation, we provide a more simple way to use the library. The 
+        all functions that should use translation, we provide a more simple way to use the library. The 
         toplevel function use a global reference to store the parameters <varname>t</varname> and 
         <varname>t'</varname>. This helps to integrate ocaml-gettext more easily into existing application.
       </para>
@@ -408,12 +432,12 @@
         <itemizedlist>
           <listitem>
             <para>
-              a file <filename>LINGUAS</filename> describing all the translation available,
+              a file <filename>LINGUAS</filename> describing available translations,
             </para>
           </listitem>
           <listitem>
             <para>
-              a file <filename>POTFILES</filename> containing the listing of all file that should
+              a file <filename>POTFILES</filename> containing the listing of all files that
               contains translatable strings,
             </para>
           </listitem>
@@ -424,7 +448,7 @@
           </listitem>
           <listitem>
             <para>
-              a set of PO file which contains translated strings for different file.
+              a set of PO file which contains translated strings for different languages.
             </para>
           </listitem>
         </itemizedlist>
@@ -467,7 +491,7 @@
                 </para>
               </footnote> 
               : a package used to extend ocaml-gettext. It is reserved for very
-              particular function ( such as creating a new <varname>realize</varname> function ),
+              particular functions ( such as creating a new <varname>realize</varname> function ),
             </para>
           </listitem>
         </itemizedlist>
@@ -497,7 +521,7 @@
         </itemizedlist>
       </para>
       <para>
-        In order to link an application using ocaml-gettext, you should link with one of : gettext.base,
+        In order to link an application or a library using ocaml-gettext, you should link with one of : gettext.base,
         gettext-camomile or gettext-stub.
       </para>
       <example>
@@ -508,16 +532,16 @@
     <section>
       <title>Library</title>
       <para>
-        Library should be based on the toplevel module <varname>Gettext.Library</varname>. It doesn't need any real implementation 
+        Library should use the module <varname>Gettext.Library</varname>. It doesn't need any real implementation 
         of ocaml-gettext. This way you can let the library user choose the most appropriate ocaml-gettext 
         implementation. This point is essential : a library could be used as well in a GUI program or in short run
-        command line program ( <command>ls</command> for example ). This two example doesn't require at all the
-        same kind of implementation : GUI program load most of their translated string, command line program
-        only use one of them. So by using the toplevel <varname>Gettext.Library</varname> framework, you don't restrict programs
-        to use one particular implementation of ocaml-gettext.
+        command line program. This two example doesn't require at all the same kind of implementation : GUI program 
+        load most of their translated strings, command line program only use one among them. So by using the module
+        <varname>Gettext.Library</varname> framework, you don't restrict programs to use one particular implementation 
+        of ocaml-gettext.
       </para>
       <para>
-        The library should define using the functor <varname>Init</varname> provided: 
+        The library should define, using the functor <varname>Init</varname> provided: 
         <itemizedlist>
           <listitem>
             <para>
@@ -575,7 +599,7 @@
       <warning>
         <para>
           You must keep the function name <varname>s_</varname>, <varname>f_</varname>, <varname>sn_</varname> and <varname>fn_</varname>.
-          The extraction of translatable strings are based on these names. If you don't keep it, the extraction of translatable strings
+          The extraction of translatable strings match these names. If you don't keep it, the extraction of translatable strings
           will fail.
         </para>
       </warning>
@@ -588,19 +612,19 @@
         <programlisting>&library-gettext-ml;</programlisting>
       </example>
       <para>
-        All the calls to the translation function, use the textdomain provided in <varname>Init</varname>.
+        All the calls to translation functions, use the textdomain provided in <varname>Init</varname>.
       </para>
       <para>
         The only constraint when using ocaml-gettext in your library is to provide an access to the value 
         <varname>Gettext.Library.init</varname>. This value is used as dependencies for other libraries and
         programs that depend on it. For example, since you use the library ocaml-gettext, your primary dependency
-        is the function <varname>init</varname> provided in the toplevel ( the function <varname>string_of_exception</varname>
+        is the function <varname>init</varname> provided in the toplevel ( the function <varname>Gettext.string_of_exception</varname>
         is localized ).
       </para>
       <warning>
         <para>
           If you distribute your library, don't forget to mention that ocaml-gettext will only be able to translate
-          the string defined in your library, if and only if the MO file provided is also installed. If not installed
+          the string defined in your library, if and only if the MO file build with is also installed. If not installed
           ocaml-gettext is useless.
         </para>
       </warning>
@@ -608,7 +632,7 @@
     <section>
       <title>Program</title>
       <para>
-        Program should used ocaml-gettext just as libraries does. The only difference lies in the fact that you should provide 
+        Program should use ocaml-gettext just as libraries does. The only difference lies in the fact that you should provide 
         a <varname>realize</varname> function in the <varname>InitProgram</varname>. The other difference is that the 
         <varname>init</varname> value is not a dependency that should be used by other program. It is a <varname>Arg</varname>
         usable value. It allows user to define some important parameters. 
@@ -650,6 +674,12 @@
         <title><filename>program.xml</filename> : Docbook manpage</title>
         <programlisting>&program-xml;</programlisting>
       </example>
+
+      <example>
+        <title><filename>Makefile</filename> : Makefile for docbook manpage</title>
+        <programlisting>&makefile-doc;</programlisting>
+      </example>
+
       <para>
         You should take care of what implementation of ocaml-gettext you are using. In order to choose the right implementation
         you should consider your program and every characteristic of it ( how many strings does he need to fetch ? Does it use already

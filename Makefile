@@ -28,22 +28,26 @@ all:
 	cd libgettext-camomile-ocaml && $(MAKE) all
 	cd ocaml-gettext             && $(MAKE) all
 	cd po                        && $(MAKE) all
+	cd doc                       && $(MAKE) all
 
 install:
-	cd libgettext-ocaml          && $(MAKE) install-lib
-	cd libgettext-stub-ocaml     && $(MAKE) install-lib
-	cd libgettext-camomile-ocaml && $(MAKE) install-lib
-	cd ocaml-gettext             && $(MAKE) install-lib
-	cd po                        && $(MAKE) install-lib
+	cd libgettext-ocaml          && $(MAKE) install
+	cd libgettext-stub-ocaml     && $(MAKE) install
+	cd libgettext-camomile-ocaml && $(MAKE) install
+	cd ocaml-gettext             && $(MAKE) install
+	cd po                        && $(MAKE) install
+	cd doc                       && $(MAKE) install
 
 uninstall:
-	cd libgettext-ocaml          && $(MAKE) uninstall-lib
-	cd libgettext-stub-ocaml     && $(MAKE) uninstall-lib
-	cd libgettext-camomile-ocaml && $(MAKE) uninstall-lib
-	cd ocaml-gettext             && $(MAKE) uninstall-lib
-	cd po                        && $(MAKE) uninstall-lib
+	cd libgettext-ocaml          && $(MAKE) uninstall
+	cd libgettext-stub-ocaml     && $(MAKE) uninstall
+	cd libgettext-camomile-ocaml && $(MAKE) uninstall
+	cd ocaml-gettext             && $(MAKE) uninstall
+	cd po                        && $(MAKE) uninstall
+	cd doc                       && $(MAKE) uninstall
 	
 clean:
+	-cd doc                       && $(MAKE) clean
 	-cd po                        && $(MAKE) clean
 	-cd examples                  && $(MAKE) clean
 	-cd test                      && $(MAKE) clean
@@ -53,6 +57,7 @@ clean:
 	-cd libgettext-ocaml          && $(MAKE) clean
 
 distclean: clean
+	-cd doc                       && $(MAKE) distclean
 	-cd po                        && $(MAKE) distclean
 	-cd examples                  && $(MAKE) distclean
 	-cd test                      && $(MAKE) distclean
@@ -65,6 +70,3 @@ distclean: clean
 	-$(RM) src/.depend
 	-$(RM) test/.depend
 	-$(RM) -r autom4te.cache config.log config.cache config.status
-
-examples: all
-	cd examples                  && $(MAKE) all

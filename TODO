@@ -3,7 +3,6 @@ v 0.2.0 :
 - Check all exported functions ( cf GettextUtils )
 - Add option to configure where gettext can be found
 - Add option not to compile gettext/camomile and configure ocaml-gettext to use the default
-- Write a quick start manual
 - Correct the BUG: related to bug from ocaml-fileutils
 - Reread the code to improve general layout ( naming scheme, exception name... ie better style )
 - Intercept problem when recoding string ( charset ), errors should be wrap inside a failsafe or

@@ -9,18 +9,11 @@
 #  Contact: sylvain@le-gall.net                                           #
 ##########################################################################
 
-all:
-	mkdir build
-	cd library && $(MAKE) all
-	cd gui     && $(MAKE) all
-	cd program && $(MAKE) all
-	cd po      && $(MAKE) all
-	cd doc     && $(MAKE) all
+all: program.1
 
 clean:
-	cd doc     && $(MAKE) clean
-	cd po      && $(MAKE) clean
-	cd program && $(MAKE) clean
-	cd gui     && $(MAKE) clean
-	cd library && $(MAKE) clean
-	$(RM) -r build
+	$(RM) program.1
+
+program.1: program.xml
+	xmllint --xinclude --noent --noout --postvalid $^
+	xsltproc --xinclude /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl $^
