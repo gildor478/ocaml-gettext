@@ -10,8 +10,11 @@
   </refmeta>
 
   <refnamediv>
-    <refname>common options for ocaml-gettext library</refname>
-    <refpurpose>common options to manage internationalization in OCaml program.</refpurpose>
+    <refname>ocaml-gettext-options</refname>
+    <refpurpose>
+      common options to manage internationalization in OCaml program through 
+      ocaml-gettext library.
+    </refpurpose>
   </refnamediv>
 
   <refsynopsisdiv>

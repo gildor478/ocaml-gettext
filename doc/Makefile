@@ -2,13 +2,16 @@ HTML_SOURCES=reference-manual.xml
 MAN_SOURCES=ocaml-gettext.xml ocaml-xgettext.xml ocaml-gettext-options.xml
 
 # Destination dir
+DOCHTML=
+DOCMAN=
+
 BUILDHTML=html
 BUILDMAN=man
 
 # Programs
 MKDIR=mkdir
 XSLTPROC=xsltproc
-TRUE=true
+XMLLINT=xmllint
 CP=cp
 
 # Stylesheets
@@ -26,32 +29,31 @@ clean: clean-doc-html clean-doc-man
 
 # Build HTML files
 
-install-builddoc-html: $(HTML_SOURCES)
-	for i in $^; do                          \
-	  DST=$(BUILDHTML)/$${i%%.xml}/;         \
-	  $(MKDIR) -p $$DST;                     \
-	  $(XSLTPROC) --xinclude                 \
-	    --stringparam base.dir "$$DST"       \
-	    $(HTMLXSL) $$i;                      \
-	done
+$(BUILDHTML)/%/index.html: %.xml
+	$(XMLLINT) --xinclude --noent --noout --postvalid $^ 
+	$(MKDIR) -p $(dir $@)
+	$(XSLTPROC) --xinclude --stringparam base.dir        \
+	  "$(dir $@)" $(HTMLXSL) $^
+
+install-builddoc-html: $(patsubst %.xml,$(BUILDHTML)/%/index.html,$(HTML_SOURCES))
 
 clean-doc-html: 
-	-for i in $(HTML_SOURCES); do                   \
-	  $(RM) -r $(BUILDHTML)/$${i%%.xml} || $(TRUE); \
-	done
-
-install-doc-html: BUILDHTML=$(DOCHTML)
+	-$(RM) -r $(patsubst %.xml,$(BUILDHTML)/%,$(HTML_SOURCES))
+	
 install-doc-html: install-builddoc-html
+	$(CP) -r $(patsubst %.xml,$(BUILDHTML)/%,$(HTML_SOURCES)) $(DOCHTML)
 
-uninstall-doc-html: BUILDHTML=$(DOCHTML)
 uninstall-doc-html: clean-doc-html
+	-$(RM) -r $(patsubst %.xml,$(DOCHTML)/%,$(HTML_SOURCES))
 
 # Build MAN files
 
 install-builddoc-man: $(MAN_SOURCES)
-	for i in $^; do                  \
-	  $(XSLTPROC) --xinclude         \
-	    $(MANXSL) $$i;               \
+	for i in $^; do                                 \
+	  $(XMLLINT) --xinclude --noent --noout         \
+	    --postvalid $$i;                            \
+	  $(XSLTPROC) --xinclude                        \
+	    $(MANXSL) $$i;                              \
 	done
 
 clean-doc-man:

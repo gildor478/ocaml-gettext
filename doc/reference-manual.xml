@@ -19,9 +19,9 @@
 <!ENTITY gui-glade                     '<xi:include href="&expl;/gui/gui.glade"              parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
 <!ENTITY gui-ml                        '<xi:include href="&expl;/gui/gui.ml"                 parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
 <!ENTITY makefile-gui                  '<xi:include href="&expl;/gui/Makefile"               parse="text" xmlns:xi="&xi;">&fbk;</xi:include>' >
-<!ENTITY ocaml-gettext-manual          '<xi:include href="ocaml-gettext.xml"         xmlns:xi="&xi;"/>' >
-<!ENTITY ocaml-xgettext-manual         '<xi:include href="ocaml-xgettext.xml"        xmlns:xi="&xi;"/>' >
-<!ENTITY ocaml-gettext-options-manual  '<xi:include href="ocaml-gettext-options.xml" xmlns:xi="&xi;"/>' >
+<!ENTITY ocaml-gettext-manual          '<xi:include href="ocaml-gettext.xml"         xmlns:xi="&xi;" xpointer="xpointer(/refentry/node())"/>' >
+<!ENTITY ocaml-xgettext-manual         '<xi:include href="ocaml-xgettext.xml"        xmlns:xi="&xi;" xpointer="xpointer(/refentry/node())"/>' >
+<!ENTITY ocaml-gettext-options-manual  '<xi:include href="ocaml-gettext-options.xml" xmlns:xi="&xi;" xpointer="xpointer(/refentry/node())"/>' >
 
 <!-- Links -->
 <!ENTITY download-ocaml             'http://caml.inria.fr/ocaml/release.en.html'>
@@ -1057,7 +1057,7 @@
   <appendix>
     <title>Manpages</title>
     <refentry>
-      &ocaml-xgettext-manual;
+      &ocaml-gettext-manual;
     </refentry>
     <refentry>
       &ocaml-xgettext-manual;
