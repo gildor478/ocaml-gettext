@@ -88,7 +88,7 @@ CMX = $(patsubst dll%.so, lib%.a, $(CMO:.cmo=.cmx))
 	 $(OCAMLOPT) -a -o $*.cmxa $^          \
 	)
 
-%.cma %.so:
+%.cma %.a %.so:
 	$(if $(STUBSOBJS),                     \
 	 $(OCAMLMKLIB) -o $* $^ $(STUBSOBJS),  \
 	 $(OCAMLC)  -a -o $*.cma $^            \
@@ -98,8 +98,8 @@ $(BUILDLIB):
 	mkdir -p $(BUILDLIB)
 
 # BUG : need a serious rewrite 
-install-buildlib-byte: REAL_INSTALLIB = $(filter-out %.o,$(filter-out %.a,$(filter-out %.cmx, $(filter-out %.cmxa,$(INSTALLIB)))))
-install-buildlib-byte: $(filter-out %.o,$(filter-out %.a,$(filter-out %.cmx, $(filter-out %.cmxa,$(INSTALLIB)))))
+install-buildlib-byte: REAL_INSTALLIB = $(filter-out %.cmx, $(filter-out %.cmxa,$(INSTALLIB)))
+install-buildlib-byte: $(filter-out %.cmx, $(filter-out %.cmxa,$(INSTALLIB)))
 install-buildlib-byte: install-buildlib-common
 
 install-buildlib-opt: REAL_INSTALLIB =  $(INSTALLIB)

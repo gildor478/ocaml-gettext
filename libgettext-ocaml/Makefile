@@ -74,7 +74,6 @@ INSTALLIB +=           \
  gettextCompile.cmi         
 
 CMO_EXTENSION=         \
- gettextConfig.cmo     \
  gettextCategory.cmo   \
  gettextLocale.cmo     \
  gettextDomain.cmo     \

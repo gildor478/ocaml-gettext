@@ -20,6 +20,7 @@ INSTALLIB +=               \
  gettextStub.a             \
  dllgettextStub.so         \
  libgettextStub.a          \
+ gettextStub.cmi           \
  gettextStubCompat.cmi     
 
 CMO_STUB =                 \

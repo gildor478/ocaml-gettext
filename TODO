@@ -1,10 +1,9 @@
 v 0.2.0 : 
 - Test GettextCamomile
+- Test GettextStub
 - Write GettextTranslate.hashtable
 - Write GettextTranslate.open ( base on file opening when a translation is required )
-- Write an adaptor : binding of gettext -> GettextRealize.REALIZE_TYPE
 - Add gettextGettext : i18n/l10n for ocaml-gettext ( if it can bootstrap easily )
-- Test GettextStub
 - Complete ocaml-gettext executable
 - Benchmark GettextCamomile/GettextStub 
 - Move all exception declaration to gettextTypes, string_of_exception to Gettext

@@ -545,7 +545,7 @@ let camomile_test tests =
   (* File scheme : 
     base_dir/lang/category/domain.mo
   *)
-  let camomile_test_one fl_mo =
+  let realize_test_load_one (realize_str,realize) fl_mo =
     let textdomain = 
       chop_extension (basename fl_mo)
     in
@@ -576,8 +576,8 @@ let camomile_test tests =
       textdomain
     in
     let t' =
-      print_debug tests "Creation of the GettextCamomile translator";
-      GettextCamomile.Map.realize t
+      print_debug tests ("Creation of the "^realize_str^" translator");
+      realize t
     in
     let mo = 
       print_debug tests ("Opening "^fl_mo);
