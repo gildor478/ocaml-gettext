@@ -77,14 +77,14 @@ $(TEMPBUILDLIB):
 	mkdir $(TEMPBUILDLIB)
 
 install-buildlib: $(TEMPBUILDLIB) byte opt META
-	$(OCAMLFIND) remove -ldconf ignore -destdir $(TEMPBUILDLIB) $(NAME) 
+	-$(OCAMLFIND) remove -ldconf ignore -destdir $(TEMPBUILDLIB) $(NAME) 
 	$(OCAMLFIND) install -ldconf ignore -destdir $(TEMPBUILDLIB) $(NAME) $(INSTALLIB)
 
 install-lib: byte opt META
 	$(OCAMLFIND) install -destdir $(LIBDIR) $(NAME) $(INSTALLIB)
 
 uninstall-lib:
-	$(OCAMLFIND) remove -destdir $(LIBDIR) $(NAME)
+	-$(OCAMLFIND) remove -destdir $(LIBDIR) $(NAME)
 
 # Build the executable
 

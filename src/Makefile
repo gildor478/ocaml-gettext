@@ -1,16 +1,16 @@
-NAME       = gettext
-CMO        = gettext.cmo 
+NAME       = gettextStub
+CMO        = gettextStub.cmo 
 LIBRARY    = true
 REQUIRES   =
 PREDICATES =
-INSTALLIB  =      \
- gettext.cmi      \
- gettext.cmxa     \
- gettext.cma      \
- pa_gettext.cma   \
- gettext.a        \
- dllgettext.so    \
- libgettext.a     \
+INSTALLIB  =       \
+ gettextStub.cmi   \
+ gettextStub.cmxa  \
+ gettextStub.cma   \
+ pa_gettext.cma    \
+ gettextStub.a     \
+ dllgettextStub.so \
+ libgettextStub.a  \
  META
 STUBSOBJS = -L/usr/lib/ocaml/3.07/ -lcamlidl
 
@@ -18,13 +18,13 @@ all: pa_gettext.cma
 include ../TopMakefile
 
 clean::
-	rm -f gettext.ml gettext.mli gettext.h 
+	rm -f gettextStub.ml gettextStub.mli gettextStub.h 
 	rm -f dll*.so lib*.a
-	rm -f gettext_stubs.c gettext_stubs.o
+	rm -f gettextStub_stubs.c gettextStub_stubs.o
 	rm -f pa_gettext.cma pa_gettext.ml
 
-gettext.cmo: gettext.cmi
-gettext.cmx: gettext.cmi
+gettextStub.cmo: gettextStub.cmi
+gettextStub.cmx: gettextStub.cmi
 pa_gettext.cma: pa_gettext.ml
 	$(OCAMLC) -I +camlp4 -a -o pa_gettext.cma pa_gettext.ml
 pa_gettext.ml: pa_gettext.ml4
