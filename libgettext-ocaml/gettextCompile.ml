@@ -1,5 +1,6 @@
 
 open GettextTypes;;
+open FileUtil;;
 open FileUtil.StrUtil;;
 open FilePath.DefaultPath;;
 
@@ -166,6 +167,20 @@ let install destdir language category textdomain filename_mo_src =
   done;
   mkdir ~parent:true dirname_mo_dst;
   cp [filename_mo_src] filename_mo_dst
+;;
+
+(** uninstall orgdir language category textdomain : remove the MO file 
+    defined by all the other parameters 
+    ( typically destdir/language/category/textdomain.mo ).
+*)
+let uninstall orgdir language category textdomain =
+  let filename_mo_org = 
+    GettextDomain.make_filename orgdir language category textdomain
+  in
+  if test Exists filename_mo_org then
+    rm [filename_mo_org]
+  else
+    ()
 ;;
 
 (** merge fln_pot fln_po_lst backup_ext : use fln_pot as a POT file and

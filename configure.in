@@ -17,8 +17,8 @@ AC_ARG_WITH(localedir,
 	LOCALEDIR=$LOCALEDIR "\"$withval\";", LOCALEDIR="\"/usr/local/share/locale\"")
 
 AC_ARG_WITH(codeset,
-	AC_HELP_STRING([--with-codeset=codeset], [Default codeset to use ( default is ANSI_X3.4-1968 )]),
-	CODESET=$withval, CODESET="ANSI_X3.4-1968")
+	AC_HELP_STRING([--with-codeset=codeset], [Default codeset to use ( default is ISO-8859-1 )]),
+	CODESET=$withval, CODESET="ISO-8859-1")
 
 VERSION=0.1.1
 DATE=`date`

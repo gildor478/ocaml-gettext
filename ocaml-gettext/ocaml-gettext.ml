@@ -22,6 +22,7 @@ type action =
     Extract
   | Compile
   | Install 
+  | Uninstall
   | Merge
   | Version
   | VersionShort
@@ -29,24 +30,28 @@ type action =
 
 type t =
   {
-    action_option              : action option;
-    extract_command            : string;
-    extract_default_option     : string;
-    extract_filename_options   : (string * string) list;
-    extract_pot                : string;
-    compile_output_file_option : string option;
-    install_language_option    : string option;
-    install_category           : GettextTypes.category;
-    install_textdomain_option  : string option;
-    install_destdir            : string;
-    merge_filename_pot         : string;
-    merge_backup_extension     : string;
-    input_files                : string list;
+    action_option               : action option;
+    extract_command             : string;
+    extract_default_option      : string;
+    extract_filename_options    : (string * string) list;
+    extract_pot                 : string;
+    compile_output_file_option  : string option;
+    install_language_option     : string option;
+    install_category            : GettextTypes.category;
+    install_textdomain_option   : string option;
+    install_destdir             : string;
+    uninstall_language_option   : string option;
+    uninstall_category          : GettextTypes.category;
+    uninstall_textdomain_option : string option;
+    uninstall_orgdir            : string;
+    merge_filename_pot          : string;
+    merge_backup_extension      : string;
+    input_files                 : string list;
   }
 ;;
 
 exception ActionRequired;;
-exception InstallTooManyFilename;;
+exception InstallUninstallTooManyFilename;;
 exception CompileTooManyFilename;;
 
 let string_of_exception exc =
@@ -62,11 +67,11 @@ let string_of_exception exc =
   match exc with
     ActionRequired ->
       (s_ "You must specify one action.")
-  | InstallTooManyFilename ->
+  | InstallUninstallTooManyFilename ->
       (s_ 
 "You cannot specify at the same time a language, a textdomain 
-and provide more than one file to install : all install 
-file will have the same destination  filename.")
+and provide more than one file to install/uninstall : all files
+will have the same destination filename.")
   | CompileTooManyFilename ->
       (s_ 
 "You cannot specify a output filename and more than one 
@@ -135,8 +140,34 @@ let do_compile t =
       raise CompileTooManyFilename
 ;;
 
+let guess_language_textdomain (language_option,textdomain_option) lst =
+  match (language_option,textdomain_option,lst) with
+    Some language, Some textdomain, [fl_mo] ->
+      [(language,textdomain,fl_mo)]
+  | Some _, Some _, [] ->
+      []
+  | Some _, Some _, lst ->
+      raise InstallUninstallTooManyFilename
+  | Some language, None, lst ->
+      List.map (fun fl_mo -> (language,(chop_extension fl_mo),fl_mo)) lst
+  | None, Some textdomain, lst ->
+      List.map (fun fl_mo -> ((chop_extension fl_mo),textdomain,fl_mo)) lst
+  | None, None, lst ->
+      List.map (fun fl_mo -> 
+        let str_reduce = 
+          chop_extension fl_mo
+        in 
+        (* BUG: should be able to have get_extension working *)
+        (*(((chop_extension str_reduce), (get_extension str_reduce)),fl_mo)*)
+        raise (Failure
+"FilePath suffers from a default with the handling of
+chop/get_extension. This bug should disappears with 
+newer version of ocaml-fileutils")
+      ) lst
+;;
+
 let do_install t =
-  let install (language,textdomain) fl_mo =
+  let install (language,textdomain,fl_mo) =
     GettextCompile.install 
     t.install_destdir 
     language 
@@ -144,29 +175,26 @@ let do_install t =
     textdomain 
     fl_mo
   in
-  match (t.install_language_option,t.install_textdomain_option,t.input_files) with
-    Some language, Some textdomain, [fl_mo] ->
-      install (language,textdomain) fl_mo
-  | Some _, Some _, [] ->
-      ()
-  | Some _, Some _, lst ->
-      raise InstallTooManyFilename
-  | Some language, None, lst ->
-      List.iter (fun fl_mo -> install (language,(chop_extension fl_mo)) fl_mo) lst
-  | None, Some textdomain, lst ->
-      List.iter (fun fl_mo -> install ((chop_extension fl_mo),textdomain) fl_mo) lst
-  | None, None, lst ->
-      List.iter (fun fl_mo -> 
-        let str_reduce = 
-          chop_extension fl_mo
-        in 
-        (* BUG: should be able to have get_extension working *)
-        (*install ((chop_extension str_reduce), (get_extension str_reduce)) fl_mo*)
-        raise (Failure
-"FilePath suffers from a default with the handling of
-chop/get_extension. This bug should disappears with 
-newer version of ocaml-fileutils")
-      ) lst
+  List.iter install (
+    guess_language_textdomain
+    (t.install_language_option,t.install_textdomain_option) 
+    t.input_files
+  )
+;;
+
+let do_uninstall t =
+  let uninstall (language,textdomain,_) =
+    GettextCompile.uninstall 
+    t.install_destdir 
+    language 
+    t.install_category 
+    textdomain 
+  in
+  List.iter uninstall (
+    guess_language_textdomain
+    (t.uninstall_language_option,t.uninstall_textdomain_option) 
+    t.input_files
+  )
 ;;
 
 let do_merge t =
@@ -181,6 +209,8 @@ let do_action t =
       do_compile t
   | Some Install ->
       do_install t
+  | Some Uninstall ->
+      do_uninstall t
   | Some Merge ->
       do_merge t
   | Some Version ->
@@ -212,26 +242,31 @@ let () =
   in
   let t = ref
     {
-      action_option              = None;
-      extract_command            = "ocaml-xgettext";
-      extract_default_option     = "-I +camlp4 pa_o.cmo";
-      extract_filename_options   = [];
-      extract_pot                = "messages.pot";
-      compile_output_file_option = None;
-      install_language_option    = None;
-      install_category           = LC_MESSAGES;
-      install_textdomain_option  = None;
-      install_destdir            = GettextConfig.default_dir;
-      merge_filename_pot         = "messages.pot";
-      merge_backup_extension     = "bak";
-      input_files                = [];
+      action_option               = None;
+      extract_command             = "ocaml-xgettext";
+      extract_default_option      = "-I +camlp4 pa_o.cmo";
+      extract_filename_options    = [];
+      extract_pot                 = "messages.pot";
+      compile_output_file_option  = None;
+      install_language_option     = None;
+      install_category            = LC_MESSAGES;
+      install_textdomain_option   = None;
+      install_destdir             = GettextConfig.default_dir;
+      uninstall_language_option   = None;
+      uninstall_category          = LC_MESSAGES;
+      uninstall_textdomain_option = None;
+      uninstall_orgdir            = GettextConfig.default_dir;
+      merge_filename_pot          = "messages.pot";
+      merge_backup_extension      = "bak";
+      input_files                 = [];
     }
   in
   let actions = [
-      "extract", Extract;
-      "compile", Compile;
-      "install", Install;
-      "merge",   Merge
+      "extract",   Extract;
+      "compile",   Compile;
+      "install",   Install;
+      "uninstall", Uninstall;
+      "merge",     Merge
     ]
   in
   let (gettext_args,gettext_copyright) = 
@@ -337,7 +372,7 @@ let () =
               t := { !t with install_category = GettextCategory.category_of_string str }
             )
           ),
-          spf (f_ "category Category to use when installing a MO file. Default: %s")
+          spf (f_ "category Category to use when installing a MO file. Default: %s.")
           (GettextCategory.string_of_category !t.install_category)
         );
         (
@@ -358,6 +393,44 @@ let () =
           ),
           spf (f_ "dirname Base dir used when installing a MO file. Default: %s.")
           !t.install_destdir
+        );
+        (
+          "--uninstall-language",
+          (
+            Arg.String ( fun str ->
+              t := { !t with uninstall_language_option = Some str }
+            )
+          ),
+          (s_ "language Language to use when uninstalling a MO file. Default: try to guess it from the name of the MO file.")
+        );
+        (
+          "--uninstall-category",
+          (
+            Arg.String ( fun str ->
+              t := { !t with uninstall_category = GettextCategory.category_of_string str }
+            )
+          ),
+          spf (f_ "category Category to use when uninstalling a MO file.  Default: %s.")
+          (GettextCategory.string_of_category !t.uninstall_category)
+        );
+        (
+          "--uninstall-textdomain",
+          (
+            Arg.String ( fun str ->
+              t := { !t with uninstall_textdomain_option = Some str }
+            )
+          ),
+          (s_ "textdomain Textdomain to use when uninstalling a MO file. Default: try to guess it from the name of the MO file.")
+        );
+        (
+          "--uninstall-orgdir",
+          (
+            Arg.String ( fun str ->
+              t := { !t with uninstall_orgdir = str }
+            )
+          ),
+          spf (f_ "dirname Base dir used when uninstalling a MO file. Default: %s.")
+          !t.uninstall_orgdir
         );
         (
           "--merge-pot",

@@ -164,7 +164,7 @@ let string_of_exception exc =
       spf (f_ "Problem while extracting %s: command %S killed by signal %d.")
       fln cmd signal
   | DomainFileDoesntExist(lst) ->
-      spf (f_ "Cannot find an approriate gettext compiled file ( %s ).")
+      spf (f_ "Cannot find an approriate ocaml-gettext compiled file ( %s ).")
       (string_of_list lst)
   | GettextUninitialized -> 
       (s_ "Ocaml-gettext library is not initialized")
