@@ -1,0 +1,6 @@
+requires = "camlp4"
+version = "0.1"
+predicates = ""
+requires = "gettext.extension camomile"
+archive(byte) = "gettextCamomile.cma"
+archive(native) = "gettextCamomile.cmxa"

@@ -8,31 +8,6 @@ INSTALLIB  = META
 all:
 
 ##############################
-# Stub library               #
-##############################
-
-INSTALLIB +=         \
- gettextStub.cmi     \
- gettextStub.cmxa    \
- gettextStub.cma     \
- gettextStub.a       \
- dllgettextStub.so   \
- libgettextStub.a   
-
-CMO_STUB =           \
- gettextStub_stubs.o \
- gettextStub.cmo 
-
-gettextStub.cmo: gettextStub.cmi
-gettextStub.cmx: gettextStub.cmi
-gettextStub.cma: $(CMO_STUB)
-gettextStub.cmxa: $(CMO_STUB:.cmo=.cmx)
-gettextStub.cma gettextStub.cmxa: STUBSOBJS = -L$(OCAMLLIB) -lcamlidl
-
-clean::
-	-$(RM) gettextStub.ml gettextStub.mli gettextStub.h gettextStub_stubs.c 
-
-##############################
 # Ocaml Gettext base library #
 ##############################
 
@@ -108,24 +83,6 @@ CMO_EXTENSION=         \
 
 gettextExtension.cma: $(CMO_EXTENSION)
 gettextExtension.cmxa: $(CMO_EXTENSION:.cmo=.cmx)
-
-##########################
-# Ocaml Gettext Camomile #
-##########################
-
-REQUIRES += camomile
-
-INSTALLIB +=          \
- gettextCamomile.cma  \
- gettextCamomile.cmxa \
- gettextCamomile.a    \
- gettextCamomile.cmi
-
-CMO_CAMOMILE=         \
- gettextCamomile.cmo
-
-gettextCamomile.cma: $(CMO_CAMOMILE)
-gettextCamomile.cmxa: $(CMO_CAMOMILE:.cmo=.cmx)
 
 ###############################
 # Pa_gettext extension        #

@@ -1,0 +1,5 @@
+version = "0.1"
+predicates = ""
+archive(byte) = "gettextStub.cma"
+archive(native) = "gettextStub.cmxa"
+

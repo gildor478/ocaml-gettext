@@ -1,13 +1,9 @@
-requires = "camlp4"
 version = "0.1"
 predicates = ""
 
-package "stub" (
-  archive(byte) = "gettextStub.cma"
-  archive(native) = "gettextStub.cmxa"
-  archive(syntax,toplevel) = "pa_gettext.cma"
-  archive(syntax,preprocessor) = "pa_gettext.cma"
-)
+# requires = "camlp4" 
+# archive(syntax,toplevel) = "pa_gettext.cma" 
+# archive(syntax,preprocessor) = "pa_gettext.cma" 
 
 package "base" (
   requires = "fileutils"
@@ -27,8 +23,3 @@ package "extension" (
   archive(native) = "gettextExtension.cmxa"
 )
 
-package "camomile" (
-  requires = "gettext.extension camomile"
-  archive(byte) = "gettextCamomile.cma"
-  archive(native) = "gettextCamomile.cmxa"
-)
