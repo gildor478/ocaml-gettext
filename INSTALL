@@ -1,0 +1,27 @@
+--------------
+libexif-ocaml.
+--------------
+
+Prerequisite :
+
+In order to install you will need :
+- ocaml ( <= 3.06 )
+	http://caml.inria.fr/
+- camlidl ( <= 1.04 )
+	http://caml.inria.fr/camlidl/
+- ocamlfind ( <= 0.8 ) 
+	http://www.ocaml-programming.de/packages/
+- libexif ( <= 0.5.9 )
+	http://sourceforge.net/projects/libexif/
+- make, a C compiler
+
+Installing :
+1) Go in the untared source directory
+2) ./configure
+3) make
+4) make install
+
+Uninstalling :
+With the same value you use to install
+1) Go in the untared source directory
+2) make uninstall

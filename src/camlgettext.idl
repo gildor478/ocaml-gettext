@@ -1,0 +1,44 @@
+
+/* Look up MSGID in the current default message catalog for the current
+   LC_MESSAGES locale.  If not found, returns MSGID itself (the default
+   text).  */
+[string]char *gettext ([string]const char *msgid);
+
+/* Look up MSGID in the DOMAINNAME message catalog for the current
+   LC_MESSAGES locale.  */
+[string]char *dgettext ([string]const char *domainname, [string]const char *msgid);
+
+/* Look up MSGID in the DOMAINNAME message catalog for the current CATEGORY
+   locale.  */
+[string]char *dcgettext ([string]const char *domainname, [string]const char *msgid, int category);
+
+/* Similar to `gettext' but select the plural form corresponding to the
+   number N.  */
+[string]char *ngettext ([string]const char *msgid1, [string]const char *msgid2, unsigned long int n);
+
+/* Similar to `dgettext' but select the plural form corresponding to the
+   number N.  */
+[string]char *dngettext ([string]const char *domainname, [string]const char *msgid1, [string]const char *msgid2, unsigned long int n);
+
+/* Similar to `dcgettext' but select the plural form corresponding to the
+   number N.  */
+[string]char *dcngettext (
+	[string]const char *domainname, 
+	[string]const char *msgid1, 
+	[string]const char *msgid2, 
+	unsigned long int n, int category);
+
+
+/* Set the current default message catalog to DOMAINNAME.
+   If DOMAINNAME is null, return the current default.
+   If DOMAINNAME is "", reset to the default of "messages".  */
+char *textdomain (const char *domainname);
+
+/* Specify that the DOMAINNAME message catalog will be found
+   in DIRNAME rather than in the system locale data base.  */
+char *bindtextdomain (const char *domainname, const char *dirname);
+
+/* Specify the character encoding in which the messages from the
+   DOMAINNAME message catalog will be returned.  */
+char *bind_textdomain_codeset (const char *domainname, const char *codeset);
+
