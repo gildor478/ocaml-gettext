@@ -1,5 +1,13 @@
+all:
+
 HTML_SOURCES=reference-manual.xml
+
+# Manpages are a little bit more complicated
 MAN_SOURCES=ocaml-gettext.xml ocaml-xgettext.xml ocaml-gettext-options.xml
+MAN_TARGETS=ocaml-gettext.1   ocaml-xgettext.1   ocaml-gettext-options.5
+ocaml-gettext.1: ocaml-gettext.xml
+ocaml-xgettext.1: ocaml-xgettext.xml
+ocaml-gettext-options.5: ocaml-gettext-options.xml
 
 # Destination dir
 DOCHTML=
@@ -32,8 +40,7 @@ clean: clean-doc-html clean-doc-man
 $(BUILDHTML)/%/index.html: %.xml
 	$(XMLLINT) --xinclude --noent --noout --postvalid $^ 
 	$(MKDIR) -p $(dir $@)
-	$(XSLTPROC) --xinclude --stringparam base.dir        \
-	  "$(dir $@)" $(HTMLXSL) $^
+	$(XSLTPROC) --xinclude --stringparam base.dir "$(dir $@)" $(HTMLXSL) $^
 
 install-builddoc-html: $(patsubst %.xml,$(BUILDHTML)/%/index.html,$(HTML_SOURCES))
 
@@ -48,19 +55,24 @@ uninstall-doc-html: clean-doc-html
 
 # Build MAN files
 
-install-builddoc-man: $(MAN_SOURCES)
-	for i in $^; do                                 \
-	  $(XMLLINT) --xinclude --noent --noout         \
-	    --postvalid $$i;                            \
-	  $(XSLTPROC) --xinclude                        \
-	    $(MANXSL) $$i;                              \
-	done
+MAN_SECTION=man$(patsubst .%,%,$(suffix $(1)))
+MAN_BUILD_TARGETS=$(BUILDMAN)/$(call MAN_SECTION,$(1))/$(1)
+MAN_INSTALL_TARGETS=$(DOCMAN)/$(call MAN_SECTION,$(1))/$(1)
+
+%.1 %.2 %.3 %.4 %.5 %.6 %.7 %.8 %.9: 
+	$(XMLLINT) --xinclude --noent --noout --postvalid $^
+	$(XSLTPROC) --xinclude $(MANXSL) $^
+	$(MKDIR) -p $(dir $(call MAN_BUILD_TARGETS,$@))
+	$(CP) $@ $(call MAN_BUILD_TARGETS,$@) 
+	
+install-builddoc-man: $(MAN_TARGETS)
 
 clean-doc-man:
-	-$(RM) $(MAN_FILES)
+	-$(RM) $(MAN_TARGETS) $(foreach i,$(MAN_TARGETS),$(call MAN_BUILD_TARGETS,$(i)))
 
-install-doc-man: BUILDMAN=$(DOCMAN)
 install-doc-man: install-builddoc-man
+	$(CP) -r $(BUILDMAN) $(DOCMAN)
 
-uninstall-doc-man: BUILDMAN=$(DOCMAN)
 uninstall-doc-man: clean-doc-man
+	-$(RM) $(foreach i,$(MAN_TARGETS),$(call MAN_INSTALL_TARGETS,$(i)))
+

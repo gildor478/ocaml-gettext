@@ -22,13 +22,14 @@
 #  Contact: sylvain@le-gall.net                                          #
 ##########################################################################
 
-NAME       = test
-CMO        = test.cmo
-REQUIRES   = gettext unix
-PREDICATES =
-SYNTAX     = camlp4o
+all:
+	cd library && $(MAKE) all
+	cd gui     && $(MAKE) all
+	cd program && $(MAKE) all
+	cd po      && $(MAKE) all
 
-include ../TopMakefile
-
-clean::
-	$(RM) $(NAME).pot
+clean:
+	cd library && $(MAKE) clean
+	cd gui     && $(MAKE) clean
+	cd program && $(MAKE) clean
+	cd po      && $(MAKE) clean
