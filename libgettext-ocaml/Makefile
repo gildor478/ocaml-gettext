@@ -101,16 +101,8 @@ gettextExtension.cmxa: $(CMO_EXTENSION:.cmo=.cmx)
 ###############################
 
 INSTALLIB +=        \
- pa_gettext.cma    
+ pr_gettext.cmo    
 
-pa_gettext.cma: pa_gettext.ml
-	$(OCAMLC) -I +camlp4 -a -o pa_gettext.cma pa_gettext.ml
-pa_gettext.ml: pa_gettext.ml4
-	$(OCAMLP4)  pa_o.cmo pa_extend.cmo q_MLast.cmo \
-	pa_extend.cmo q_MLast.cmo pr_o.cmo -impl $< > $@
-
-clean::
-	-$(RM) pa_gettext.ml
-
+pr_gettext.cmo: REQUIRES=ast-analyze
 
 include ../TopMakefile

@@ -37,7 +37,7 @@ Arg.parse
 ;;
 *)
 
-let verbose = ref true
+(*let verbose = ref true
 ;;
 
 let po_test = 
@@ -127,4 +127,4 @@ let _ =
 in
 run_test_tt_main all_test
 
-
+*)

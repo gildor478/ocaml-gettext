@@ -23,3 +23,8 @@ package "extension" (
   archive(native) = "gettextExtension.cmxa"
 )
 
+package "extract" (
+  requires = "ast-analyze"
+  archive(syntax,toplevel) = "pr_gettext.cmo" 
+  archive(syntax,preprocessor) = "pr_gettext.cmo"
+)
