@@ -1,7 +1,10 @@
 open GettextUtils;;
 open GettextTypes;;
 open GettextMo_int32;;
- 
+
+type range = Int32.t * Int32.t 
+;;
+
 exception InvalidOptions of Lexing.lexbuf * string;;
 exception InvalidPlurals of Lexing.lexbuf * string;;
 exception InvalidContentType of Lexing.lexbuf * string;;
@@ -10,6 +13,13 @@ exception InvalidTranslationPlural of (string list) * int;;
 exception Junk of string * string list;;
 exception EmptyEntry;;
 exception InvalidMoFile;;
+exception InvalidMoHeaderNegativeStrings;; 
+exception InvalidMoHeaderTableStringOutOfBound of range * range;;
+exception InvalidMoHeaderTableTranslationOutOfBound of range * range;;
+exception InvalidMoHeaderTableTranslationStringOverlap of range * range;;
+exception InvalidMoStringOutOfBound of int * int;;
+exception InvalidMoTranslationOutOfBound of int * int;;
+
 
 let mo_sig_be = int32_of_byte (0x95, 0x04, 0x12, 0xde)
 ;;
@@ -19,18 +29,24 @@ let mo_sig_le = int32_of_byte (0xde, 0x12, 0x04, 0x95)
 
 
 let string_of_exception exc =   
+  let string_of_range (start_bound,end_bound) = 
+    "["^(Int32.to_string start_bound)^"; "^(Int32.to_string end_bound)^"]"
+  in
+  let string_of_list lst = 
+    "[ \""^(String.concat "\"; \"" lst)^"\" ]"
+  in
   match exc with
     InvalidOptions (lexbuf,text) ->
-      "Error while processing parsing of options : \n"
+      "Error while processing parsing of options : "
       ^(string_of_pos lexbuf)^"\n"
       ^text
   | InvalidPlurals (lexbuf,text) ->
-      "Error while processing parsing of plural : \n"
+      "Error while processing parsing of plural : "
       ^(string_of_pos lexbuf)^"\n"
       ^text
   | InvalidContentType (lexbuf,text) ->
-      "Error while processing parsing of content-type : \n"
-      ^(string_of_pos lexbuf)^"\n"
+      "Error while processing parsing of content-type : "
+      ^(string_of_pos lexbuf)^" "
       ^text
   | InvalidMoFile ->
       "MO file provided is not encoded following gettext convention"
@@ -42,18 +58,99 @@ let string_of_exception exc =
   | InvalidTranslationPlural (lst,x) ->
       "Trying to fetch the plural form "
       ^(string_of_int x)
-      ^" of plural form [ \""
-      ^(String.concat "\"; \"" lst)
-      ^"\" ]"
+      ^" of plural form "^(string_of_list lst)
   | Junk (id,lst) ->
       "Junk at the end of the plural form id "
-      ^id^" : [ \""
-      ^(String.concat "\"; \"" lst)
-      ^"\" ]"
+      ^id^" : "^(string_of_list lst)
   | EmptyEntry ->
       "An empty entry has been encounter"
+  | InvalidMoHeaderNegativeStrings ->
+      "Number of strings is negative"
+  | InvalidMoHeaderTableStringOutOfBound(r1,r2) ->
+      "Offset of string table is out of bound ("^
+      (string_of_range r2)^" should be in "^(string_of_range r1)^")"
+  | InvalidMoHeaderTableTranslationOutOfBound(r1,r2) ->
+      "Offset of translation table is out of bound ("^
+      (string_of_range r2)^" should be in "^(string_of_range r1)^")"
+  | InvalidMoHeaderTableTranslationStringOverlap(r1,r2) ->
+      "Translation table and string table overlap ("^
+      (string_of_range r1)^" and "^(string_of_range r2)^
+      " have a non empty intersection)"
+  | InvalidMoStringOutOfBound(max,cur) ->
+      "Out of bound access when trying to find a string ("
+      ^(string_of_int max)^" < "^(string_of_int cur)^")"
+  | InvalidMoTranslationOutOfBound(max,cur) ->
+      "Out of bound access when trying to find a translation ("
+      ^(string_of_int max)^" < "^(string_of_int cur)^")"
   | _ ->
       ""
+;;
+
+let check_mo_header chn hdr =
+  let offset_min = Int32.of_int 28
+  in
+  let offset_max = Int32.of_int (in_channel_length chn)
+  in
+  let range_offset start_bound = 
+    let end_bound = 
+      Int32.add start_bound ( 
+        Int32.mul (Int32.pred hdr.number_of_strings) (Int32.of_int 8)
+      )
+    in
+    (offset_min,offset_max),(start_bound,end_bound)
+  in
+  let val_in_range (start_bound,end_bound) value =
+    Int32.compare start_bound value <= 0 
+      && Int32.compare value end_bound <= 0 
+  in
+  (* check_* function return true in case of problem *)
+  let check_overlap start_bound1 start_bound2 =
+    let (_,(_,end_bound1)) = 
+      range_offset start_bound1
+    in
+    let (_,(_,end_bound2)) = 
+      range_offset start_bound2
+    in
+    val_in_range (start_bound1,end_bound1) start_bound2
+    || val_in_range (start_bound1,end_bound1) end_bound2
+    || val_in_range (start_bound2,end_bound2) start_bound1
+    || val_in_range (start_bound2,end_bound2) end_bound1
+  in
+  let check_range_offset start_bound =
+    let (file,(start_bound,end_bound)) = 
+      range_offset start_bound
+    in
+    not (
+      val_in_range file start_bound 
+      && val_in_range file end_bound
+    )
+  in
+  if Int32.compare hdr.number_of_strings Int32.zero < 0 then
+    raise InvalidMoHeaderNegativeStrings
+  else if check_range_offset hdr.offset_table_strings then
+    raise (
+      InvalidMoHeaderTableStringOutOfBound(
+        fst (range_offset hdr.offset_table_strings),
+        snd (range_offset hdr.offset_table_strings)
+      )
+    )
+  else if check_range_offset hdr.offset_table_translation then
+    raise (
+      InvalidMoHeaderTableTranslationOutOfBound(
+        fst (range_offset hdr.offset_table_translation),
+        snd (range_offset hdr.offset_table_translation)
+      )
+    )
+  else if check_overlap hdr.offset_table_translation hdr.offset_table_strings then
+    raise (
+      InvalidMoHeaderTableTranslationStringOverlap(
+        snd (range_offset hdr.offset_table_translation),
+        snd (range_offset hdr.offset_table_strings)
+      )
+    )
+  (* We don't care of hashing table, since we don't use it *)
+  else 
+    hdr
 ;;
 
 let input_mo_header chn = 
@@ -69,6 +166,7 @@ let input_mo_header chn =
   in
   let seek_and_input x = seek_in chn x; input_int32 chn endianess
   in
+  check_mo_header chn 
   {
     endianess                = endianess;
     file_format_revision     = seek_and_input  4;
@@ -108,25 +206,29 @@ let string_of_mo_header mo_header =
 ;;
 
 let input_mo_untranslated failsafe chn mo_header number = 
-  (* BUG : no bound check *)
   let offset_pair = 
     (Int32.to_int mo_header.offset_table_strings) + number * 8
   in
   let str = 
-    seek_in chn offset_pair;
-    input_int32_pair_string chn mo_header.endianess
+    try
+      seek_in chn offset_pair;
+      input_int32_pair_string chn mo_header.endianess
+    with End_of_file ->
+      raise (InvalidMoStringOutOfBound(in_channel_length chn,offset_pair))
   in
   split_plural str
 ;;
 
 let input_mo_translated failsafe chn mo_header number = 
-  (* BUG : no bound check *)
   let offset_pair = 
     (Int32.to_int mo_header.offset_table_translation) + number * 8
   in
   let str = 
-    seek_in chn offset_pair;
-    input_int32_pair_string chn mo_header.endianess
+    try
+      seek_in chn offset_pair;
+      input_int32_pair_string chn mo_header.endianess
+    with End_of_file ->
+      raise (InvalidMoTranslationOutOfBound(in_channel_length chn,offset_pair))
   in
   split_plural str 
 ;;

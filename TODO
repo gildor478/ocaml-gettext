@@ -1,7 +1,4 @@
 v 0.2.0 : 
-- Parse comments, to keep licence et al 
-- Treat differently the ouptut of "" and its translation in PO file
-- Add test concerning mo file structure : check that each pointer are valid ( no table conflict, et all )
 - Write gettextFormat : check format of ocaml string ( concerning %s, %a... )
 - Test MO file before installing it
 - Test GettextCamomile
@@ -12,9 +9,12 @@ v 0.2.0 :
 - Test GettextStub
 - Complete ocaml-gettext executable
 - Benchmark GettextCamomile/GettextStub 
+- Move all exception declaration to gettextTypes, string_of_exception to Gettext
 - Add a header to each source code file concerning the licence ( LGPL + Ocaml + copyright )
 - Write a quick start manual
 - Generate a ocamldoc manual
-- correct the BUG: related to bug from ocaml-fileutils
+- Correct the BUG: related to bug from ocaml-fileutils
+- Remove \t in all the code, find a the good settings to work with vim and use a tags in each file to made it clear
 
 v 0.3.0 :
+- Better parse comments, to keep licence et al 
