@@ -22,8 +22,8 @@ INSTALLIB +=         \
  gettextMo.cmi    
 
 CMO_BASE  =            \
- gettextUtils.cmo      \
  gettextTypes.cmo      \
+ gettextUtils.cmo      \
  gettextMo_int32.cmo   \
  gettextMo_parser.cmo  \
  gettextMo_lexer.cmo   \
