@@ -24,6 +24,13 @@ module Native : GettextRealize.REALIZE_TYPE =
         | GettextTypes.LC_MESSAGES ->  GettextStubCompat.LC_MESSAGES 
         | GettextTypes.LC_ALL      ->  GettextStubCompat.LC_ALL      
       in
+      let default_dir = 
+        match t.path with
+         default_dir :: _ ->
+           Some default_dir 
+        | [] ->
+            None
+      in
       let bind_textdomain_one textdomain (codeset_opt,dir_opt) =
         (
           let codeset =
@@ -46,11 +53,23 @@ module Native : GettextRealize.REALIZE_TYPE =
               in
               ()
           | None ->
-              ()
+              (
+                match default_dir with
+                  Some dir ->
+                    let str : string = 
+                      GettextStubCompat.bindtextdomain textdomain dir
+                    in
+                    ()
+                | None ->
+                    ()
+              )
         )
       in
-      (* We ignore t.path, since there is no notion of search path in native gettext.
-         So the MO file should be in the default directory of gettext.
+      (* We only use the first path of t.path, since there is no notion of search path 
+         in native gettext. So the MO file should be in :
+           - first component of t.path,
+           - directory pointed by bindtextdomain,
+           - default directory of gettext.
        *)
       let str : string = 
         GettextStubCompat.textdomain t.default

@@ -1,6 +1,4 @@
 v 0.2.0 : 
-- Test GettextCamomile
-- Test GettextStub
 - Write GettextTranslate.hashtable
 - Write GettextTranslate.open ( base on file opening when a translation is required )
 - Add gettextGettext : i18n/l10n for ocaml-gettext ( if it can bootstrap easily )
@@ -13,6 +11,7 @@ v 0.2.0 :
 - Generate a ocamldoc manual
 - Write a quick start manual
 - Correct the BUG: related to bug from ocaml-fileutils
+- Remove dependence on ocamli18n : parsing POSIX compliant locale is not the aim of ocamli18n
 
 v 0.3.0 :
 - Better parse comments, to keep licence et al 

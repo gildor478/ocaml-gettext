@@ -359,6 +359,31 @@ let format_test tests =
     )
 ;;
 
+(**************************)
+(* Split plural functions *)
+(**************************)
+
+let split_plural_test tests = 
+  let split_plural_test_one (str,res_lst) = 
+      (Printf.sprintf "Split plural test %S" str) >::
+        ( fun () ->
+          let lst = GettextUtils.split_plural str
+          in
+          List.iter2 ( fun str1 str2 -> 
+            print_debug tests (Printf.sprintf "Extracted : %S" str2);
+            print_debug tests (Printf.sprintf "Expected  : %S" str1);
+            if str1 = str2 then 
+              ()
+            else
+              assert_failure (Printf.sprintf "%S should be %S" str2 str1)
+          ) res_lst lst
+        )
+  in
+  "Split plural test" >:::
+    List.map split_plural_test_one [
+      ("%d coffee\000more %d coffee",["%d coffee"; "more %d coffee"])
+    ]
+;;
 
 (*************************)
 (* Test of PO processing *)
@@ -664,7 +689,7 @@ let implementation_test tests =
     let check_translation str lst = 
       let (_,same_str) =
         List.fold_left ( 
-          fun (prev_str_opt,res) cur_str -> 
+          fun (prev_str_opt,res) (_,cur_str) -> 
             match prev_str_opt with
               Some prev_str ->
                 (Some cur_str, res && prev_str = cur_str)
@@ -737,9 +762,11 @@ let implementation_test tests =
   in
   let implementation_lst = 
     [
-      ("GettextCamomile.Map.realize", GettextCamomile.Map.realize);
-      ("GettextStub.Native.realize",  GettextStub.Native.realize);
-      ("GettextStub.Preload.realize", GettextStub.Preload.realize);
+      ("GettextCamomile.Map.realize",     GettextCamomile.Map.realize);
+      ("GettextCamomile.Hashtbl.realize", GettextCamomile.Hashtbl.realize);
+      ("GettextCamomile.Open.realize",    GettextCamomile.Open.realize);
+      ("GettextStub.Native.realize",      GettextStub.Native.realize);
+      ("GettextStub.Preload.realize",     GettextStub.Preload.realize);
     ]
   in
   "Gettext implementation test" >:::
@@ -761,6 +788,7 @@ let all_test =
   "Test ocaml-gettext" >::: 
     [
       format_test         tests;
+      split_plural_test   tests;
       po_test             tests; 
       compatibility_test  tests;
       extract_test        tests;

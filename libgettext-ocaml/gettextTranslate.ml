@@ -5,13 +5,10 @@ open GettextUtils;;
 open GettextMo;;
 open GettextFormat;;
 
-exception GettextTranslateCouldNotOpenFile of string ;;
 exception GettextTranslateStringNotFound of string ;;
 
 let string_of_exception exc =
   match exc with
-    GettextTranslateCouldNotOpenFile fln ->
-      "Could not open file "^fln
   | GettextTranslateStringNotFound str ->
       "Cannot find string "^str
   | _ ->
@@ -76,47 +73,26 @@ module Map : TRANSLATE_TYPE =
     }
 
     let create t filename charset =
-      let map = ref MapString.empty
-      in
-      let fun_plural_forms = 
-        try 
-          (* Processing of the file *)
-          let chn = open_in filename
-          in
-          let mo_header = input_mo_header chn
-          in
-          let fun_plural_forms = 
-            let informations = 
-              input_mo_informations t.GettextTypes.failsafe chn mo_header
-            in
-            informations.GettextTypes.fun_plural_forms
-          in
-          for i = 0 to (Int32.to_int mo_header.number_of_strings) - 1
-          do
-            let new_translation = 
-              input_mo_translation t.GettextTypes.failsafe chn mo_header i
-            in
-            map :=
-              match new_translation with
-                Singular(id,str) ->
-                MapString.add id 
-                (Singular(id, charset str)) 
-                !map
-              | Plural(id,id_plural,lst) ->
-                MapString.add id 
-                (Plural (id, id_plural, List.map charset lst)) 
-                !map
-          done;
-          fun_plural_forms
-        with (Sys_error _) ->
-          fail_or_continue t.GettextTypes.failsafe
-          string_of_exception
-          (GettextTranslateCouldNotOpenFile filename)
-          germanic_plural
+      let (map,fun_plural_forms) = 
+        fold_mo 
+        t.GettextTypes.failsafe
+        ( fun translation accu ->
+          match translation with
+            Singular(str_id, str) ->
+              MapString.add str_id
+              (Singular(str_id,charset str))
+              accu
+          | Plural(str_id,str_plural,lst) ->
+              MapString.add str_id
+              (Plural(str_id,str_plural,List.map charset lst))
+              accu
+        )
+        MapString.empty
+        filename
       in
       {
         dummy            = Dummy.create t filename charset;
-        map              = !map;
+        map              = map;
         failsafe         = t.GettextTypes.failsafe;
         fun_plural_forms = fun_plural_forms;
       }
@@ -144,3 +120,126 @@ module Map : TRANSLATE_TYPE =
         (Dummy.translate u.dummy printf_format str plural_form)
   end
 ;;
+
+module Hashtbl : TRANSLATE_TYPE =
+  struct
+    
+    type u = {
+      dummy            : Dummy.u;
+      hashtbl          : (string,translation) Hashtbl.t;
+      failsafe         : failsafe;
+      fun_plural_forms : int -> int;
+    }
+
+    let create t filename charset =
+      let (hashtbl,fun_plural_forms) = 
+        fold_mo 
+        t.GettextTypes.failsafe
+        ( fun translation accu ->
+          match translation with
+            Singular(str_id, str) ->
+              (
+                Hashtbl.add accu str_id
+                (Singular(str_id,charset str));
+                accu
+              )
+          | Plural(str_id,str_plural,lst) ->
+              (
+                Hashtbl.add accu str_id
+                (Plural(str_id,str_plural,List.map charset lst));
+                accu
+              )
+        )
+        (* 32 is only a guest on the number of string contains in the 
+           future table *)
+        (Hashtbl.create 32)
+        filename
+      in
+      {
+        dummy            = Dummy.create t filename charset;
+        hashtbl          = hashtbl;
+        failsafe         = t.GettextTypes.failsafe;
+        fun_plural_forms = fun_plural_forms;
+      }
+      
+    let translate u printf_format str plural_form =
+      try
+        let plural_number = 
+          u.fun_plural_forms (
+            match plural_form with
+              Some(_,x) -> x
+              | None -> 0
+          )
+        in
+        let check =
+          if printf_format then
+            check_format u.failsafe
+          else
+            fun x -> x
+        in
+        get_translated_value u.failsafe (check (Hashtbl.find u.hashtbl str)) plural_number
+      with Not_found ->
+        fail_or_continue u.failsafe
+        string_of_exception
+        (GettextTranslateStringNotFound str)
+        (Dummy.translate u.dummy printf_format str plural_form)
+  end
+;;
+
+module Open : TRANSLATE_TYPE =
+  struct
+    
+    type u = {
+      dummy             : Dummy.u;
+      filename          : filename;
+      charset           : string -> string;
+      failsafe          : failsafe;
+      fun_plural_forms  : int -> int;
+      number_of_strings : int;
+    }
+
+    let create t filename charset =
+      (* Processing of the file *)
+      let chn =
+        open_in filename
+      in
+      let mo_header = input_mo_header chn
+      in
+      let informations = 
+        input_mo_informations t.GettextTypes.failsafe chn mo_header
+      in
+      let fun_plural_forms = 
+        informations.GettextTypes.fun_plural_forms
+      in
+      {
+        dummy            = Dummy.create t filename charset;
+        filename         = filename;
+        charset          = charset;
+        failsafe         = t.GettextTypes.failsafe;
+        fun_plural_forms = fun_plural_forms;
+        number_of_strings= 
+      }
+      
+    let translate u printf_format str plural_form =
+      try
+        let plural_number = 
+          u.fun_plural_forms (
+            match plural_form with
+              Some(_,x) -> x
+              | None -> 0
+          )
+        in
+        let check =
+          if printf_format then
+            check_format u.failsafe
+          else
+            fun x -> x
+        in
+        get_translated_value u.failsafe (check (Hashtbl.find u.hashtbl str)) plural_number
+      with Not_found ->
+        fail_or_continue u.failsafe
+        string_of_exception
+        (GettextTranslateStringNotFound str)
+        (Dummy.translate u.dummy printf_format str plural_form)
+  end
+;

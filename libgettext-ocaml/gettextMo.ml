@@ -19,6 +19,7 @@ exception InvalidMoHeaderTableTranslationOutOfBound of range * range;;
 exception InvalidMoHeaderTableTranslationStringOverlap of range * range;;
 exception InvalidMoStringOutOfBound of int * int;;
 exception InvalidMoTranslationOutOfBound of int * int;;
+exception CannotOpenMoFile of string;;
 
 
 let mo_sig_be = int32_of_byte (0x95, 0x04, 0x12, 0xde)
@@ -82,6 +83,8 @@ let string_of_exception exc =
   | InvalidMoTranslationOutOfBound(max,cur) ->
       "Out of bound access when trying to find a translation ("
       ^(string_of_int max)^" < "^(string_of_int cur)^")"
+  | CannotOpenMoFile fln ->
+      "Could not open file "^fln
   | _ ->
       ""
 ;;
@@ -488,4 +491,41 @@ let output_mo ?(endianess = LittleEndian) chn lst =
   ) [ untranslated_table ; translated_table ];
   List.iter (output_string chn) untranslated;
   List.iter (output_string chn) translated
+;;
+
+let fold_mo failsafe f init fl_mo = 
+  try 
+  (* Processing of the file *)
+    let chn =
+        open_in fl_mo
+    in
+    let mo_header = input_mo_header chn
+    in
+    let informations = 
+      input_mo_informations failsafe chn mo_header
+    in
+    let fun_plural_forms = 
+      informations.GettextTypes.fun_plural_forms
+    in
+    let rec fold_mo_aux accu i = 
+      if i < Int32.to_int mo_header.number_of_strings then
+        let new_translation = 
+          input_mo_translation failsafe chn mo_header i
+        in
+        let new_accu = 
+          f new_translation accu 
+        in
+        fold_mo_aux new_accu (i+1)
+    else
+        accu 
+    in
+    let translations = 
+      fold_mo_aux init 0 
+    in
+    (translations,fun_plural_forms)
+  with (Sys_error _) ->
+    fail_or_continue failsafe
+    string_of_exception
+    (CannotOpenMoFile fl_mo)
+    (init,germanic_plural)
 ;;

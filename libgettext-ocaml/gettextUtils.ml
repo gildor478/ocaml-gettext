@@ -17,17 +17,18 @@ let string_of_pos lexbuf =
 
 let split_plural str =
   let rec split_plural_one start =
-    try 
-      let next_sep = String.index_from str start '\000' 
-      in
-      let new_plural = String.sub str start (next_sep - start)
-      in
-      if (next_sep + 1) >= String.length str then
-        [new_plural]
-      else
-        new_plural :: ( split_plural_one (next_sep + 1) )
-    with Not_found ->
-      [str]
+    let next_sep = 
+      try
+        String.index_from str start '\000' 
+      with Not_found ->
+        String.length str
+    in
+    let new_plural = String.sub str start (next_sep - start)
+    in
+    if (next_sep + 1) >= String.length str then
+      [new_plural]
+    else
+      new_plural :: ( split_plural_one (next_sep + 1) )
   in
   split_plural_one 0
 ;;
