@@ -1,6 +1,6 @@
 open FileUtil;;
 open FileUtil.StrUtil;;
-open Camlgettext;;
+open GettextMo;;
 
 let read_one_mo file = 
   try 
@@ -13,13 +13,14 @@ let read_one_mo file =
     let translation = input_mo_translation mo_file header
     in
     close_in mo_file 
-  with Camlgettext_types.Bad_mo_file ->
+  with GettextTypes.Bad_mo_file ->
     print_endline "Bad mo file"
 in
 Arg.parse 
 [
   ("-search", (Arg.String( fun s -> 
-      print_endline ("Searching "^s);
+      print_string ("Searching "^s);
+      print_newline ();
       find (Has_extension "mo") s (fun () fln -> read_one_mo fln) ()
       )
     ), "Search the directory for .mo file")

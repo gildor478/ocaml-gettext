@@ -70,7 +70,11 @@ opt:  $(if $(LIBRARY), install-buildlib, $(NAME).opt)
 # Build the lib
 
 %.cmxa %.cma: 
-	$(OCAMLMKLIB) -o $* $^ $(STUBSOBJS)
+	$(if $(STUBSOBJS), \
+	 $(OCAMLMKLIB) -o $* $^ $(STUBSOBJS), \
+	 $(if $(filter %.cmo,$^), $(OCAMLC)   -a -o $*.cma  $(filter %.cmo,$^));\
+	 $(if $(filter %.cmx,$^), $(OCAMLOPT) -a -o $*.cmxa $(filter %.cmx,$^)) \
+	 )
 
 $(TEMPBUILDLIB):
 	mkdir $(TEMPBUILDLIB)

@@ -1,7 +1,13 @@
-type endianess = ArchEndian | NotArchEndian
+
+type failsafe = 
+    Ignore 
+  | InformStderr 
+  | RaiseException
 ;;
 
-exception Bad_mo_file
+type endianess = 
+    ArchEndian 
+  | NotArchEndian
 ;;
 
 (* Specification of .MO file *)
@@ -86,7 +92,6 @@ type mo_header_type = {
 (* true                                         *)
 
 type mo_translation_type = {
-  translation_from_string   : (string, string) Hashtbl.t;
   project_id_version        : string option;
   report_msgid_bugs_to      : string option;
   pot_creation_date         : string option;
@@ -103,4 +108,15 @@ type mo_translation_type = {
   nplurals                  : int;
   fun_plural_forms          : int -> int; 
 }
+;;
+
+type translation_type = 
+  Singular of string
+| Plural of string list
+;;
+
+type po_content_type =
+  Domain of string * (po_content_type list)
+| SingularEntry of string * string
+| PluralEntry of string * ((int * string) list)
 ;;

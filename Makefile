@@ -1,21 +1,18 @@
 all:
-	cd src && $(MAKE) all
+	cd libgettext-ocaml && $(MAKE) all
 
 install:
-	cd src && $(MAKE) install-lib
+	cd libgettext-ocaml && $(MAKE) install-lib
 
 uninstall:
-	cd src && $(MAKE) uninstall-lib
+	cd libgettext-ocaml && $(MAKE) uninstall-lib
 	
 clean:
-	cd src && $(MAKE) clean
-	cd test && $(MAKE) clean
+	-cd libgettext-ocaml && $(MAKE) clean
+	-cd test             && $(MAKE) clean
+	-cd examples         && $(MAKE) clean
 
-distclean:
-	-@if [ -e TopMakefile ]; then \
-	 cd src && $(MAKE) clean; \
-	 cd test && $(MAKE) clean; \
-	fi
+distclean: clean
 	-$(RM) config.* TopMakefile
 	-$(RM) -r .libs
 	-$(RM) src/.depend

@@ -1,6 +1,63 @@
 open GettextTypes;;
 open GettextMo_int32;;
  
+exception InvalidOptions of Lexing.lexbuf * string;;
+exception InvalidPlurals of Lexing.lexbuf * string;;
+exception InvalidContentType of Lexing.lexbuf * string;;
+exception InvalidTranslationSingular of string * int;;
+exception InvalidTranslationPlural of (string list) * int;;
+exception InvalidMoFile;;
+
+let string_of_exception exc =   
+  let string_of_pos lexbuf = 
+    "line "^(string_of_int lexbuf.Lexing.lex_curr_p.Lexing.pos_lnum)
+    ^" character "
+    ^(string_of_int (lexbuf.Lexing.lex_curr_p.Lexing.pos_cnum - lexbuf.Lexing.lex_curr_p.Lexing.pos_bol))
+  in
+  match exc with
+    InvalidOptions (lexbuf,text) ->
+      "Error while processing parsing of options : \n"
+      ^(string_of_pos lexbuf)^"\n"
+      ^text
+  | InvalidPlurals (lexbuf,text) ->
+      "Error while processing parsing of plural : \n"
+      ^(string_of_pos lexbuf)^"\n"
+      ^text
+  | InvalidContentType (lexbuf,text) ->
+      "Error while processing parsing of content-type : \n"
+      ^(string_of_pos lexbuf)^"\n"
+      ^text
+  | InvalidMoFile ->
+      "MO file provided is not encoded following gettext convention"
+  | InvalidTranslationSingular (str,x) ->
+      "Trying to fetch the plural form "
+      ^(string_of_int x)
+      ^" of a singular form \""
+      ^str^"\""
+  | InvalidTranslationPlural (lst,x) ->
+      "Trying to fetch the plural form "
+      ^(string_of_int x)
+      ^" of plural form [ \""
+      ^(String.concat "\"; \"" lst)
+      ^"\" ]"
+  | _ ->
+      ""
+;;
+
+let fail_or_continue failsafe exc cont_value =
+  match failsafe with
+    Ignore ->
+      cont_value
+  | InformStderr ->
+      (
+        prerr_string (string_of_exception exc);
+        prerr_newline ();
+        cont_value
+      )
+  | RaiseException ->
+      raise exc
+;;
+
 let input_mo_header chn = 
   let endianess = 
     let magic_number = seek_in chn 0; input_int32 chn ArchEndian
@@ -11,7 +68,7 @@ let input_mo_header chn =
     | 0xde120495 ->
         NotArchEndian
     | _ ->
-          raise Bad_mo_file 
+          raise InvalidMoFile
   in
   let seek_and_input x = seek_in chn x; input_int32 chn endianess
   in
@@ -38,131 +95,130 @@ let string_of_mo_header mo_header =
   Buffer.contents buff
 ;;
 
-let input_mo_translation chn mo_header =
-  let input_strings_list () = 
-    let input_one_string (length,offset) = 
-      let str = String.make (Int32.to_int length) 'X'
-      in
-      seek_in chn (Int32.to_int offset);
-      really_input chn str 0 (Int32.to_int length);
-      str
-    in
-    List.map input_one_string
-      (
-        input_int32_pair_table
-        chn 
-        mo_header.endianess 
-    (Int32.to_int mo_header.number_of_strings) 
-      )
-   in
-   let list_strings = 
-     seek_in chn (Int32.to_int mo_header.offset_table_strings);
-     input_strings_list ()
-   in
-   let list_translations = 
-     seek_in chn (Int32.to_int mo_header.offset_table_translation);
-     input_strings_list ()
-   in
-   let translations = 
-     Hashtbl.create (Int32.to_int mo_header.number_of_strings)
-   in
-   let empty_translation = 
-     List.iter2 ( fun s t -> Hashtbl.add translations s t ) list_strings
-     list_translations;
-     try
-       let res = Hashtbl.find translations ""
-       in
-       Hashtbl.remove translations "";
-       res
-     with Not_found ->
-       ""
-   in
-   let string_of_pos lexbuf = 
-     "line "^(string_of_int lexbuf.Lexing.lex_curr_p.Lexing.pos_lnum)
-     ^" character "
-     ^(string_of_int (lexbuf.Lexing.lex_curr_p.Lexing.pos_cnum - lexbuf.Lexing.lex_curr_p.Lexing.pos_bol))
-   in
-   let field_value = 
-     let lexbuf = Lexing.from_string empty_translation
-     in
-     try
-       GettextMo_parser.main GettextMo_lexer.token_field_name lexbuf
-     with 
-       Parsing.Parse_error 
-     | Failure("lexing: empty token") ->
-       (
-         prerr_string "Error while processing parsing of options : ";
-         prerr_newline ();
-         prerr_string (string_of_pos lexbuf);
-         prerr_newline ();
-         prerr_string empty_translation;
-         prerr_newline ();
-         []
-       )
-   in
-   let (nplurals,fun_plural_forms) = 
-     let germanic_plural = 
-       (* The germanic default *)
-       (2,fun n -> if n = 1 then 1 else 0)
-     in
-     try 
-       let field_plural_forms = List.assoc "Plural-Forms" field_value
-       in
-       let lexbuf = Lexing.from_string field_plural_forms
-       in
-       try
-         GettextMo_parser.plural_forms
-         GettextMo_lexer.token_field_plural_value lexbuf 
-       with 
-         Parsing.Parse_error 
-       | Failure("lexing: empty token") ->
-         (
-           prerr_string "Error while processing parsing of plural : ";
-           prerr_newline ();
-           prerr_string (string_of_pos lexbuf);
-           prerr_newline ();
-           prerr_string field_plural_forms;
-           prerr_newline ();
-           germanic_plural
-         ) 
-     with Not_found ->
-       germanic_plural 
-   in
-   let (content_type, content_type_charset) = 
-     let gettext_content = ("text/plain", "UTF-8")
-     in
-     try 
-       let field_content_type = List.assoc "Content-Type" field_value
-       in
-       let lexbuf = Lexing.from_string field_content_type
-       in
-       try
-         GettextMo_parser.content_type 
-         GettextMo_lexer.token_field_content_type lexbuf
-       with      
-         Parsing.Parse_error 
-       | Failure("lexing: empty token") ->
-         (
-           prerr_string "Error while processing parsing of content-type : ";
-           prerr_newline ();
-           prerr_string (string_of_pos lexbuf);
-           prerr_newline ();
-           prerr_string field_content_type;
-           prerr_newline ();
-           gettext_content
-         )
-     with Not_found ->
-       gettext_content 
-   in
-   let extract_field_string name = 
-     try 
-       Some (List.assoc name field_value)
-     with Not_found ->
-       None
-   in
+let input_mo_untranslated ?(failsafe = Ignore) chn mo_header number = 
+  let offset_pair = 
+    (Int32.to_int mo_header.offset_table_strings) + number * 8
+  in
+  seek_in chn offset_pair;
+  input_int32_pair_string chn mo_header.endianess
+;;
 
+let input_mo_translated ?(failsafe = Ignore) chn mo_header number = 
+  let offset_pair = 
+    (Int32.to_int mo_header.offset_table_translation) + number * 8
+  in
+  let str = 
+    seek_in chn offset_pair;
+    input_int32_pair_string chn mo_header.endianess
+  in
+  if String.contains str '\000' then
+    let rec split_plural start =
+      try 
+        let next_sep = String.index_from str start '\000' 
+        in
+        let new_plural = String.sub str start (next_sep - start)
+        in
+        if (next_sep + 1) >= String.length str then
+          [new_plural]
+        else
+          new_plural :: ( split_plural (next_sep + 1) )
+      with Not_found ->
+        [str]
+    in
+    Plural (split_plural 0)
+  else
+    Singular str
+;;
+
+let get_translated_value ?(failsafe = Ignore) translation plural_number =
+  match (translation, plural_number) with
+    (Singular str, 0) ->
+      str
+  | (Singular str, x) ->
+      fail_or_continue 
+      failsafe
+      (InvalidTranslationSingular(str,x))
+      str
+  | (Plural lst, x) when x < List.length lst ->
+      List.nth lst x 
+  | (Plural lst, x) ->
+      fail_or_continue 
+      failsafe
+      (InvalidTranslationPlural(lst,x))
+      List.nth lst 0
+;;
+
+let input_mo_informations ?(failsafe = Ignore) chn mo_header =
+  (* La position de "" est forcément 0 *)
+  let empty_translation = 
+    get_translated_value ~failsafe 
+    (input_mo_translated chn mo_header 0)
+    0
+  in
+  let field_value = 
+    let lexbuf = Lexing.from_string empty_translation
+    in
+    try
+      GettextMo_parser.main GettextMo_lexer.token_field_name lexbuf
+    with 
+      Parsing.Parse_error 
+    | Failure("lexing: empty token") ->
+        fail_or_continue 
+        failsafe 
+        (InvalidOptions (lexbuf,empty_translation)) 
+        []
+  in
+  let (nplurals,fun_plural_forms) = 
+    let germanic_plural = 
+      (* The germanic default *)
+      (2,fun n -> if n = 1 then 1 else 0)
+    in
+    try 
+      let field_plural_forms = List.assoc "Plural-Forms" field_value
+      in
+      let lexbuf = Lexing.from_string field_plural_forms
+      in
+      try
+        GettextMo_parser.plural_forms
+        GettextMo_lexer.token_field_plural_value lexbuf 
+      with 
+        Parsing.Parse_error 
+      | Failure("lexing: empty token") ->
+          fail_or_continue 
+          failsafe 
+          (InvalidPlurals(lexbuf,field_plural_forms))
+          germanic_plural
+    with Not_found ->
+      germanic_plural 
+  in
+  let (content_type, content_type_charset) = 
+    let gettext_content = ("text/plain", "UTF-8")
+    in
+    try 
+      let field_content_type = List.assoc "Content-Type" field_value
+      in
+      let lexbuf = Lexing.from_string field_content_type
+      in
+      try
+        GettextMo_parser.content_type 
+        GettextMo_lexer.token_field_content_type lexbuf
+      with      
+        Parsing.Parse_error 
+      | Failure("lexing: empty token") ->
+          fail_or_continue
+          failsafe
+          (InvalidContentType(lexbuf,field_content_type))
+          gettext_content
+    with Not_found ->
+      gettext_content 
+  in
+  let extract_field_string name = 
+    try 
+      Some (List.assoc name field_value)
+    with Not_found ->
+      None
+  in
    {
-     translation_from_string   = translations;
      project_id_version        = extract_field_string "Project-Id-Version";
      report_msgid_bugs_to      = extract_field_string "Report-Msgid-Bugs-To";
      pot_creation_date         = extract_field_string "POT-Creation-Date"; 
@@ -186,17 +242,9 @@ let string_of_mo_translation ?(omit_translation=true) ?(compute_plurals=(0,3)) m
   in
   let extract_string x = 
     match x with
-      Some s ->
-        s
-    | None ->
-        ""
+      Some s -> s
+    | None -> ""
   in
-  p buff "Translations              : \n";
-  if omit_translation then
-    p buff "omited\n"
-  else
-    Hashtbl.iter ( fun s t -> p buff "\"%s\" -> \"%s\"\n" s t ) mo_translation.translation_from_string
-  ;
   p buff "Project-Id-Version        : %s\n" (extract_string mo_translation.project_id_version);
   p buff "Report-Msgid-Bugs-To      : %s\n" (extract_string mo_translation.report_msgid_bugs_to);
   p buff "POT-Creation-Date         : %s\n" (extract_string mo_translation.pot_creation_date); 

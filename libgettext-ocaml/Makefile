@@ -29,15 +29,16 @@ gettextStub.cma gettextStub.cmxa: STUBSOBJS = -L/usr/lib/ocaml/3.07/ -lcamlidl
 clean::
 	-$(RM) gettextStub.ml gettextStub.mli gettextStub.h gettextStub_stubs.c 
 
-# Ocaml base library #
+# Ocaml Gettext base library #
 
 INSTALLIB +=         \
  gettextBase.cma     \
  gettextBase.cmxa    \
+ gettextBase.a       \
  gettextTypes.cmi    \
  gettextMo.cmi    
 
-CMO_BASE  +=           \
+CMO_BASE  =            \
  gettextTypes.cmo      \
  gettextMo_int32.cmo   \
  gettextMo_parser.cmo  \
@@ -50,8 +51,30 @@ gettextBase.cma gettextBase.cmxa: $(CMO_BASE)
 gettextBase.cma gettextBase.cmxa: $(CMO_BASE:.cmo=.cmx)
 
 clean::
-	-$(RM) gettextParser.mli gettextMo_parser.output \
+	-$(RM) gettextMo_parser.output \
 	 gettextMo_parser.ml gettextMo_parser.mli
+
+# Ocaml Gettext compile library */
+
+INSTALLIB +=           \
+ gettextCompile.cma    \
+ gettextCompile.cmxa   \
+ gettextCompile.a      \
+ gettextPo.cmi         
+
+CMO_COMPILE =          \
+ gettextPo_parser.cmo  \
+ gettextPo_lexer.cmo   \
+ gettextPo.cmo
+
+gettextPo_parser.cmo: gettextPo_parser.cmi
+gettextPo_parser.cmx: gettextPo_parser.cmi
+gettextCompile.cma gettextCompile.cmxa: $(CMO_COMPILE)
+gettextCompile.cma gettextCompile.cmxa: $(CMO_COMPILE:.cmo=.cmx)
+
+clean::
+	-$(RM) gettextPo_parser.output \
+	 gettextPo_parser.ml gettextPo_parser.mli
 
 # Pa_gettext extension #
 INSTALLIB +=        \

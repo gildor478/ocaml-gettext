@@ -1,7 +1,15 @@
 requires = "camlp4"
 version = "0.1"
 predicates = ""
-archive(byte) = "gettextStub.cma"
-archive(native) = "gettextStub.cmxa"
-archive(syntax,toplevel) = "pa_gettext.cma"
-archive(syntax,preprocessor) = "pa_gettext.cma"
+
+package "stub" (
+  archive(byte) = "gettextStub.cma"
+  archive(native) = "gettextStub.cmxa"
+  archive(syntax,toplevel) = "pa_gettext.cma"
+  archive(syntax,preprocessor) = "pa_gettext.cma"
+)
+
+package "base" (
+  archive(byte) = "gettextBase.cma"
+  archive(native) = "gettextBase.cmxa"
+)

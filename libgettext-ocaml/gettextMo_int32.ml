@@ -30,21 +30,20 @@ let input_int32 chn endian =
 
 
 let input_int32_pair chn endian =  
-   let a = input_int32 endian chn
+   let a = input_int32 chn endian
    in
-   let b = input_int32 endian chn
+   let b = input_int32 chn endian
    in
    (a, b)
 ;;
 
-let input_int32_pair_table chn endian number =
-   let rec input_int32_pair_table_aux number lst = 
-     match number with 
-       0 -> lst
-     | x -> input_int32_pair_table_aux 
-       (x-1) 
-       ((input_int32_pair endian chn) :: lst)
+let input_int32_pair_string chn endian =
+   let (length,offset) = 
+     input_int32_pair chn endian
    in
-   input_int32_pair_table_aux number []
+   let str = String.make (Int32.to_int length) 'X'
+   in
+   seek_in chn (Int32.to_int offset);
+   really_input chn str 0 (Int32.to_int length);
+   str
 ;;
- 
