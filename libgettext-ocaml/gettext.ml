@@ -23,7 +23,7 @@ type global_type = {
 (* Default value *)
 
 let dummy_realize =
-  (fun t textdomain str str_plural category -> str)
+  (fun t printf_format textdomain str str_plural category -> str)
 ;;
 
 let default_realize = 

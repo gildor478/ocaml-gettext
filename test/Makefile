@@ -1,6 +1,6 @@
 NAME       = test
 CMO        = test.cmo
-REQUIRES   = fileutils gettext.base gettext.extension oUnit
+REQUIRES   = fileutils gettext.base gettext.extension gettext-camomile oUnit
 
 include ../TopMakefile
 

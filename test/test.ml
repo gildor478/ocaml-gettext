@@ -99,7 +99,7 @@ let load_mo_file tests fl_mo =
         let mo_header = GettextMo.input_mo_header mo
         in
         let mo_informations = GettextMo.input_mo_informations
-          GettextTypes.RaiseException mo mo_header
+          RaiseException mo mo_header
         in
         print_debug tests (GettextMo.string_of_mo_informations mo_informations);
         close_in mo
@@ -478,7 +478,7 @@ let install_test tests =
           "Offset of table with original strings is out of bound";
         "test7.mo",GettextMo.InvalidMoHeaderTableTranslationOutOfBound((i32 28, i32 2626),(i32 (-49), i32 111)),
           "Offset of table with translation strings is out of bound";
-        "test8.mo",GettextMo.InvalidMoStringOutOfBound(2626, 196),
+        "test8.mo",GettextMo.InvalidMoStringOutOfBound(2626, 36),
           "Offset of first string is out of bound";
         "test9.mo",GettextMo.InvalidMoTranslationOutOfBound(2626, 196),
           "Offset of first translation is out of bound";
@@ -537,6 +537,103 @@ let merge_test tests =
     List.map merge_one [ (concat tests.test_dir "test4.pot","test4.po", "bak") ]
 ;;
 
+(***************************)
+(* Test of GettextCamomile *)
+(***************************)
+
+let camomile_test tests =
+  (* File scheme : 
+    base_dir/lang/category/domain.mo
+  *)
+  let camomile_test_one fl_mo =
+    let textdomain = 
+      chop_extension (basename fl_mo)
+    in
+    let category =
+      GettextCategory.category_of_string (basename (dirname fl_mo))
+    in
+    let language = 
+      (basename (dirname (dirname (fl_mo))))
+    in
+    let base_dir =
+      (dirname (dirname (dirname (fl_mo))))
+    in
+    let () = 
+      print_debug tests ("Filename:   "^fl_mo);
+      print_debug tests ("Textdomain: "^textdomain);
+      print_debug tests ("Category:   "^(GettextCategory.string_of_category category));
+      print_debug tests ("Language:   "^language);
+      print_debug tests ("Base dir:   "^base_dir)
+    in
+    let t =
+      (* We use a UTF-8 binding, this is the most generic encoding
+         for all strings *)
+      GettextModules.create 
+      ~failsafe:RaiseException
+      ~codesets:[(textdomain,"UTF-8")] 
+      ~path:[base_dir] 
+      ~language:language 
+      textdomain
+    in
+    let t' =
+      print_debug tests "Creation of the GettextCamomile translator";
+      GettextCamomile.Map.realize t
+    in
+    let mo = 
+      print_debug tests ("Opening "^fl_mo);
+      open_in_bin fl_mo
+    in
+    let mo_header = 
+      print_debug tests "Fetching headers";
+      GettextMo.input_mo_header mo
+    in
+    let mo_informations = 
+      print_debug tests "Fetching informations";
+      GettextMo.input_mo_informations
+      RaiseException mo mo_header
+    in
+    let test_cases = ref []
+    in
+    for i = 0 to (Int32.to_int mo_header.number_of_strings) - 1 do
+      let translation = 
+        print_debug tests ("Fetching translation n°"^(string_of_int i));
+        GettextMo.input_mo_translation RaiseException mo mo_header i
+      in
+      let func = 
+        print_debug tests (
+          "Building function for testing translation "
+          ^(string_of_translation translation));
+        match translation with
+        (* We cannot compare directly extracted values and t' extracted
+           value , since we have a charset translation *)
+          Singular(str_id,_) ->
+            fun () -> ignore(GettextCompat.gettext t' str_id)
+        | Plural(str_id,str_plural,_) ->
+            (* Using values from 0 to 2, we cover most of the plural cases *)
+            fun () -> (
+              ignore(GettextCompat.ngettext t' str_id str_plural 0);
+              ignore(GettextCompat.ngettext t' str_id str_plural 1);
+              ignore(GettextCompat.ngettext t' str_id str_plural 2)
+            )
+      in
+      test_cases := 
+        (
+          print_debug tests 
+          ("Building test case for translation "^(string_of_translation translation));
+          ((string_of_translation translation) >:: func) 
+          :: !test_cases
+        )
+    done;
+    print_debug tests ("Closing file "^fl_mo);
+    close_in mo;
+    fl_mo >::: !test_cases
+  in
+  "GettextCamomile test" >:::
+    List.map camomile_test_one [
+      make_filename ["." ; "fr" ; "LC_MESSAGES" ; "test4.mo" ];
+    ]
+;;
+
 (*********************)
 (* Main test routine *)
 (*********************)
@@ -552,6 +649,7 @@ let all_test =
       extract_test       tests;
       install_test       tests;
       merge_test         tests;
+      camomile_test      tests;
     ]
 in
 let () = 

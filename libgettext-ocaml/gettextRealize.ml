@@ -78,7 +78,7 @@ module Generic : (
       let dummy_translate =
         GettextTranslate.Dummy.create t "(none)" ( fun s -> s ) 
       in
-      fun opt str plural_form category ->
+      fun printf_format opt str plural_form category ->
         (
           let textdomain = 
             match opt with
@@ -86,13 +86,13 @@ module Generic : (
             | None -> t.default
           in
           try 
-            Translate.translate (
+            Translate.translate  (
               MapTranslate.find (textdomain,category) map_translate
-            ) str plural_form 
+            ) printf_format str plural_form 
           with Not_found ->
             GettextTranslate.Dummy.translate 
             dummy_translate
-            str plural_form
+            printf_format str plural_form
         )
   end 
 ;;

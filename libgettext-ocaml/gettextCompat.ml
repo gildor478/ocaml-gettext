@@ -2,8 +2,8 @@
 open GettextTypes;;
 open GettextModules;;
 
-let format_of_string = 
-  Obj.magic
+let format_of_string x = 
+  Obj.magic x
 ;;
 
 let bindtextdomain textdomain dir t =
@@ -23,49 +23,49 @@ let get_textdomain t =
 ;;
 
 let gettext t' str =
-  t' None str None LC_MESSAGES
+  t' false None str None LC_MESSAGES
 ;;
 
 let fgettext t' str =
-  format_of_string gettext
+  format_of_string (t' true None str None LC_MESSAGES)
 ;;
   
 let dgettext t' textdomain str =
-  t' (Some textdomain) str None LC_MESSAGES
+  t' false (Some textdomain) str None LC_MESSAGES
 ;;
 
-let fdgettext t' domain str =
-  format_of_string dgettext
+let fdgettext t' textdomain str =
+  format_of_string (t' false (Some textdomain) str None LC_MESSAGES)
 ;;
   
 let dcgettext t' textdomain str category = 
-  t' (Some textdomain) str None category
+  t' false (Some textdomain) str None category
 ;;
 
-let fdcgettext t' domain str category =
-  format_of_string dcgettext
+let fdcgettext t' textdomain str category =
+  format_of_string (t' true (Some textdomain) str None category)
 ;;
   
 let ngettext t' str str_plural n =
-  t' None str (Some(str_plural,n)) LC_MESSAGES
+  t' false None str (Some(str_plural,n)) LC_MESSAGES
 ;;
 
 let fngettext t' str str_plural n =
-  format_of_string ngettext
+  format_of_string (t' true None str (Some(str_plural,n)) LC_MESSAGES)
 ;;
   
 let dngettext t' textdomain str str_plural n =
-  t' (Some textdomain) str (Some (str_plural,n)) LC_MESSAGES
+  t' false (Some textdomain) str (Some (str_plural,n)) LC_MESSAGES
 ;;
 
-let fdngettext t' domain str str_plural n =
-  format_of_string dngettext
+let fdngettext t' textdomain str str_plural n =
+  format_of_string (t' true (Some textdomain) str (Some (str_plural,n)) LC_MESSAGES)
 ;;
 
 let dcngettext t' textdomain str str_plural n category = 
-  t' (Some textdomain) str (Some(str_plural,n)) category
+  t' false (Some textdomain) str (Some(str_plural,n)) category
 ;;
   
-let fdcngettext =
-  format_of_string dcngettext
+let fdcngettext t' textdomain str str_plural n category =
+  format_of_string (t' true (Some textdomain) str (Some(str_plural,n)) category)
 ;;

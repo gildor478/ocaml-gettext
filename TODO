@@ -1,6 +1,4 @@
 v 0.2.0 : 
-- Use gettextFormat to produce translation which could be used with printf like functions ( differentiate printf like 
-  function and normal print function in t' ).
 - Test GettextCamomile
 - Write GettextTranslate.hashtable
 - Write GettextTranslate.open ( base on file opening when a translation is required )

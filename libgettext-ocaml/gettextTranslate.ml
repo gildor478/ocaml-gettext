@@ -3,6 +3,7 @@
 open GettextTypes;;
 open GettextUtils;;
 open GettextMo;;
+open GettextFormat;;
 
 exception GettextTranslateCouldNotOpenFile of string ;;
 exception GettextTranslateStringNotFound of string ;;
@@ -35,6 +36,7 @@ module type TRANSLATE_TYPE =
     *)
     val translate : 
          u
+      -> bool
       -> string 
       -> (string * int) option
       -> string 
@@ -47,12 +49,19 @@ module Dummy : TRANSLATE_TYPE =
 
     let create t filename charset = charset
 
-    let translate charset str plural_form = 
+    let translate charset printf_format str plural_form = 
       match plural_form with
         None ->
           charset str
       | Some(str_plural,x) ->
-          charset (get_translated_value Ignore (Plural(str,str_plural,[])) (germanic_plural x))
+          let check =
+            if printf_format then
+              check_format Ignore
+            else
+              fun x -> x
+          in
+          charset (get_translated_value Ignore (check (Plural(str,str_plural,[]))) 
+          (germanic_plural x))
   end
 ;;
 
@@ -112,7 +121,7 @@ module Map : TRANSLATE_TYPE =
         fun_plural_forms = fun_plural_forms;
       }
       
-    let translate u str plural_form =
+    let translate u printf_format str plural_form =
       try
         let plural_number = 
           u.fun_plural_forms (
@@ -121,11 +130,17 @@ module Map : TRANSLATE_TYPE =
               | None -> 0
           )
         in
-        get_translated_value u.failsafe (MapString.find str u.map) plural_number
+        let check =
+          if printf_format then
+            check_format u.failsafe
+          else
+            fun x -> x
+        in
+        get_translated_value u.failsafe (check (MapString.find str u.map)) plural_number
       with Not_found ->
         fail_or_continue u.failsafe
         string_of_exception
         (GettextTranslateStringNotFound str)
-        (Dummy.translate u.dummy str plural_form)
+        (Dummy.translate u.dummy printf_format str plural_form)
   end
 ;;

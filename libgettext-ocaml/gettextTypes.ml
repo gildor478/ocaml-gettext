@@ -211,7 +211,7 @@ type t = {
 }
 ;;
   
-type t' = textdomain option -> string -> (string * int) option -> category -> string
+type t' = bool -> textdomain option -> string -> (string * int) option -> category -> string
 ;;
 
 type dependencies = (textdomain * (codeset option) * (dir option)) list

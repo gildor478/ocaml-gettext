@@ -179,7 +179,7 @@ let install destdir language category textdomain filename_mo_src =
     GettextMo.input_mo_informations RaiseException chn mo_hdr
   in
   for i = 0 to (Int32.to_int mo_hdr.number_of_strings) - 1 do
-    let _ = GettextMo.input_mo_translation RaiseException chn mo_hdr
+    let _ = GettextMo.input_mo_translation RaiseException chn mo_hdr i
     in
     ()
   done;
