@@ -122,6 +122,7 @@ let string_of_mo_header mo_header =
 ;;
 
 let input_mo_untranslated ?(failsafe = Ignore) chn mo_header number = 
+  (* BUG : no bound check *)
   let offset_pair = 
     (Int32.to_int mo_header.offset_table_strings) + number * 8
   in
@@ -133,6 +134,7 @@ let input_mo_untranslated ?(failsafe = Ignore) chn mo_header number =
 ;;
 
 let input_mo_translated ?(failsafe = Ignore) chn mo_header number = 
+  (* BUG : no bound check *)
   let offset_pair = 
     (Int32.to_int mo_header.offset_table_translation) + number * 8
   in

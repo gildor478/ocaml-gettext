@@ -1,7 +1,7 @@
 NAME       = gettext
 CMO        =       
 LIBRARY    = true
-REQUIRES   = fileutils
+REQUIRES   = fileutils camomile
 PREDICATES =
 INSTALLIB  = META
 
@@ -104,7 +104,8 @@ CMO_EXTENSION=         \
  gettextDomain.cmo     \
  gettextCharset.cmo    \
  gettextTranslate.cmo  \
- gettextModules.cmo 
+ gettextModules.cmo    \
+ gettextCamomile.cmo  
 
 gettextExtension.cma gettextExtension.cmxa: $(CMO_EXTENSION)
 gettextExtension.cma gettextExtension.cmxa: $(CMO_EXTENSION:.cmo=.cmx)

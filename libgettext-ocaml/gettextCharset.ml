@@ -2,7 +2,7 @@
 
 module type CHARSET_TYPE = 
   sig
-    type encoding  = string
+    type encoding = string
     type t
     
     (** create in_enc out_enc : create a new charset converter from charset 

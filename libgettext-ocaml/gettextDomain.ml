@@ -55,7 +55,7 @@ module Generic : DOMAIN_TYPE =
 
     open Locale
 
-    let guess_language domain category = 
+    let guess_language category domain = 
       (* http://www.gnu.org/software/gettext/manual/html_mono/gettext.html#SEC155
        * In the function dcgettext at every call the current setting of the 
        * highest priority environment variable is determined and used. 
@@ -65,24 +65,48 @@ module Generic : DOMAIN_TYPE =
           3. LC_xxx, according to selected locale
           4. LANG 
       *)
-      match domain.language with 
-          Some str ->
-            str
-        | None ->
-            try
+      let add_if_found lst f = 
+        try
+          let str = f ()
+          in
+          str :: lst
+        with Not_found ->
+          lst
+      in
+      let considered_language = 
+        List.fold_left add_if_found [] 
+        [
+          (
+            fun () -> 
+              match domain.language with 
+                Some str ->
+                  str
+              | None ->
+                  raise Not_found
+          );
+          ( 
+            fun () ->
               Sys.getenv "LANGUAGE" 
-            with Not_found ->
-              try
-                get_locale all domain.locale
-              with Not_found ->
-                try 
-                  get_locale category domain.locale
-                with Not_found ->
-                  try
-                    Sys.getenv "LANG"
-                  with Not_found ->
-                    raise 
-                    (DomainLanguageNotSet(string_of_category category))
+          );
+          (
+            fun () ->
+              get_locale all domain.locale
+          );
+          (
+            fun () ->
+              get_locale category domain.locale
+          );
+          (
+            fun () ->
+              Sys.getenv "LANG"
+          );
+        ]
+      in
+      match considered_language with
+        [] ->
+          raise (DomainLanguageNotSet(string_of_category category))
+      | lst ->
+          lst
     
     let create ?language locale = {
         locale   = locale;
@@ -107,18 +131,37 @@ module Generic : DOMAIN_TYPE =
         dir_name/locale/LC_category/domain_name.mo *)
       let end_path = 
         make_filename [ 
-          guess_language domain category; 
           string_of_category category ; 
           (* BUG : should use add_extension *)
           textdomain ^ ".mo" 
         ]
       in
-      let compute_simple_path dir = 
-        concat dir end_path
+      let considered_language = 
+        guess_language category domain 
+      in
+      let compute_simple_path dir language = 
+        make_filename [
+          dir;
+          language;
+          end_path;
+        ]
+      in
+      let considered_files =
+        List.flatten ( 
+          List.map 
+          ( 
+            fun dir -> 
+              List.map ( 
+                fun language ->
+                  compute_simple_path dir language 
+                  ) 
+              considered_language
+          )
+          search_path
+        )
       in
       try
-        List.find (test (And(Exists,Is_readable)))
-        (List.map compute_simple_path search_path)
+        List.find (test (And(Exists,Is_readable))) considered_files
       with Not_found ->
         raise (DomainFileDoesntExist(textdomain,string_of_category category))
           
