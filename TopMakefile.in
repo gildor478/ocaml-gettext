@@ -65,11 +65,11 @@ export OCAMLPATH
 
 all: $(STUBSLIB) all-$(OCAMLBEST)
 all-byte: $(if $(LIBRARY), install-buildlib-byte, install-buildprog-byte)
-all-opt:  $(if $(LIBRARY), install-buildlib-byte, install-buildprog-opt)
+all-opt:  $(if $(LIBRARY), install-buildlib-opt, install-buildprog-opt)
 
 install: all install-$(OCAMLBEST)
 install-byte: $(if $(LIBRARY), install-lib-byte, install-prog-byte)
-install-opt:  $(if $(LIBRARY), install-lib-byte, install-prog-byte)
+install-opt:  $(if $(LIBRARY), install-lib-opt, install-prog-byte)
 
 uninstall: $(if $(LIBRARY), uninstall-lib, uninstall-prog)
 
@@ -98,13 +98,28 @@ $(BUILDLIB):
 	mkdir -p $(BUILDLIB)
 
 # BUG : need a serious rewrite 
-install-buildlib-byte install-buildlib-opt: $(BUILDLIB) $(INSTALLIB)
-	-$(OCAMLFIND) remove -destdir $(BUILDLIB) $(NAME) 
-	$(OCAMLFIND)  install -ldconf ignore -destdir $(BUILDLIB) $(NAME) $(INSTALLIB)
+install-buildlib-byte: REAL_INSTALLIB = $(filter-out %.o,$(filter-out %.a,$(filter-out %.cmx, $(filter-out %.cmxa,$(INSTALLIB)))))
+install-buildlib-byte: $(filter-out %.o,$(filter-out %.a,$(filter-out %.cmx, $(filter-out %.cmxa,$(INSTALLIB)))))
+install-buildlib-byte: install-buildlib-common
 
-# BUG : need a serious rewrite 
-install-lib-byte install-lib-opt: $(INSTALLIB) 
-	$(OCAMLFIND) install -destdir $(LIBDIR) $(NAME) $(INSTALLIB)
+install-buildlib-opt: REAL_INSTALLIB =  $(INSTALLIB)
+install-buildlib-opt: $(INSTALLIB)
+install-buildlib-opt: install-buildlib-common
+
+install-buildlib-common: $(BUILDLIB)
+	-$(OCAMLFIND) remove -destdir $(BUILDLIB) $(NAME) 
+	$(OCAMLFIND)  install -ldconf ignore -destdir $(BUILDLIB) $(NAME) $(REAL_INSTALLIB)
+
+install-lib-byte: REAL_INSTALLIB = $(filter-out %.o,$(filter-out %.a,$(filter-out %.cmx, $(filter-out %.cmxa,$(INSTALLIB)))))
+install-lib-byte: $(filter-out %.o,$(filter-out %.a,$(filter-out %.cmx, $(filter-out %.cmxa,$(INSTALLIB)))))
+install-lib-byte: install-lib-common
+
+install-lib-opt: REAL_INSTALLIB =  $(INSTALLIB)
+install-lib-opt: $(INSTALLIB)
+install-lib-opt: install-lib-common
+	
+install-lib-common:
+	$(OCAMLFIND) install -destdir $(LIBDIR) $(NAME) $(REAL_INSTALLIB)
 
 uninstall-lib:
 	-$(OCAMLFIND) remove -destdir $(LIBDIR) $(NAME)
@@ -179,7 +194,7 @@ clean-prog:
 .zog.ml:
 	$(OCAMLP4) pa_o.cmo pa_zog.cma  pr_o.cmo -impl $< > $@
 	
-clean::
+clean:: $(if $(LIBRARY),clean-lib,clean-prog)
 	rm -f *.cm[ioxa] *.o *.cmxa *.a *.so
 	rm -f $(GENERATED) parser.output
 

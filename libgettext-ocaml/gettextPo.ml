@@ -27,7 +27,12 @@ let string_of_exception exc =
       raise exc
 ;;
 
-(** add_po_translation_no_domain (location_lst,translation) : add a translation 
+(** empty_po : value representing an empty PO *)
+let empty_po = 
+  GettextPo_utils.empty_po
+;;
+
+(** add_po_translation_no_domain po (location_lst,translation) : add a translation 
     to a corpus of already defined translation with no domain defined. If the 
     translation already exist, they are merged concerning location, and 
     follow these rules for the translation itself : 
@@ -48,7 +53,7 @@ let add_po_translation_no_domain po (location_lst,translation) =
     raise (PoInconsistentMerge(str1,str2))
 ;;
 
-(** add_po_translation_domain domain (location_lst,translation) po : add a
+(** add_po_translation_domain po domain (location_lst,translation) : add a
     translation to the already defined translation with the domain defined. 
     See add_translation_no_domain for details.
 *)
@@ -59,7 +64,7 @@ let add_po_translation_domain po domain (location_lst,translation) =
     raise (PoInconsistentMerge(str1,str2))
 ;;
 
-(** merge_po po1 po2 : merge two po. The rule for merging are the same as
+(** merge_po po1 po2 : merge two PO. The rule for merging are the same as
     defined in add_po_translation_no_domain. Can raise PoInconsistentMerge 
 *)
 let merge_po po1 po2 = 
@@ -80,15 +85,80 @@ let merge_po po1 po2 =
   MapTextdomain.fold merge_one_domain po1.domain merge_no_domain
 ;;
 
-(** merge_pot po pot : merge a po with a pot. The rule for merging are the same
-    as defined in add_po_translation_no_domain. Only consider strings that
-    exists in the pot.
+(** merge_pot po pot : merge a PO with a POT. Only consider strings that
+    exists in the pot. Always use location as defined in the POT. If a string 
+    is not found, use the translation provided in the POT. If a plural is found
+    and a singular should be used, downgrade the plural to singular. If a
+    singular is found and a plural should be used, upgrade singular to plural,
+    using the strings provided in the POT for ending the translation.
   *)
-let merge_pot po pot =
-;;
-
-let empty_po = 
-  GettextPo_utils.empty_po
+let merge_pot pot po =
+  let order_po_map ?(domain) () = 
+    match domain with 
+      None ->
+        po.no_domain :: ( 
+          MapTextdomain.fold ( fun _ x lst -> x :: lst ) 
+          po.domain []
+        )
+    | Some domain ->
+        let tl = 
+          po.no_domain :: (
+            MapTextdomain.fold ( 
+              fun key x lst -> 
+                if key = domain then 
+                  lst 
+                else 
+                  x :: lst 
+            ) po.domain []
+          )
+        in
+        try
+          (MapTextdomain.find domain po.domain) :: tl
+        with Not_found ->
+          tl
+  in
+  let merge_translation map_lst key (location_pot,translation_pot) =
+    let translation_merged = 
+      try 
+        let (_,translation_po) = 
+          let map_po = 
+            List.find (MapString.mem key) map_lst
+          in
+          MapString.find key map_po
+        in
+        (* Implementation of the rule given above *)
+        match (translation_pot,translation_po) with
+          Singular(str_id,_), Plural(_, _, str :: _ ) -> 
+            Singular(str_id, str)
+        | Plural(str_id, str_plural, _ :: tl ), Singular(_, str) ->
+            Plural(str_id, str_plural, str :: tl)
+        | Plural(str_id, str_plural, []), Singular(_, str) ->
+            Plural(str_id, str_plural, str :: [])
+        | _, translation ->
+            translation
+      with Not_found ->
+        (* Fallback to the translation provided in the POT *)
+        translation_pot
+    in
+    (location_pot,translation_merged)
+  in
+  (* We begin with an empty po, and merge everything according to the rule 
+     above. *)
+  let merge_no_domain = 
+    MapString.fold ( 
+      fun key (location_pot,translation_pot) po ->
+        add_po_translation_no_domain po 
+        (merge_translation (order_po_map ()) key (location_pot,translation_pot))
+    ) pot.no_domain empty_po
+  in
+  let merge_one_domain domain map_domain po = 
+    MapString.fold ( 
+      fun key (location_pot,translation_pot) po ->
+        add_po_translation_domain domain po 
+        (merge_translation (order_po_map ~domain:domain ()) key (location_pot,translation_pot))
+    ) map_domain po
+  in
+  MapTextdomain.fold merge_one_domain pot.domain merge_no_domain
 ;;
 
 let input_po chn =

@@ -22,16 +22,6 @@ let string_of_exception exc =
       raise exc
 ;;
 
-(** extract cmd default_option file_options src_files ppf : extract the
-    translatable strings from all the src_files provided. Each source file will 
-    be extracted using the command cmd, which should be an executable that has
-    the same output as ocaml-xgettext. If cmd is not provided, it will be
-    searched in the current path. The command will be called with
-    default_option, or if the file being extracted is mapped in file_options,
-    with the option associated to the filename in file_options. The result will
-    be written using module Format to the formatter ppf. The result of the
-    extraction should be used as a po template file.
-  *)
 let po_of_filename filename = 
   let chn = 
     try
@@ -46,6 +36,16 @@ let po_of_filename filename =
   po
 ;;
 
+(** extract cmd default_option file_options src_files ppf : extract the
+    translatable strings from all the src_files provided. Each source file will 
+    be extracted using the command cmd, which should be an executable that has
+    the same output as ocaml-xgettext. If cmd is not provided, it will be
+    searched in the current path. The command will be called with
+    default_option, or if the file being extracted is mapped in file_options,
+    with the option associated to the filename in file_options. The result will
+    be written using module Format to the formatter ppf. The result of the
+    extraction should be used as a po template file.
+  *)
 let extract command default_options filename_options filename_lst filename_pot =
   let make_command options filename = 
     command^" "^options^" "^filename
@@ -106,7 +106,9 @@ msgstr \"\"
   close_out chn
 ;;
 
-(** compile *)
+(** compile input_po output_mo : create a binary representation of the PO file
+    provided as input_pot. The output file is output_mo. 
+*)
 let compile filename_po filename_mo =
   let po = 
     po_of_filename filename_po
@@ -128,6 +130,10 @@ let compile filename_po filename_mo =
     ) po.domain
 ;;
 
+(** install destdir language category textdomain fln : copy the given
+    filename ( should be a MO file ) to the filename defined by all the
+    other parameters ( typically destdir/language/category/textdomain.mo ).
+*)
 let install destdir language category textdomain filename_mo_src =
   let filename_mo_dst = 
     GettextDomain.make_filename destdir language category textdomain
@@ -139,6 +145,11 @@ let install destdir language category textdomain filename_mo_src =
   cp [filename_mo_src] filename_mo_dst
 ;;
 
+(** merge fln_pot fln_po_lst backup_ext : use fln_pot as a POT file and
+    merge the current content of the listed PO file ( fln_po_lst ) with it.
+    Backup all the PO file using the provided backup extension backup_ext and 
+    produce a merged PO file in place.
+*)
 let merge filename_pot filename_po_lst backup_extension =
   let pot = 
     po_of_filename filename_pot
@@ -147,11 +158,18 @@ let merge filename_pot filename_po_lst backup_extension =
     let po = 
       po_of_filename filename_po
     in
+    let po_merged = 
+      GettextPo.merge_pot pot po
+    in
     let _ = 
       (* BUG: should use add_extension *)
       mv filename_po (filename_po^"."^backup_extension)
     in
-    merge_pot po pot
+    let chn = 
+      open_out filename_po
+    in
+    GettextPo.output_po chn po_merged;
+    close_out chn
   in
-
+  List.iter merge_one filename_po_lst
 ;;
