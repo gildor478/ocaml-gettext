@@ -167,17 +167,29 @@ end)
 type location = filename * int
 ;;
 
+type comments = string list
+;;
+
+type hyphens = int list
+;;
+
 type translation = 
-  Singular of string * string
+  Singular of string * string 
 | Plural of string * string * string list
 ;;
 
-type translations = (location list * translation) MapString.t
+type po_translation = 
+  PoSingular of (string * hyphens) * ( string * hyphens )
+| PoPlural of (string * hyphens) * ( string * hyphens ) * ( string * hyphens ) list
+;;
+
+type translations = (comments * location list * translation) MapString.t
 ;;
 
 type po_content = {
-  no_domain :  translations;
-  domain    :  translations MapTextdomain.t;
+  no_domain    : translations;
+  domain       : translations MapTextdomain.t;
+  last_comment : comments;
 }
 ;;
 

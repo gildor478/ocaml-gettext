@@ -81,7 +81,21 @@ let extract command default_options filename_options filename_lst filename_pot =
   let chn = 
     open_out filename_pot
   in
-  Printf.fprintf chn "%s" 
+  let date =
+    let current_time = 
+      Unix.time ()
+    in
+    let gmt_time = 
+      Unix.gmtime current_time
+    in
+    Printf.sprintf "%04d-%02d-%02d %02d:%02d+0000"
+    (gmt_time.Unix.tm_year + 1900) 
+    (gmt_time.Unix.tm_mon + 1)
+    (gmt_time.Unix.tm_mday)
+    (gmt_time.Unix.tm_hour)
+    (gmt_time.Unix.tm_min)
+  in
+  Printf.fprintf chn 
 "# SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
@@ -92,7 +106,7 @@ msgid \"\"
 msgstr \"\"
 \"Project-Id-Version: PACKAGE VERSION\\n\"
 \"Report-Msgid-Bugs-To: \\n\"
-\"POT-Creation-Date: 2005-02-02 00:35+0100\\n\"
+\"POT-Creation-Date: %s\\n\"
 \"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n\"
 \"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n\"
 \"Language-Team: LANGUAGE <LL@li.org>\\n\"
@@ -101,7 +115,7 @@ msgstr \"\"
 \"Content-Transfer-Encoding: 8bit\\n\"
 \"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\\n\"
 
-";
+" date;
   GettextPo.output_po chn extraction;
   close_out chn
 ;;
@@ -123,10 +137,20 @@ let compile filename_po filename_mo =
     GettextMo.output_mo chn lst;
     close_out chn
   in
+  let make_filename domain filename_mo =
+    let dirname = 
+      dirname filename_mo
+    in
+    let basename =
+      basename filename_mo
+    in
+    (* BUG : should use add_extension *)
+    make_filename [ dirname ; domain^"."^basename ]
+  in
   output_one_map filename_mo po.no_domain;
   MapTextdomain.iter ( 
     fun domain map -> 
-      output_one_map (domain^"."^filename_mo) map 
+      output_one_map (make_filename domain filename_mo) map 
     ) po.domain
 ;;
 

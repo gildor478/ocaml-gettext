@@ -12,14 +12,16 @@ type tests = {
   verbose        : bool;
   search_path    : string list;
   ocaml_xgettext : string;
+  test_dir       : string;
 }
 ;;
 
 let parse_arg () = 
   let tests = ref { 
-    verbose = false; 
-    search_path = []; 
-    ocaml_xgettext = make_filename [ parent_dir ; "build" ; "bin" ; "ocaml-xgettext"]
+    verbose        = false; 
+    search_path    = []; 
+    ocaml_xgettext = make_filename [ parent_dir ; "build" ; "bin" ; "ocaml-xgettext"];
+    test_dir       = make_filename [ current_dir ; "tests" ];
   }
   in
   Arg.parse [
@@ -43,6 +45,13 @@ let parse_arg () =
           tests := { !tests with ocaml_xgettext = s }
         )
       ,"Specify the ocaml-xgettext executable"
+    );
+    (
+      "-test-dir", Arg.String (
+        fun s ->
+          tests := { !tests with test_dir = s }
+        )
+      ,"Specify the temporary dir for testing files"
     );
   ]
   (fun str -> () )
@@ -93,7 +102,7 @@ let load_mo_file tests fl_mo =
 
 let load_po_file tests fl_po = 
   (* BUG : should use add_extension *)
-  let fl_mo = ((chop_extension fl_po)^".mo")
+  let fl_mo = concat tests.test_dir ((chop_extension fl_po)^".mo")
   in
   [
     "Parsing" >:: 
@@ -160,7 +169,7 @@ let extract_test tests =
   in
   let extract_test_one fl_ml = 
     (* BUG : should use add_extension *)
-    let fl_pot = ((chop_extension fl_ml)^".pot")
+    let fl_pot = concat tests.test_dir ((chop_extension fl_ml)^".pot")
     in
     fl_ml >:::
       [ 
@@ -188,7 +197,7 @@ let install_test tests =
         "Installing" >::
           ( fun () ->
             try 
-              GettextCompile.install current_dir language category textdomain fl_mo;
+              GettextCompile.install tests.test_dir language category textdomain fl_mo;
               if test Exists fl_dst then
                 ()
               else
@@ -202,20 +211,20 @@ let install_test tests =
   "MO file installation test" >:::
     List.map install_test_one [
       (
-        "fr",LC_MESSAGES, "gettext-test1", "test1.mo", 
-        make_filename [ current_dir ; "fr" ; "LC_MESSAGES" ; "gettext-test1.mo" ]
+        "fr",LC_MESSAGES, "gettext-test1", concat tests.test_dir "test1.mo", 
+        make_filename [ tests.test_dir ; "fr" ; "LC_MESSAGES" ; "gettext-test1.mo" ]
       );
       (
-        "fr_FR",LC_MESSAGES, "gettext-test2", "test2.mo", 
-        make_filename [ current_dir ; "fr_FR" ; "LC_MESSAGES" ; "gettext-test2.mo"]
+        "fr_FR",LC_MESSAGES, "gettext-test2", concat tests.test_dir "test2.mo", 
+        make_filename [ tests.test_dir ; "fr_FR" ; "LC_MESSAGES" ; "gettext-test2.mo"]
       );
       (
-        "fr",LC_TIME, "gettext-test3", "test3.mo", 
-        make_filename [ current_dir ; "fr" ; "LC_TIME" ; "gettext-test3.mo" ]
+        "fr",LC_TIME, "gettext-test3", concat tests.test_dir "test3.mo", 
+        make_filename [ tests.test_dir ; "fr" ; "LC_TIME" ; "gettext-test3.mo" ]
       );
       (
-        "fr_FR@euro",LC_MESSAGES, "gettext-test4", "test4.mo",
-        make_filename [ current_dir ; "fr_FR@euro" ; "LC_MESSAGES" ; "gettext-test4.mo" ]
+        "fr_FR@euro",LC_MESSAGES, "gettext-test4", concat tests.test_dir "test4.mo",
+        make_filename [ tests.test_dir ; "fr_FR@euro" ; "LC_MESSAGES" ; "gettext-test4.mo" ]
       );
     ]
 ;;
@@ -231,11 +240,18 @@ let merge_test tests =
         "Merging" >::
           ( fun () ->
             try
+              (* Copying the file to the good place *)
+              let fl_po_cp = 
+                concat tests.test_dir fl_po
+              in
+              let () = 
+                cp [fl_po] fl_po_cp
+              in
               let fl_backup = 
                 (* BUG : should use add_extension *)
-                fl_po^"."^backup_ext
+                fl_po_cp^"."^backup_ext
               in
-              GettextCompile.merge fl_pot [fl_po] backup_ext;
+              GettextCompile.merge fl_pot [fl_po_cp] backup_ext;
               match cmp fl_po fl_backup with
                 Some -1 -> 
                   assert_failure (fl_po^" or "^fl_backup^" doesn't exist")
@@ -250,7 +266,7 @@ let merge_test tests =
       ]
   in
   "POT/PO file merge test" >:::
-    List.map merge_one [ ("test4.pot","test4.po", "bak") ]
+    List.map merge_one [ (concat tests.test_dir "test4.pot","test4.po", "bak") ]
 ;;
 
 (*********************)
@@ -269,10 +285,12 @@ let all_test =
       merge_test         tests;
     ]
 in
-let _ = 
+let () = 
   print_endline ("Test            : ocaml-gettext "^(GettextConfig.version));
   print_endline ("Test build date : "^(GettextConfig.build_date));
   print_endline ("OS              : "^(Sys.os_type));
+  print_endline ("Creating "^(tests.test_dir)^"...");
+  mkdir ~parent:true tests.test_dir;
   print_endline ("Running...")
 in
 run_test_tt all_test

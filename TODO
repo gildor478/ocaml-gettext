@@ -1,8 +1,6 @@
 v 0.2.0 : 
 - Parse comments, to keep licence et al 
 - Treat differently the ouptut of "" and its translation in PO file
-- Use real date in the generation of the POT
-- Test GettextCompile.merge
 - Add test concerning mo file structure : check that each pointer are valid ( no table conflict, et all )
 - Write gettextFormat : check format of ocaml string ( concerning %s, %a... )
 - Test MO file before installing it
