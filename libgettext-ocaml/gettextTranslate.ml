@@ -86,12 +86,12 @@ module Map : TRANSLATE_TYPE =
             match new_translation with
               Singular(id,str) ->
                 MapString.add 
-                str 
+                id 
                 (Singular(id,Charset.recode str mp.charset)) 
                 mp.map
             | Plural(id,id_plural,lst) ->
                 MapString.add
-                str
+                id
                 (Plural(id,id_plural,
                 List.map (fun x -> Charset.recode x mp.charset) lst))
                 mp.map
@@ -106,6 +106,11 @@ module Map : TRANSLATE_TYPE =
               last      = mp.last + 1;
             }
           in
+          (* DEBUG *) print_endline ( "Comparing \""
+            ^str
+            ^"\" with \""
+            ^(match new_translation with Singular(id,_) | Plural(id,_,_) -> id )
+            ^"\"");
           match new_translation with
             Singular(id,_) when id = str ->
               (new_translation,new_mp)
@@ -120,6 +125,8 @@ module Map : TRANSLATE_TYPE =
                     translate str new_mp
               )
         else
+          (* BUG : on ne retient pas la mémorisation des chaines parcourue
+          * pendant la recherche *)
           raise Not_found
             
   end
