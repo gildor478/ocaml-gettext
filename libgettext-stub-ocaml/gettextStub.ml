@@ -88,7 +88,7 @@ module Native : GettextRealize.REALIZE_TYPE =
               Singular(_,str) -> str
             | _ -> str_id
           else
-            str
+            x
         in
         let ncat = 
           native_category_of_category cat

@@ -662,21 +662,61 @@ let implementation_test tests =
       implementation_lst
     in
     let check_translation str lst = 
-      
+      let (_,same_str) =
+        List.fold_left ( 
+          fun (prev_str_opt,res) cur_str -> 
+            match prev_str_opt with
+              Some prev_str ->
+                (Some cur_str, res && prev_str = cur_str)
+            | None ->
+                (Some cur_str, res)
+          ) (None,true) lst
+      in
+      if same_str then 
+        ()
+      else
+        assert_failure 
+        (
+          Printf.sprintf 
+          "All values should be identical in [ %s ] in function %s" 
+          ( 
+            String.concat " ; " 
+            (
+              List.map ( fun (realize_str,str) ->
+                Printf.sprintf "(%s,%S)" realize_str str
+              ) lst 
+            ) 
+          )
+          str
+        )
+    in
     let test_cross_one translation = 
       match translation with
         Singular(str_id,_) ->
-          List.map ( 
-            fun (realize_str,t') -> 
-              (realize_str,GettextCompat.gettext t' str_id)
-          ) t'_lst
+          check_translation 
+          (
+            Printf.sprintf "GettextCompat.gettext t' %S" str_id
+          )
+          (
+            List.map ( 
+              fun (realize_str,t') -> 
+                (realize_str,GettextCompat.gettext t' str_id)
+            ) t'_lst
+          )
       | Plural(str_id,str_plural,_) ->
           List.iter ( 
             fun n ->
-              List.map ( 
-                fun (realize_str,t') ->
-                  (realize_str,GettextCompat.ngettext t' str_id str_plural n)
-              ) t'_lst
+              check_translation
+              (
+                Printf.sprintf "GettextCompat.ngettext t' %S %S %d" 
+                str_id str_plural n
+              )
+              (
+                List.map ( 
+                  fun (realize_str,t') ->
+                    (realize_str,GettextCompat.ngettext t' str_id str_plural n)
+                ) t'_lst
+              )
           ) [ 0 ; 1 ; 2 ]
     in
     fl_mo >::
@@ -685,15 +725,17 @@ let implementation_test tests =
       )
   in
   (* Extract and test *)
-  let parameters = 
+  let parameters_lst = 
     List.map extract_parameters [
       make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test1.mo" ];
       make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test2.mo" ];
       make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test3.mo" ];
       make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test4.mo" ];
+      make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test10.mo" ];
+      make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test11.mo" ];
     ]
   in
-  let implementation = 
+  let implementation_lst = 
     [
       ("GettextCamomile.Map.realize", GettextCamomile.Map.realize);
       ("GettextStub.Native.realize",  GettextStub.Native.realize);
@@ -703,9 +745,9 @@ let implementation_test tests =
   "Gettext implementation test" >:::
     [
       "Load" >:::
-        List.map (test_load parameters) implementation;
+        List.map (test_load parameters_lst) implementation_lst;
       "Cross check" >:::
-        List.map 
+        List.map (test_cross implementation_lst) parameters_lst;
     ]
 ;;
 
