@@ -5,11 +5,11 @@ libgettext-ocaml.
 Prerequisite :
 
 In order to install you will need :
-- ocaml ( <= 3.06 )
+- ocaml ( >= 3.07 )
 	http://caml.inria.fr/
-- camlidl ( <= 1.04 )
+- camlidl ( >= 1.04 )
 	http://caml.inria.fr/camlidl/
-- ocamlfind ( <= 0.8 ) 
+- ocamlfind ( >= 0.8 ) 
 	http://www.ocaml-programming.de/packages/
 - make, a C compiler, libintl.h ( which is bundle in libc6 )
 

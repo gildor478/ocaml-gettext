@@ -20,6 +20,13 @@ Warning : if you use xgettext patched YOU NEED CLEAN SOURCE, in other
 word, don't forget to pass camlp4 on your source to remove any special
 syntax...
 
-Please report me any problem ( incoherent type for an entry ).
+Please report me any problem : send an email to submit@bugs.gallu.homelinux.org
+beginning with 
+
+Package: libgettext-ocaml
+Version: 0.1
+Severity: { choose wishlist,normal,important }
+
+and the description of your bugs.
 
 Sylvain LE GALL
