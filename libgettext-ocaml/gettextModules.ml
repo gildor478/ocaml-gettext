@@ -88,7 +88,7 @@ module type META_GETTEXT_TYPE =
   functor ( Domain    : GettextDomain.DOMAIN_TYPE ) ->
   functor ( Charset   : GettextCharset.CHARSET_TYPE ) ->
   functor ( Translate : GettextTranslate.TRANSLATE_TYPE ) ->
-    ( GETTEXT_TYPE with category = Locale.t )
+    ( GETTEXT_TYPE with type category = Locale.category )
 ;;
 
 module Generic : META_GETTEXT_TYPE = 
@@ -97,8 +97,6 @@ module Generic : META_GETTEXT_TYPE =
   functor ( Charset   : GettextCharset.CHARSET_TYPE ) ->
   functor ( Translate : GettextTranslate.TRANSLATE_TYPE ) ->
   struct
-    
-    module Charset = Charset(Locale)
     
     module Translate = Translate(Charset)
 
@@ -114,15 +112,18 @@ module Generic : META_GETTEXT_TYPE =
     (* Hide type *)
     type translation = (in_channel * Translate.t) option
     
-    module MapDomainCategory = Map.Make(struct
-      type t      = domain * category
-      let compare (d1,c1) (d2,c2) = 
-        match String.compare d1 d2 with
-          0 -> Locale.compare_category c1 c2
-        | x -> x
-    end)
+    module MapDomainCategory = Map.Make(
+      struct
+        type t      = textdomain * category
+        
+        let compare (d1,c1) (d2,c2) = 
+          match String.compare d1 d2 with
+            0 -> Locale.compare c1 c2
+          | x -> x
+      end)
 
     type t = {
+      locale       : Locale.t;
       domain       : Domain.t;
       textdomain   : textdomain;
       translations : translation MapDomainCategory.t;
@@ -140,25 +141,25 @@ module Generic : META_GETTEXT_TYPE =
       global_gettext := Some gtxt
     
     let init ?(categories = []) ?(language) textdomain =
-      let default_locale =
+      let locale =
           List.fold_left
-          ( fun default_locale (cat,locale) -> Locale.set_locale cat lang default_locale ) 
+          ( fun locales (cat,locale) -> Locale.set_locale cat locale locales ) 
           (Locale.create ()) categories
       in
       let domain = 
-        let default_domain = 
-          match language with 
-            Some lang ->
-              (* Explicit set of the language *)
-              Domain.create ~language:lang default_locale 
-          | None ->
-              (* Try to guess the language *)
-              Domain.create default_locale
+        match language with 
+          Some lang ->
+            (* Explicit set of the language *)
+            Domain.create ~language:lang locale 
+        | None ->
+            (* Try to guess the language *)
+            Domain.create locale
       in
       set_global_gettext {
+        locale       = locale;
         domain       = domain;
         textdomain   = textdomain;
-        translations = MapDomainCategory.create default_locale;
+        translations = MapDomainCategory.empty;
       }      
 
     let close () = 
@@ -171,6 +172,7 @@ module Generic : META_GETTEXT_TYPE =
       in
       MapDomainCategory.iter close_one gtxt.translations;
       set_global_gettext {
+        locale       = gtxt.locale;
         domain       = gtxt.domain;
         textdomain   = gtxt.textdomain;
         translations = MapDomainCategory.empty;
@@ -180,6 +182,7 @@ module Generic : META_GETTEXT_TYPE =
       let gtxt = get_global_gettext ()
       in
       set_global_gettext {
+        locale       = gtxt.locale;
         domain       = gtxt.domain;
         textdomain   = textdomain;
         translations = gtxt.translations;
@@ -194,15 +197,18 @@ module Generic : META_GETTEXT_TYPE =
       let gtxt = get_global_gettext ()
       in
       set_global_gettext {
+        locale       = gtxt.locale;
         domain       = Domain.add_textdomain textdomain dir gtxt.domain;
         textdomain   = gtxt.textdomain;
         translations = gtxt.translations;
       }
 
     let bind_textdomain_codeset textdomain codeset = 
+      (* BUG : does nothing -- for now *)
       let gtxt = get_global_gettext ()
       in
       set_global_gettext {
+        locale       = gtxt.locale;
         domain       = gtxt.domain;
         textdomain   = gtxt.textdomain;
         translations = gtxt.translations;
@@ -227,9 +233,12 @@ module Generic : META_GETTEXT_TYPE =
               in
               let mo_informations = input_mo_informations chn mo_header
               in
-              (* BUG : we don't check that there is a hook to prevent
+              (* BUG : we don't check that there is a specific which could prevent
                  recoding of string. *)
-              let charset = Charset.create_default mo_informations.content_type_charset
+              let charset = 
+                Charset.create 
+                mo_informations.content_type_charset
+                (Locale.default_charset gtxt.locale)
               in
               Some (chn, Translate.create chn charset)
             else
@@ -255,6 +264,7 @@ module Generic : META_GETTEXT_TYPE =
       in
       (* Reinject the changed entry *)
       set_global_gettext {
+          locale       = gtxt.locale;
           domain       = gtxt.domain;
           textdomain   = gtxt.textdomain;
           translations = MapDomainCategory.add (textdomain,category) new_translation gtxt.translations;

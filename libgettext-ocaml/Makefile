@@ -92,14 +92,14 @@ INSTALLIB +=           \
  gettextExtension.cma  \
  gettextExtension.cmxa \
  gettextExtension.a    \
- gettextCategory.cmi   \
+ gettextLocale.cmi     \
  gettextDomain.cmi     \
  gettextCharset.cmi    \
  gettextTranslate.cmi  \
  gettextModules.cmi    
 
 CMO_EXTENSION=         \
- gettextCategory.cmo   \
+ gettextLocale.cmo     \
  gettextDomain.cmo     \
  gettextCharset.cmo    \
  gettextTranslate.cmo  \

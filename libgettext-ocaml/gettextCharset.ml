@@ -1,19 +1,14 @@
 (** Signature of module for charset conversion *)
 
-
 module type CHARSET_TYPE = 
   sig
+    type encoding  = string
     type t
     
     (** create in_enc out_enc : create a new charset converter from charset 
         in_enc to out_enc.
     *)
-    val create : string -> string -> t
-
-    (** create_default in_enc : create a new charset converter from charset
-        in_enc to out_enc.
-      *)
-    val create_default : string -> t
+    val create : encoding -> encoding -> t
 
     (** recode str enc : return a transcoded string according to enc.
     *)
@@ -23,7 +18,8 @@ module type CHARSET_TYPE =
 
 module Dummy : CHARSET_TYPE =
   struct
-
+    type in_enc  = string
+    type out_enc = string
     type t = ()
 
     let create in_enc out_enc = ()
