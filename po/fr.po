@@ -1,3 +1,9 @@
+# Ocaml-gettext catalog. 
+# Copyright (C) 2005 by Sylvain Le Gall <sylvain@le-gall.net>.
+# This file is distributed under the same license as the ocaml-gettext package.
+# Author: Sylvain Le Gall <sylvain@le-gall.net> 2005.
+# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: ocaml-gettext v0.1.1\n"

@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<book>
+  <title>Ocaml-gettext reference manual</title>
+  <bookinfo>
+    <legalnotice>
+      <para>
+        This user manual is considered as a source code and is licensed under the GNU Library Public 
+        License v2.1.
+      </para>
+    </legalnotice>
+    <author><firstname>Sylvain</firstname><surname>Le Gall</surname></author>
+    <copyright><year>2005</year></copyright>
+    <revhistory>
+      <revision>
+        <!-- BUG: to complete wiht the right tags -->
+        <revnumber>svn:revision</revnumber>
+        <date>svn:date</date>
+      </revision>
+    </revhistory>
+  </bookinfo>
+  <chapter>
+    <title>Overview</title>
+    <para>Placez ici le texte du premier chapitre</para>
+    <section>
+      <title>What is ocaml-gettext ?</title>
+      <para>
+        Ocaml-gettext is a library to support string translation in OCaml. It provides a simple interface 
+        to help programmer's and translator to create programs that can support different languages. This
+        permits the internationalization of programs.
+      </para>
+      <para>The internationalization is provided following three point of view :</para>
+      <itemizedlist>
+        <listitem>
+          <para>programmer : this library provide functions that can be used in OCaml,</para>
+        </listitem>
+        <listitem>
+          <para>translator : this library provides a standard file to help translator,</para>
+        </listitem>
+        <listitem>
+          <para>
+            user : this library provides a set of command line options to set the language 
+            and the charset.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </section>
+    <section>
+      <title>How is ocaml-gettext related to gettext ?</title>
+      <para>
+        Ocaml-gettext is the nearby cousin of gettext. In fact, the API is based on gettext. Everything 
+        in ocaml-gettext is compatible with gettext :
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para>the function provided in the API are very near to the gettext one,</para>
+        </listitem>
+        <listitem>
+          <para>the library contains a binding of the gettext library,</para>
+        </listitem>
+        <listitem>
+          <para>
+            all the file outputed are gettext compatible : the library use PO file for translator 
+            and MO file for translation,
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            the library try to use the same initialization sequence as gettext :
+            it uses the same environment variable, try to find MO file in the
+            same place...
+          </para>
+        </listitem>
+      </itemizedlist>
+    </section>
+  </chapter>
+  <chapter>
+    <title>Installing ocaml-gettext</title>
+    <section>
+      <title>Downloading and compiling</title>
+      <para>For compiling ocaml-gettext, you need to download all the
+        prerequisite :
+      </para>
+      <itemizedlist>
+        <!-- BUG: complete the right URL -->
+        <listitem>
+          <para>
+            <ulink url="XXX">OCaml</ulink> v3.08.3 or later,
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <ulink url="XXX">findlib</ulink> vXXX or later,
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <ulink url="XXX">ocaml-fileutils</ulink> v0.3.0 or later,
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <optional><ulink url="XXX">camomile</ulink> v0.6.0 or later
+              (optional),</optional>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <ulink url="XXX">gettext</ulink> vXXX or later (optional),
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <ulink url="XXX">OUnit</ulink> vXXX or later (optional),
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <ulink url="XXX">ocaml-benchmark</ulink> vXXX or later (optional),
+          </para>
+        </listitem>
+      </itemizedlist>
+      <para>
+        After having build and install all the prerequisite, extract the source
+        code of ocaml-gettext to a directory. Go to this directory and type :
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para>
+            <command>./configure</command>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <command>make</command>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <command>make install</command>
+          </para>
+        </listitem>
+      </itemizedlist>
+      <para>
+        If needed, you can use <command>./configure
+          <option>--help</option></command> to have a complete help on the
+        different option you can use to tweak the installation of ocaml-gettext.
+      </para>
+    </section>
+  </chapter>
+  <chapter>
+    <title>Programming with ocaml-gettext</title>
+    <section>
+      <title>Makefile and source layout</title>
+      <para/>
+    </section>
+    <section>
+      <title>Library</title>
+      <para/>
+    </section>
+    <section>
+      <title>Program</title>
+      <para/>
+    </section>
+    <section>
+      <title>Graphical user interface</title>
+      <para/>
+    </section>
+  </chapter>
+  <chapter>
+    <title>Translating ocaml-gettext programs and libraries</title>
+    <para/>
+  </chapter>
+  <chapter>
+    <title>Using ocaml-gettext programs</title>
+    <para/>
+  </chapter>
+  <appendix>
+    <title>Links</title>
+    <para/>
+  </appendix>
+</book>
