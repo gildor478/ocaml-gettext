@@ -36,12 +36,14 @@ module Generic : (
           textdomain
         in
         let in_enc =
-          let chn = open_in_bin filename
+          let chn = 
+            open_in_bin filename
           in
           let mo_header = GettextMo.input_mo_header chn
           in
           let mo_informations = GettextMo.input_mo_informations t.failsafe chn mo_header
           in
+          close_in chn;
           mo_informations.content_type_charset
         in
         let out_enc = 

@@ -14,7 +14,7 @@ let parse_arg () =
   let benchs = ref {
     verbose     = false;
     search_path = [];
-    time        = 10;
+    time        = 1;
   }
   in
   Arg.parse (Arg.align [
@@ -68,6 +68,58 @@ let rec get_buffer (lst1,lst2) =
       failwith "Buffer is empty"
 ;;
 
+(* Generic function to benchmark gettextCompat function *)
+let gettext_bench benchs str_gettext fun_gettext = 
+  let f ref_translations = 
+    let ((debug_str,t',textdomain,tr),buffer) = 
+      get_buffer !ref_translations
+    in
+    let translation = 
+      print_debug benchs 
+      (Printf.sprintf "Translation of %S from %s" (string_of_translation tr) debug_str);
+      fun_gettext t' textdomain tr
+    in
+    ref_translations := buffer
+  in
+  let parameters_lst = 
+    List.map parameters_of_filename mo_files_data
+  in
+  let create_translation (str_realize,realize) = 
+    let rec create_one_translation accu lst = 
+      match lst with
+        parameters :: tl ->
+          let t = 
+            t_of_parameters parameters
+          in
+          let t' = 
+            realize t
+          in
+          let new_accu = 
+            List.fold_left ( fun lst tr ->
+              (
+                (str_realize^" with textdomain "^parameters.textdomain),
+                t',parameters.textdomain,tr)
+              :: lst
+              ) accu parameters.translations
+          in
+          create_one_translation new_accu tl
+      | [] ->
+          make_buffer accu
+    in
+    ref (create_one_translation [] parameters_lst)
+  in
+  let bench_lst =
+    List.map ( fun (str_realize, realize) ->
+      str_realize, f, create_translation (str_realize,realize)
+    ) realize_data
+  in
+  print_debug benchs ("Benchmarking "^str_gettext^":");
+  (
+    str_gettext^" benchmark",
+    throughputN benchs.time bench_lst
+  )
+;;
+
 (*******************************)
 (* Performance of check_format *)
 (*******************************)
@@ -85,11 +137,13 @@ let format_bench benchs =
     ref_buffer := buffer
   in  
   print_debug benchs "Benchmarking format :";
-  throughputN benchs.time [
-    ("Singular", f, ref (make_buffer format_translation_singular_data));
-    ("Plural"  , f, ref (make_buffer format_translation_plural_data));
-    ("All"     , f, ref (make_buffer format_translation_all_data));
-  ]
+  ("Format benchmark",
+    throughputN benchs.time [
+      ("Singular", f, ref (make_buffer format_translation_singular_data));
+      ("Plural"  , f, ref (make_buffer format_translation_plural_data));
+      ("All"     , f, ref (make_buffer format_translation_all_data));
+    ]
+  )
 ;;
 
 (***************************)
@@ -97,24 +151,123 @@ let format_bench benchs =
 (***************************)
 
 let realize_bench benchs = 
-  let f =
-
+  let f (realize,parameters_lst) =
+    let f_one parameters = 
+      let t = 
+        print_debug benchs ("Creating t for "^parameters.fl_mo);
+        t_of_parameters parameters
+      in
+      let t' = 
+        print_debug benchs ("Realizing t for "^parameters.fl_mo);
+        realize t
+      in
+      ()
+    in
+    List.iter f_one parameters_lst
+  in
+  let parameters_lst = 
+    List.map parameters_of_filename mo_files_data
+  in
+  let bench_lst = 
+    List.map ( fun (str_implementation, realize) ->
+      str_implementation, f, (realize,parameters_lst)
+    ) realize_data
+  in
+  print_debug benchs "Benchmarking realize:";
+  ( "Realize benchmark",
+    throughputN benchs.time bench_lst
+  )
+;;
 
 (**********************)
 (* Performance of s_  *)
 (**********************)
 
+let s_bench benchs = 
+  let fun_gettext t' textdomain translation = 
+    match translation with
+      Singular(str,_) ->
+        let str : string = 
+          GettextCompat.dgettext t' textdomain str
+        in
+        ()
+    | _ ->
+        ()
+  in
+  gettext_bench benchs "s_" fun_gettext 
+;;
+
 (*********************)
 (* Performance of f_ *)
 (*********************)
+
+let f_bench benchs = 
+  let fun_gettext t' textdomain translation = 
+    match translation with
+      Singular(str,_) ->
+        let str = 
+          GettextCompat.fdgettext t' textdomain str
+        in
+        ()
+    | _ ->
+        ()
+  in
+  gettext_bench benchs "f_" fun_gettext 
+;;
 
 (**********************)
 (* Performance of sn_ *)
 (**********************)
 
+let sn_bench benchs = 
+  let fun_gettext t' textdomain translation = 
+    match translation with
+      Plural(str_id,str_plural,_) ->
+        let str0 : string = 
+          GettextCompat.dngettext t' textdomain str_id str_plural 0
+        in
+        let str1 : string = 
+          GettextCompat.dngettext t' textdomain str_id str_plural 1
+        in
+        let str2 : string = 
+          GettextCompat.dngettext t' textdomain str_id str_plural 2
+        in
+        let str3 : string = 
+          GettextCompat.dngettext t' textdomain str_id str_plural 3
+        in
+        ()
+    | _ ->
+        ()
+  in
+  gettext_bench benchs "sn_" fun_gettext 
+;;
+
 (**********************)
 (* Performance of fn_ *)
 (**********************)
+
+let fn_bench benchs = 
+  let fun_gettext t' textdomain translation = 
+    match translation with
+      Plural(str_id,str_plural,_) ->
+        let str0 = 
+          GettextCompat.fdngettext t' textdomain str_id str_plural 0
+        in
+        let str1 = 
+          GettextCompat.fdngettext t' textdomain str_id str_plural 1
+        in
+        let str2 = 
+          GettextCompat.fdngettext t' textdomain str_id str_plural 2
+        in
+        let str3 = 
+          GettextCompat.fdngettext t' textdomain str_id str_plural 3
+        in
+        ()
+    | _ ->
+        ()
+  in
+  gettext_bench benchs ("fn_") fun_gettext 
+;;
 
 (**************************)
 (* Main benchmark routine *)
@@ -125,15 +278,22 @@ in
 let all_bench = 
   [
     format_bench;
+    realize_bench;
+    s_bench;
+    f_bench;
+    sn_bench;
+    fn_bench;
   ]
 in
 print_env "benchmarks";
 (* Running *)
-let results = 
-  List.fold_left ( 
-    fun sample bench -> 
-      merge (bench benchs) sample 
-    ) [] all_bench
+let all_results = 
+  List.map (fun x -> x benchs) all_bench 
 in
-tabulate results
+List.iter ( fun(str,results) ->
+  print_newline ();
+  print_newline ();
+  print_endline str;
+  tabulate results
+) all_results
 

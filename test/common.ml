@@ -1,5 +1,80 @@
 open GettextTypes;;
+open FilePath.DefaultPath;;
 
+(* Version data *)
+let print_env str = 
+  print_endline ("Version         : ocaml-gettext "^(GettextConfig.version));
+  print_endline ("Build date      : "^(GettextConfig.build_date));
+  print_endline ("OS              : "^(Sys.os_type));
+  print_endline ("Running "^str^" ...")
+;;
+
+(* Print a translation *)
+let string_of_translation trans = 
+  match trans with
+    Singular(str_id, str) ->
+      Printf.sprintf "Singular(%S, %S)" str_id str
+  | Plural(str_id, str_plural, lst) ->
+      Printf.sprintf "Plural(%S, %S, [ %s ])" str_id str_plural 
+      (String.concat " ; " (List.map (fun x -> Printf.sprintf "%S" x) lst)) 
+;;
+
+(* Function for extracting all information of MO file *)
+type parameters = {
+  fl_mo        : filename;
+  base_dir     : dir;
+  language     : locale;
+  category     : category;
+  textdomain   : textdomain;
+  translations : translation list;
+}
+;;
+
+let parameters_of_filename fl_mo =
+  (* File scheme : 
+    base_dir/lang/category/domain.mo
+   *)
+  let textdomain = 
+    chop_extension (basename fl_mo)
+  in
+  let category =
+    GettextCategory.category_of_string (basename (dirname fl_mo))
+  in
+  let language = 
+    (basename (dirname (dirname (fl_mo))))
+  in
+  let base_dir =
+    (dirname (dirname (dirname (fl_mo))))
+  in
+  let (translations,_) = 
+    GettextMo.fold_mo RaiseException 
+    ( fun x lst -> x :: lst ) 
+    []
+    fl_mo
+  in
+  {
+    fl_mo = fl_mo;
+    base_dir = base_dir;
+    language = language;
+    category = category;
+    textdomain = textdomain;
+    translations = translations;
+  }
+;;
+
+(* Build the parameter t out of parameters extracted above *)
+let t_of_parameters parameters =
+  (* We use a UTF-8 binding, this is the most generic encoding
+  * for all strings *)
+  GettextModules.create 
+  ~failsafe:RaiseException
+  ~codesets:[(parameters.textdomain,"UTF-8")] 
+  ~path:[parameters.base_dir] 
+  ~language:parameters.language
+  parameters.textdomain
+;;
+
+(* Data for format test/bench *)
 let format_translation_check_data =
   [
     (* Identity *)
@@ -195,20 +270,28 @@ let format_translation_singular_data =
   format_translation_all_data
 ;;
 
-let print_env str = 
-  print_endline ("Version         : ocaml-gettext "^(GettextConfig.version));
-  print_endline ("Build date      : "^(GettextConfig.build_date));
-  print_endline ("OS              : "^(Sys.os_type));
-  print_endline ("Running "^str^" ...")
+
+(* Files installed for testing purpose. "." refers to the directory
+   where common.ml is installed. *)
+let mo_files_data = 
+  [
+    make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test1.mo" ];
+    make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test2.mo" ];
+    make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test3.mo" ];
+    make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test4.mo" ];
+    make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test10.mo" ];
+    make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test11.mo" ];
+  ]
 ;;
 
-let string_of_translation trans = 
-  match trans with
-    Singular(str_id, str) ->
-      Printf.sprintf "Singular(%S, %S)" str_id str
-  | Plural(str_id, str_plural, lst) ->
-      Printf.sprintf "Plural(%S, %S, [ %s ])" str_id str_plural 
-      (String.concat " ; " (List.map (fun x -> Printf.sprintf "%S" x) lst)) 
+(* Different implementation of realize. *)
+let realize_data = 
+  [
+    ("Camomile.Map",     GettextCamomile.Map.realize);
+    ("Camomile.Hashtbl", GettextCamomile.Hashtbl.realize);
+    ("Camomile.Open",    GettextCamomile.Open.realize);
+    ("Stub.Native",      GettextStub.Native.realize);
+    ("Stub.Preload",     GettextStub.Preload.realize);
+  ]
 ;;
-
 

@@ -189,7 +189,7 @@ module Open : TRANSLATE_TYPE =
     let create t filename charset =
       (* Processing of the file *)
       let chn =
-        open_in filename
+        open_in_bin filename
       in
       let header = 
         input_mo_header chn
@@ -197,6 +197,7 @@ module Open : TRANSLATE_TYPE =
       let informations = 
         input_mo_informations t.GettextTypes.failsafe chn header
       in
+      close_in chn;
       {
         dummy             = Dummy.create t filename charset;
         filename          = filename;
@@ -207,70 +208,73 @@ module Open : TRANSLATE_TYPE =
       }
       
     let translate u printf_format str plural_form =
-      try
-        let plural_number = 
-          u.fun_plural_forms (
-            match plural_form with
-              Some(_,x) -> x
-              | None -> 0
-          )
-        in
-        let check =
-          if printf_format then
-            check_format u.failsafe
-          else
-            fun x -> x
-        in
-        let chn = 
+      let chn = 
           open_in_bin u.filename 
-        in
-        let header = 
-          input_mo_header chn
-        in
-        let rec find_str_id (start_index,end_index) = 
-          let middle_index = 
-            (start_index + end_index) / 2
+      in
+      let res = 
+        try
+          let plural_number = 
+            u.fun_plural_forms (
+              match plural_form with
+                Some(_,x) -> x
+                | None -> 0
+            )
           in
-          let str_id = 
-            let lst_str_id = 
-              input_mo_untranslated u.failsafe chn header middle_index
+          let check =
+            if printf_format then
+              check_format u.failsafe
+            else
+              fun x -> x
+          in
+          let header = 
+            input_mo_header chn
+          in
+          let rec find_str_id (start_index,end_index) = 
+            let middle_index = 
+              (start_index + end_index) / 2
             in
-            match lst_str_id with
-              str_id :: _ ->
-                str_id
-            | [] ->
-                (* BUG : should be a real exception *)
+            let str_id = 
+              let lst_str_id = 
+                input_mo_untranslated u.failsafe chn header middle_index
+              in
+              match lst_str_id with
+                str_id :: _ ->
+                  str_id
+              | [] ->
+                  (* BUG : should be a real exception *)
+                  raise Not_found
+            in
+            match String.compare str str_id with
+              x when x < 0 && start_index <= middle_index - 1 ->
+                find_str_id (start_index,middle_index - 1)
+            | x when x > 0 && middle_index + 1 <= end_index->
+                find_str_id (middle_index + 1,end_index)
+            | x when x = 0 ->
+                middle_index
+            | _ ->
                 raise Not_found
           in
-          match String.compare str str_id with
-            x when x < 0 && start_index <= middle_index - 1 ->
-              find_str_id (start_index,middle_index - 1)
-          | x when x > 0 && middle_index + 1 <= end_index->
-              find_str_id (middle_index + 1,end_index)
-          | x when x = 0 ->
-              middle_index
-          | _ ->
-              raise Not_found
-        in
-        let translation = 
           let translation = 
-            input_mo_translation 
-            u.failsafe 
-            chn 
-            header 
-            (find_str_id (0,u.number_of_strings-1))
+            let translation = 
+              input_mo_translation 
+              u.failsafe 
+              chn 
+              header 
+              (find_str_id (0,u.number_of_strings-1))
+            in
+            match translation with
+              Singular(str_id, str) ->
+                Singular(str_id, u.charset str)
+            | Plural(str_id,str_plural,lst) ->
+                Plural(str_id, str_plural, List.map u.charset lst)
           in
-          match translation with
-            Singular(str_id, str) ->
-              Singular(str_id, u.charset str)
-          | Plural(str_id,str_plural,lst) ->
-              Plural(str_id, str_plural, List.map u.charset lst)
-        in
-        close_in chn;
-        get_translated_value u.failsafe translation plural_number
-      with Not_found ->
-        fail_or_continue u.failsafe
-        (GettextTranslateStringNotFound str)
-        (Dummy.translate u.dummy printf_format str plural_form)
+          get_translated_value u.failsafe translation plural_number
+        with Not_found ->
+          fail_or_continue u.failsafe
+          (GettextTranslateStringNotFound str)
+          (Dummy.translate u.dummy printf_format str plural_form)
+      in
+      close_in chn;
+      res
   end
 ;;

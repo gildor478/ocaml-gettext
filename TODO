@@ -1,5 +1,4 @@
 v 0.2.0 : 
-- Benchmark GettextCamomile/GettextStub 
 - Remove \t in all the code, find a the good settings to work with vim and use a tags in each file to made it clear
 - Add a header to each source code file concerning the licence ( LGPL + Ocaml + copyright )
 - Check all exported functions ( cf GettextUtils )
@@ -10,3 +9,4 @@ v 0.2.0 :
 
 v 0.3.0 :
 - Better parse comments, to keep licence et al 
+- Try to be faster than gettext C library

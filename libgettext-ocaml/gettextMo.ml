@@ -406,37 +406,41 @@ let output_mo ?(endianess = LittleEndian) chn lst =
 ;;
 
 let fold_mo failsafe f init fl_mo = 
-  try 
-  (* Processing of the file *)
-    let chn =
-        open_in fl_mo
-    in
-    let mo_header = input_mo_header chn
-    in
-    let informations = 
-      input_mo_informations failsafe chn mo_header
-    in
-    let fun_plural_forms = 
-      informations.GettextTypes.fun_plural_forms
-    in
-    let rec fold_mo_aux accu i = 
-      if i < Int32.to_int mo_header.number_of_strings then
-        let new_translation = 
-          input_mo_translation failsafe chn mo_header i
-        in
-        let new_accu = 
-          f new_translation accu 
-        in
-        fold_mo_aux new_accu (i+1)
-    else
-        accu 
-    in
-    let translations = 
-      fold_mo_aux init 0 
-    in
-    (translations,fun_plural_forms)
-  with (Sys_error _) ->
-    fail_or_continue failsafe
-    (CannotOpenMoFile fl_mo)
-    (init,germanic_plural)
+  let chn =
+      open_in_bin fl_mo
+  in
+  let res = 
+    try 
+    (* Processing of the file *)
+      let mo_header = input_mo_header chn
+      in
+      let informations = 
+        input_mo_informations failsafe chn mo_header
+      in
+      let fun_plural_forms = 
+        informations.GettextTypes.fun_plural_forms
+      in
+      let rec fold_mo_aux accu i = 
+        if i < Int32.to_int mo_header.number_of_strings then
+          let new_translation = 
+            input_mo_translation failsafe chn mo_header i
+          in
+          let new_accu = 
+            f new_translation accu 
+          in
+          fold_mo_aux new_accu (i+1)
+      else
+          accu 
+      in
+      let translations = 
+        fold_mo_aux init 0 
+      in
+      (translations,fun_plural_forms)
+    with (Sys_error _) ->
+      fail_or_continue failsafe
+      (CannotOpenMoFile fl_mo)
+      (init,germanic_plural)
+  in
+  close_in chn;
+  res
 ;;

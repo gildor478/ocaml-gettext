@@ -306,9 +306,9 @@ module Program =
         (
           "--gettext-domain-dir",
           ( 
-	    let current_textdomain = ref textdomain 
-	    in
-	    Arg.Tuple 
+            let current_textdomain = ref textdomain 
+            in
+            Arg.Tuple 
             [
               Arg.String ( fun textdomain -> current_textdomain := textdomain );
               Arg.String ( fun dir -> 

@@ -9,23 +9,25 @@
 quote(c, "#include <locale.h>");
 
 enum lc {
-	LC_CTYPE,
-	LC_NUMERIC,
-	LC_TIME,
-	LC_COLLATE,
-	LC_MONETARY,
-	LC_MESSAGES,
-	LC_ALL
+  LC_CTYPE,
+  LC_NUMERIC,
+  LC_TIME,
+  LC_COLLATE,
+  LC_MONETARY,
+  LC_MESSAGES,
+  LC_ALL
 };
 
 quote(mli, "(** Set the current localization for the category *)");
-[string]char *setlocale( enum lc n, [string]const char *val) 
-	quote(call, 
-	"_res=setlocale(n,val);\
-	if ( _res == NULL )\
-		failwith(\"setlocale(invalid localization)\");\
-	");
-	
+[string]char *setlocale( 
+    enum lc n, 
+    [string]const char *val)
+quote(call, 
+    "_res=setlocale(n,val);\
+    if ( _res == NULL )\
+    failwith(\"setlocale(invalid localization)\");\
+    ");
+
 /***************************/
 /*                         */
 /*                         */
@@ -41,89 +43,91 @@ catalog for the current LC_MESSAGES locale.  If not found, \
 returns MSGID itself (the default text).  *)");
 
 [string]char *gettext (
-	[string]const char *msgid);
+    [string]const char *msgid);
 
 quote(mli, "(** Look up MSGID in the DOMAINNAME message catalog \
 for the current LC_MESSAGES locale.  *)");
 
 [string]char *dgettext (
-	[string]const char *domainname, 
-	[string]const char *msgid);
+    [string]const char *domainname, 
+    [string]const char *msgid);
 
 quote(mli, "(** Look up MSGID in the DOMAINNAME message catalog \
 for the current CATEGORY locale.  *)");
 
 [string]char *dcgettext (
-	[string]const char *domainname, 
-	[string]const char *msgid, 
-	enum lc category);
+    [string]const char *domainname, 
+    [string]const char *msgid, 
+    enum lc category);
 
 quote(mli, "(** Similar to `gettext' but select the plural form \
 corresponding to the number N.  *)");
 
 [string]char *ngettext (
-	[string]const char *msgid1, 
-	[string]const char *msgid2, 
-	unsigned long int n);
+    [string]const char *msgid1, 
+    [string]const char *msgid2, 
+    unsigned long int n);
 
 quote(mli, "(** Similar to `dgettext' but select the plural form \
 corresponding to the number N.  *)");
 
 [string]char *dngettext (
-	[string]const char *domainname, 
-	[string]const char *msgid1, 
-	[string]const char *msgid2, 
-	unsigned long int n);
+    [string]const char *domainname, 
+    [string]const char *msgid1, 
+    [string]const char *msgid2, 
+    unsigned long int n);
 
 quote(mli, "(** Similar to `dcgettext' but select the plural form \
 corresponding to the number N.  *)");
 
 [string]char *dcngettext (
-	[string]const char *domainname, 
-	[string]const char *msgid1, 
-	[string]const char *msgid2, 
-	unsigned long int n, 
-	enum lc category);
+    [string]const char *domainname, 
+    [string]const char *msgid1, 
+    [string]const char *msgid2, 
+    unsigned long int n, 
+    enum lc category);
 
 quote(mli, "(** Set the current default message catalog to DOMAINNAME.\
  If DOMAINNAME is \"\", reset to the default of \"messages\". *)");
 
-[string]char *textdomain ( [string]const char *domainname) 
-	quote(call, 
-	"_res=textdomain(domainname);\
-	if ( _res == NULL )\
-		failwith(\"textdomain\");\
-	");
+[string]char *textdomain ( 
+    [string]const char *domainname) 
+quote(call, 
+    "_res=textdomain(domainname);\
+    if ( _res == NULL )\
+    failwith(\"textdomain\");\
+    ");
 
 quote(mli, "(** Get the current default message catalog to DOMAINNAME.*)");
 
-[string]char *get_textdomain ( void )
-	quote(call, 
-	"_res=textdomain(NULL);\
-	if ( _res == NULL )\
-		failwith(\"get_textdomain\");\
-	");
+[string]char *get_textdomain ( 
+    void)
+quote(call, 
+    "_res=textdomain(NULL);\
+    if ( _res == NULL )\
+    failwith(\"get_textdomain\");\
+    ");
 
 quote(mli, "(** Specify that the DOMAINNAME message catalog will be found\
    in DIRNAME rather than in the system locale data base.  *)");
 
 [string]char *bindtextdomain (
-	[string]const char *domainname, 
-	[string]const char *dirname)
-	quote(call, 
-	"_res=bindtextdomain(domainname, dirname);\
-	if ( _res == NULL )\
-		failwith(\"bindtextdomain\");\
-	");
+    [string]const char *domainname, 
+    [string]const char *dirname)
+quote(call, 
+    "_res=bindtextdomain(domainname, dirname);\
+    if ( _res == NULL )\
+    failwith(\"bindtextdomain\");\
+    ");
 
 quote(mli, "(** Specify the character encoding in which the messages from the\
    DOMAINNAME message catalog will be returned.*)");
 
 [string]char *bind_textdomain_codeset (
-	[string]const char *domainname, 
-	[string]const char *codeset)
-	quote(call, 
-	"_res=bind_textdomain_codeset(domainname,codeset);\
-	if ( _res == NULL )\
-		failwith(\"bind_textdomain_codeset\");\
-	");
+    [string]const char *domainname, 
+    [string]const char *codeset)
+quote(call, 
+    "_res=bind_textdomain_codeset(domainname,codeset);\
+    if ( _res == NULL )\
+    failwith(\"bind_textdomain_codeset\");\
+    ");

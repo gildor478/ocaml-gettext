@@ -380,76 +380,15 @@ let merge_test tests =
 (**********************************)
 
 let implementation_test tests =
-  (* Function for extracting all information of MO file *)
-  let extract_parameters fl_mo =
-    (* File scheme : 
-      base_dir/lang/category/domain.mo
-     *)
-    let textdomain = 
-      chop_extension (basename fl_mo)
-    in
-    let category =
-      GettextCategory.category_of_string (basename (dirname fl_mo))
-    in
-    let language = 
-      (basename (dirname (dirname (fl_mo))))
-    in
-    let base_dir =
-      (dirname (dirname (dirname (fl_mo))))
-    in
-    let () = 
-      print_debug tests ("Filename:   "^fl_mo);
-      print_debug tests ("Textdomain: "^textdomain);
-      print_debug tests ("Category:   "^(GettextCategory.string_of_category category));
-      print_debug tests ("Language:   "^language);
-      print_debug tests ("Base dir:   "^base_dir)
-    in
-    let mo = 
-      print_debug tests ("Opening "^fl_mo);
-      open_in_bin fl_mo
-    in
-    let mo_header = 
-      print_debug tests "Fetching headers";
-      GettextMo.input_mo_header mo
-    in
-    let mo_informations = 
-      print_debug tests "Fetching informations";
-      GettextMo.input_mo_informations
-      RaiseException mo mo_header
-    in
-    let test_translations = ref []
-    in
-    for i = 0 to (Int32.to_int mo_header.number_of_strings) - 1 do
-      let translation = 
-        print_debug tests ("Fetching translation n°"^(string_of_int i));
-        GettextMo.input_mo_translation RaiseException mo mo_header i
-      in
-      test_translations := translation :: !test_translations
-    done;
-    print_debug tests ("Closing file "^fl_mo);
-    close_in mo;
-    (fl_mo,base_dir,language,category,textdomain,!test_translations)
-  in
-  (* Build the parameter t out of parameters extracted above *)
-  let t_of_parameters parameters =
-    let (fl_mo,base_dir,language,category,textdomain,test_translations) = 
-      parameters
-    in
-    (* We use a UTF-8 binding, this is the most generic encoding
-      for all strings *)
-    GettextModules.create 
-    ~failsafe:RaiseException
-    ~codesets:[(textdomain,"UTF-8")] 
-    ~path:[base_dir] 
-    ~language:language
-    textdomain
-  in
   (* Generate a test case of simple load of a MO file using an implementation *)
   let test_load parameters_lst (realize_str,realize) = 
     let test_load_one realize parameters =
       (* Extract usefull information out of parameters *)
-      let (fl_mo,_,_,_,_,test_translations) = 
-        parameters
+      let fl_mo = 
+        parameters.fl_mo
+      in
+      let test_translations = 
+        parameters.translations
       in
       (* Build t *)
       let t =
@@ -486,8 +425,11 @@ let implementation_test tests =
   (* Generate a cross test of string extracted, using different implementation *)
   let test_cross implementation_lst parameters = 
     (* Extract usefull information out of parameters *)
-    let (fl_mo,_,_,_,_,test_translations) = 
-      parameters
+    let fl_mo = 
+      parameters.fl_mo
+    in
+    let test_translations= 
+      parameters.translations
     in
     (* Build t *)
     let t =
@@ -564,23 +506,10 @@ let implementation_test tests =
   in
   (* Extract and test *)
   let parameters_lst = 
-    List.map extract_parameters [
-      make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test1.mo" ];
-      make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test2.mo" ];
-      make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test3.mo" ];
-      make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test4.mo" ];
-      make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test10.mo" ];
-      make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test11.mo" ];
-    ]
+    List.map parameters_of_filename mo_files_data 
   in
   let implementation_lst = 
-    [
-      ("GettextCamomile.Map.realize",     GettextCamomile.Map.realize);
-      ("GettextCamomile.Hashtbl.realize", GettextCamomile.Hashtbl.realize);
-      ("GettextCamomile.Open.realize",    GettextCamomile.Open.realize);
-      ("GettextStub.Native.realize",      GettextStub.Native.realize);
-      ("GettextStub.Preload.realize",     GettextStub.Preload.realize);
-    ]
+    realize_data
   in
   "Gettext implementation test" >:::
     [
