@@ -1,3 +1,4 @@
+open GettextTypes;;
 
 let format_translation_check_data =
   [
@@ -181,7 +182,7 @@ let format_translation_check_data =
 
 let format_translation_all_data = 
   List.fold_left ( fun lst (a,b) -> a :: b :: lst )
-  format_translation_check_data
+  [] format_translation_check_data
 ;;
 
 let format_translation_plural_data =
