@@ -21,10 +21,8 @@ let string_of_exception exc =
       ""
 ;;
 
-(** Functions for manipulation the type t : create, textdomain, get_textdomain,
-    bindtextdomain, bindtextdomain_codeset *)
+(** Function for manipulation the type t *)
 
-(* Utility functions *)
 let upgrade_textdomain t k value =  
   let (current_codeset,current_dir) = 
     try
@@ -42,28 +40,13 @@ let upgrade_textdomain t k value =
   { t with textdomains = MapTextdomain.add k new_value t.textdomains }
 ;;
 
-let bindtextdomain textdomain dir t =
-  upgrade_textdomain t textdomain (None,Some dir)
-;;
-  
-let bindtextdomain_codeset textdomain codeset t =
-  upgrade_textdomain t textdomain (Some codeset,None)
-;;
-
-let textdomain default t = 
-  { t with default = default }
-;;
-
-let get_textdomain t = 
-  t.default
-;;
-
 let create 
   ?(failsafe = Ignore) 
   ?(categories = []) 
   ?(codesets = [])
   ?(dirs = []) 
   ?(textdomains = [])
+  ?(codeset)
   ?(language)
   textdomain =
     let map_categories = 
@@ -76,22 +59,40 @@ let create
     in
     let result =
       {
-        failsafe = failsafe;
+        failsafe    = failsafe;
         textdomains = MapTextdomain.empty;
-        categories = map_categories; 
-        language = language;
-        default = textdomain;
+        categories  = map_categories;
+        language    = language;
+        codeset     = codeset;
+        default     = textdomain;
       }
     in
-    let apply_upgrade t (to_std,lst) =
+    (* Apply any upgrade required by the different settings provided *)
+    let apply_upgrade t lst =
       List.fold_left (
         fun t (textdomain,changes) ->
           upgrade_textdomain t textdomain changes
-      ) result (List.map to_std lst)
+      ) t lst
     in
-    List.fold_left apply_upgrade result [
-      (fun textdomain -> (textdomain,(None,None))), (textdomain :: textdomains);
-      (fun (textdomain,codeset) -> (textdomain,(Some codeset,None))), codeset;
-      (fun (textdomain,dir) -> (textdomain,(None,Some dir))) dirs
-    ]
+    (* All changes from the setting of textdomains *)
+    let textdomains_changes = 
+      List.map 
+      (fun textdomain -> (textdomain,(None,None))) 
+      (textdomain :: textdomains)
+    in
+    (* All changes from the setting of codesets *)
+    let codesets_changes =
+      List.map 
+      (fun (textdomain,codeset) -> (textdomain,(Some codeset,None))) 
+      codesets
+    in
+    (* All changes from the setting of dirs *)
+    let dirs_changes =
+      List.map 
+      (fun (textdomain,dir) -> (textdomain,(None,Some dir))) 
+      dirs
+    in
+    apply_upgrade 
+    result 
+    ( textdomains_changes @ codesets_changes @ dirs_changes )
 ;;

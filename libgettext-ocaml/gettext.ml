@@ -1,28 +1,22 @@
 open GettextTypes;;
+open GettextCompat;;
 
 (* High level functions *)
 
 module Library =
-  functor ( Init : init ) ->
-  functor ( InitDependencies : init list ) ->
+  functor ( Init : Init ) ->
   struct
-    let textdomain = 
-      let (textdomain,_,_) = Init 
-      in
-      textdomain
+    let init = (Init.textdomain, Init.codeset, Init.dir) :: Init.dependencies
 
-    let init = Init :: InitDependencies
-
-    let s_   = dgettext (get_global_t' ()) textdomain 
-    val f_   = fdgettext (get_global_t' ()) textdomain
-    val sn_  = dngettext (get_global_t' ()) textdomain
-    val fn_  = fdngettext (get_global_t' ()) textdomain
+    let s_   = dgettext (get_global_t' ()) Init.textdomain 
+    let f_   = fdgettext (get_global_t' ()) Init.textdomain
+    let sn_  = dngettext (get_global_t' ()) Init.textdomain
+    let fn_  = fdngettext (get_global_t' ()) Init.textdomain
   end
 ;;
 
 module Program = 
-  functor ( Init : init ) ->
-  functor ( InitDependencies : init list ) ->
+  functor ( Init : Init ) ->
   functor ( Realize : realize ) ->
   struct
     let textdomain = 
@@ -36,10 +30,11 @@ module Program =
         ( Arg.Symbol 
           (
             ["ignore"; "inform-stderr"; "raise-exception"],
-            ( fun 
-                  "ignore"          -> set_global { get_global () with failsafe = Ignore }
-                | "inform-stderr"   -> set_global { get_global () with failsafe = InformStderr }
-                | "raise-exception" -> set_global { get_global () with failsafe = RaiseException }
+            ( fun x ->
+                match x with
+                  "ignore"          -> set_global { (get_global ()) with failsafe = Ignore }
+                | "inform-stderr"   -> set_global { (get_global ()) with failsafe = InformStderr }
+                | "raise-exception" -> set_global { (get_global ()) with failsafe = RaiseException }
             )
           )
         ),
@@ -48,7 +43,7 @@ module Program =
       (
         "--gettext-disable",
         ( Arg.Unit 
-          ( fun () -> set_global { get_global () with realize = XXX } 
+          ( fun () -> set_global { (get_global ()) with realize = XXX } 
           )
         ),
         "Disable the translation perform by gettext"
@@ -65,7 +60,7 @@ module Program =
       (
         "--gettext-dir",
         ( Arg.String
-          ( fun s -> set_global { get_global () with dir = s }
+          ( fun s -> set_global { (get_global ()) with dir = s }
           )
         ),
         "Set the default dir to search gettext files"
@@ -73,7 +68,7 @@ module Program =
       (
         "--gettext-language",
         ( Arg.String
-          ( fun s -> set_global { get_global () with language = s }
+          ( fun s -> set_global { (get_global ()) with language = s }
           )
         ),
         "Set the default language for gettext"
@@ -81,7 +76,7 @@ module Program =
       (
         "--gettext-codeset",
         ( Arg.String
-          ( fun s -> set_global { get_global () with codeset = s }
+          ( fun s -> set_global { (get_global ()) with codeset = s }
           )
         ),
         "Set the default codeset for outputting string with gettext"
@@ -89,9 +84,9 @@ module Program =
       ]
       
     let s_   = dgettext (get_global_t' ()) textdomain 
-    val f_   = fdgettext (get_global_t' ()) textdomain
-    val sn_  = dngettext (get_global_t' ()) textdomain
-    val fn_  = fdngettext (get_global_t' ()) textdomain
+    let f_   = fdgettext (get_global_t' ()) textdomain
+    let sn_  = dngettext (get_global_t' ()) textdomain
+    let fn_  = fdngettext (get_global_t' ()) textdomain
 
   end
 ;;

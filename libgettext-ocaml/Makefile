@@ -19,7 +19,10 @@ INSTALLIB +=         \
  gettextBase.cmxa    \
  gettextBase.a       \
  gettextTypes.cmi    \
- gettextMo.cmi    
+ gettextMo.cmi       \
+ gettextModules.cmi  \
+ gettextCompat.cmi   \
+ gettext.cmi         
 
 CMO_BASE  =            \
  gettextTypes.cmo      \
@@ -27,10 +30,14 @@ CMO_BASE  =            \
  gettextMo_int32.cmo   \
  gettextMo_parser.cmo  \
  gettextMo_lexer.cmo   \
- gettextMo.cmo     
+ gettextMo.cmo         \
+ gettextModules.cmo    \
+ gettextCompat.cmo     \
+ gettext.cmo           
 
 gettextMo_parser.cmo: gettextMo_parser.cmi
 gettextMo_parser.cmx: gettextMo_parser.cmi
+gettextCompat.cmo: gettextCompat.cmi
 gettextBase.cma: $(CMO_BASE)
 gettextBase.cmxa: $(CMO_BASE:.cmo=.cmx)
 
