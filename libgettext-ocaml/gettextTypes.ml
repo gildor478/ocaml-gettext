@@ -110,13 +110,12 @@ type mo_translation_type = {
 }
 ;;
 
-type translation_type = 
-  Singular of string
-| Plural of string list
+type translated_type = 
+  Singular of string * string
+| Plural of string * string * string list
 ;;
 
 type po_content_type =
-  Domain of string * (po_content_type list)
-| SingularEntry of string * string
-| PluralEntry of string * string * ((int * string) list)
+  Domain of string * (translated_type list)
+| NoDomain of translated_type list
 ;;

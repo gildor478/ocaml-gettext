@@ -15,6 +15,6 @@ msgid "hey"
 msgstr "hé"
 
 msgid "%d coffee"
-msgid_plural "%d coffee"
+msgid_plural "more %d coffee"
 msgstr[0] "%d café"
 msgstr[1] "%d cafés"

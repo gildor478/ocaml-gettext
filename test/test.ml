@@ -35,22 +35,37 @@ Arg.parse
 ;;
 *)
 
-let po_parsing = 
-  let po_parse_one fl = 
-    fl >:: ( fun () -> 
-      try 
-        let _ = po_of_file "test1.po"
-        in
-        ()
-      with x ->
-        print_string (GettextPo.string_of_exception x);
-        assert_failure (fl^" doesn't parse correctly")
-      )
+let po_test = 
+  let po_test_one fl = 
+    fl >:::
+      [
+        "Parsing" >:: 
+        ( fun () -> 
+          try 
+            let _ = po_of_file fl
+            in
+            ()
+          with x ->
+            print_endline (GettextPo.string_of_exception x);
+            assert_failure (fl^" doesn't parse correctly")
+        );
+
+        "Compiling" >::
+        ( fun () ->
+          try
+            let _ = compile_po (po_of_file fl)
+            in
+            () 
+          with x ->
+            print_endline (GettextPo.string_of_exception x);
+            assert_failure (fl^" doesn't compile correctly")
+        )
+      ]
   in
-  "Po_parsing" >:::
-    List.map po_parse_one ["test1.po"; "test2.po"]
+  "Self test" >:::
+    List.map po_test_one ["test1.po"; "test2.po" ; (*"test3.po"*)]
 in
-let all_test = po_parsing
+let all_test = po_test
 in
 let _ = 
   print_endline ("Test            : gettext "^(Version.version));

@@ -1,6 +1,28 @@
 %{
 
 open GettextTypes;;
+open GettextUtils;;
+
+let check_string_format ref str =
+  str
+;;
+
+let check_plural id id_plural lst =
+  let rec check_plural_one nxt lst = 
+    match lst with 
+      (x,str) :: tl when x = nxt ->
+        (check_string_format id str) :: (check_plural_one (nxt + 1) tl)
+    | (x,str) :: tl ->
+        raise (InvalidIndex(id,x))
+    | [] ->
+        []
+  in
+  Plural(id, (check_string_format id id_plural), (check_plural_one 0 lst))
+;;
+  
+let check_singular id str =
+  Singular(id, check_string_format id str)
+;;
 
 %}
 
@@ -22,8 +44,8 @@ open GettextTypes;;
 msgfmt:
   msgfmt domain        { let (a,b) = $2 in Domain (a,b) :: $1 } 
 | domain               { let (a,b) = $1 in [Domain (a,b)] }
-| msgfmt message       { $2 :: $1 }
-| message              { [$1] }
+| msgfmt message_list  { (NoDomain $2) :: $1 }
+| message_list         { [NoDomain $1] }
 | EOF                  { [] }
 ;
 
@@ -38,8 +60,8 @@ message_list:
 ;
 
 message:
-  MSGID string_list MSGSTR string_list               { SingularEntry($2,$4) } 
-| MSGID string_list msgid_pluralform pluralform_list { PluralEntry($2,$3,$4) }
+  MSGID string_list MSGSTR string_list               { check_singular $2 $4 } 
+| MSGID string_list msgid_pluralform pluralform_list { check_plural $2 $3 (List.rev $4) }
 ;
 
 msgid_pluralform:
