@@ -1,6 +1,20 @@
-(** Implements different operation over category *)
+(** Implements different operation over locale/category *)
 
-open GettextTypes;;
+module type LOCALE_TYPE = 
+  sig
+    type locale   = string
+    type category
+    type t 
+    
+    val create : unit -> t
+    
+    val compare : category -> category -> int
+
+    val set_locale : category -> locale -> t -> t 
+    
+    val get_locale : category -> t -> locale
+  end
+;;
 
 let compare a b = 
   let value_of_category c =

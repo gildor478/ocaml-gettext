@@ -9,16 +9,23 @@ open GettextTypes;;
 
 module type GETTEXT_TYPE = 
   sig
+
+    type textdomain = string
+    type locale     = string
+    type dir        = string
+    type codeset    = string
+    type category 
+    
     (** init categories language textdomain : Initialize the library globally.
-        language should be a well formed ISO code one. If you use None
-        for language, a value should be guessed using environnement, falling
+        language should be a well formed ISO code one. If you don't set
+        the language, a value should be guessed using environnement, falling
         back to C default if guess failed. textdomain is the default catalog used 
-        to lookup string. You can define more category binding usnig categories.
+        to lookup string. You can define more category binding using categories.
     *)
     val init : 
-         ?categories : (GettextTypes.locale_category_type * string) list 
-      -> ?language : string
-      -> string 
+         ?categories : (category * locale) list 
+      -> ?language : locale
+      -> textdomain 
       -> unit 
 
     (** close () : Close the current gettext working environnement.
@@ -27,35 +34,35 @@ module type GETTEXT_TYPE =
  
     (** textdomain domain : Set the current text domain.
     *)
-    val textdomain : string -> unit
+    val textdomain : textdomain -> unit
 
     (** get_textdomain () : Returns the current text domain.
     *)
-    val get_textdomain : unit -> string
+    val get_textdomain : unit -> textdomain
 
-    (** bindtextdomain domain dir : Set the default base directory for the specified
+    (** bindtextdomain textdomain dir : Set the default base directory for the specified
         domain.
     *)
-    val bindtextdomain : string -> string -> unit
+    val bindtextdomain : textdomain -> dir -> unit
 
-    (** bind_textdomain_codeset domain codeset : Set the codeset to use for the
+    (** bind_textdomain_codeset textdomain codeset : Set the codeset to use for the
         specified domain. codeset must be a valid codeset for the underlying
         character encoder/decoder ( iconv, camomile, extlib... )
     *)
-    val bind_textdomain_codeset : string -> string -> unit
+    val bind_textdomain_codeset : textdomain -> codeset -> unit
      
     (** gettext str : Translate the string str.
     *)
     val gettext : string -> string
 
-    (** dgettext domain str : Translate the string str for the specified domain.
+    (** dgettext textdomain str : Translate the string str for the specified domain.
     *)
-    val dgettext : string -> string -> string
+    val dgettext : textdomain -> string -> string
 
-    (** dcgettext domain str category : Translate the string str for the specified
+    (** dcgettext textdomain str category : Translate the string str for the specified
         domain and category.
     *)
-    val dcgettext : string -> string -> GettextTypes.locale_category_type -> string
+    val dcgettext : textdomain -> string -> category -> string
 
     (** ngettext str str_plural n : Translate the string str using a plural form.
         str_plural is the default english plural. n is the relevant number for plural
@@ -63,49 +70,61 @@ module type GETTEXT_TYPE =
     *)
     val ngettext : string -> string -> int -> string
 
-    (** dngettext domain str str_plural n : Translate the string str using a plural
+    (** dngettext textdomain str str_plural n : Translate the string str using a plural
         form for the specified domain.
     *)
-    val dngettext : string -> string -> string -> int -> string
+    val dngettext : textdomain -> string -> string -> int -> string
 
-    (** dcngettext domain str str_plural n category : Translate the string str
+    (** dcngettext textdomain str str_plural n category : Translate the string str
         using a plural form for the specified domain and category.
     *)
-    val dcngettext : string -> string -> string -> int -> GettextTypes.locale_category_type -> string 
+    val dcngettext : textdomain -> string -> string -> int -> category -> string 
 
   end
 ;;
 
 module type META_GETTEXT_TYPE = 
-  functor ( Domain  : GettextDomain.DOMAIN_TYPE ) ->
-  functor ( Charset : GettextCharset.CHARSET_TYPE ) ->
+  functor ( Locale    : GettextLocale.LOCALE_TYPE ) ->
+  functor ( Domain    : GettextDomain.DOMAIN_TYPE ) ->
+  functor ( Charset   : GettextCharset.CHARSET_TYPE ) ->
   functor ( Translate : GettextTranslate.TRANSLATE_TYPE ) ->
-    GETTEXT_TYPE
+    ( GETTEXT_TYPE with category = Locale.t )
 ;;
 
 module Generic : META_GETTEXT_TYPE = 
-  functor ( Domain : GettextDomain.DOMAIN_TYPE ) ->
-  functor ( Charset : GettextCharset.CHARSET_TYPE ) ->
+  functor ( Locale    : GettextLocale.LOCALE_TYPE ) ->
+  functor ( Domain    : GettextDomain.DOMAIN_TYPE ) ->
+  functor ( Charset   : GettextCharset.CHARSET_TYPE ) ->
   functor ( Translate : GettextTranslate.TRANSLATE_TYPE ) ->
   struct
     
+    module Charset = Charset(Locale)
+    
     module Translate = Translate(Charset)
 
-    type domain      = string
-    type category    = GettextTypes.locale_category_type
+    module Domain = Domain(Locale)
+    
+    (* Public type *)
+    type textdomain = string
+    type locale     = string
+    type dir        = string
+    type codeset    = string
+    type category   = Locale.category
+    
+    (* Hide type *)
     type translation = (in_channel * Translate.t) option
     
     module MapDomainCategory = Map.Make(struct
       type t      = domain * category
       let compare (d1,c1) (d2,c2) = 
         match String.compare d1 d2 with
-          0 -> GettextCategory.compare c1 c2
+          0 -> Locale.compare_category c1 c2
         | x -> x
     end)
 
     type t = {
       domain       : Domain.t;
-      textdomain   : string;
+      textdomain   : textdomain;
       translations : translation MapDomainCategory.t;
     }
     
@@ -121,24 +140,25 @@ module Generic : META_GETTEXT_TYPE =
       global_gettext := Some gtxt
     
     let init ?(categories = []) ?(language) textdomain =
+      let default_locale =
+          List.fold_left
+          ( fun default_locale (cat,locale) -> Locale.set_locale cat lang default_locale ) 
+          (Locale.create ()) categories
+      in
       let domain = 
         let default_domain = 
           match language with 
             Some lang ->
               (* Explicit set of the language *)
-              Domain.create ~language:lang ()
+              Domain.create ~language:lang default_locale 
           | None ->
               (* Try to guess the language *)
-              Domain.create ()
-        in
-        List.fold_left 
-        ( fun domain (cat,lang) -> Domain.add_category cat lang domain ) 
-        default_domain categories
+              Domain.create default_locale
       in
       set_global_gettext {
         domain       = domain;
         textdomain   = textdomain;
-        translations = MapDomainCategory.empty;
+        translations = MapDomainCategory.create default_locale;
       }      
 
     let close () = 
@@ -242,19 +262,19 @@ module Generic : META_GETTEXT_TYPE =
       result
           
     let gettext str =
-      translate (get_textdomain ()) str LC_MESSAGES
+      translate (get_textdomain ()) str Locale.messages
 
     let dgettext domain str =
-      translate domain str LC_MESSAGES
+      translate domain str Locale.messages
 
     let dcgettext domain str category = 
       translate domain str category
 
     let ngettext str str_plural n =
-      translate (get_textdomain ()) str ~plural_form:(str_plural,n) LC_MESSAGES
+      translate (get_textdomain ()) str ~plural_form:(str_plural,n) Locale.messages
 
     let dngettext domain str str_plural n =
-      translate domain str ~plural_form:(str_plural,n) LC_MESSAGES
+      translate domain str ~plural_form:(str_plural,n) Locale.messages
 
     let dcngettext domain str str_plural n category = 
       translate domain str ~plural_form:(str_plural,n) category
