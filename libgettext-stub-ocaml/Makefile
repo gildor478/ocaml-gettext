@@ -1,7 +1,7 @@
 NAME       = gettext-stub
 CMO        =       
 LIBRARY    = true
-REQUIRES   = fileutils 
+REQUIRES   = gettext.extension
 PREDICATES =
 INSTALLIB  = META
 
@@ -15,22 +15,23 @@ distclean::
 ##############################
 
 INSTALLIB +=               \
- gettextStubCompat.cmi     \
- gettextStubCompat.cmxa    \
- gettextStubCompat.cma     \
- gettextStubCompat.a       \
- dllgettextStubCompat.so   \
- libgettextStubCompat.a   
+ gettextStub.cmxa          \
+ gettextStub.cma           \
+ gettextStub.a             \
+ dllgettextStub.so         \
+ libgettextStub.a          \
+ gettextStubCompat.cmi     
 
 CMO_STUB =                 \
  gettextStubCompat_stubs.o \
- gettextStubCompat.cmo 
+ gettextStubCompat.cmo     \
+ gettextStub.cmo 
 
 gettextStubCompat.cmo: gettextStubCompat.cmi
 gettextStubCompat.cmx: gettextStubCompat.cmi
-gettextStubCompat.cma: $(CMO_STUB)
-gettextStubCompat.cmxa: $(CMO_STUB:.cmo=.cmx)
-gettextStubCompat.cma gettextStubCompat.cmxa: STUBSOBJS = -L$(OCAMLLIB) -lcamlidl
+gettextStub.cma: $(CMO_STUB)
+gettextStub.cmxa: $(CMO_STUB:.cmo=.cmx)
+gettextStub.cma gettextStub.cmxa: STUBSOBJS = -L$(OCAMLLIB) -lcamlidl
 
 clean::
 	-$(RM) gettextStubCompat.ml gettextStubCompat.mli 

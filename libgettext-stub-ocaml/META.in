@@ -1,5 +1,5 @@
 version = "@VERSION@"
-predicates = ""
+predicates = "gettext.extension"
 archive(byte) = "gettextStub.cma"
 archive(native) = "gettextStub.cmxa"
 

@@ -8,27 +8,6 @@
 
 quote(c, "#include <locale.h>");
 
-struct lconv {
-	[string]char *decimal_point;		/* decimal point character */
-	[string]char *thousands_sep;		/* thousands separator */
-	[string]char *grouping;			/* digit grouping */
-	[string]char *int_curr_symbol;		/* international currency symbol */
-	[string]char *currency_symbol;		/* national currency symbol */
-	[string]char *mon_decimal_point;	/* currency decimal point */
-	[string]char *mon_thousands_sep;	/* currency thousands separator */
-	[string]char *mon_grouping;		/* currency digits grouping */
-	[string]char *positive_sign;		/* currency plus sign */
-	[string]char *negative_sign;		/* currency minus sign */
-	char int_frac_digits;			/* internat currency fractional digits */
-	char frac_digits;			/* currency fractional digits */
-	char p_cs_precedes;			/* currency plus location */
-	char p_sep_by_space;			/* currency plus space ind. */
-	char n_cs_precedes;			/* currency minus location */
-	char n_sep_by_space;			/* currency minus space ind. */
-	char p_sign_posn;			/* currency plus position */
-	char n_sign_posn;			/* currency minus position */
-};
-
 enum lc {
 	LC_CTYPE,
 	LC_NUMERIC,
@@ -47,9 +26,6 @@ quote(mli, "(** Set the current localization for the category *)");
 		failwith(\"setlocale(invalid localization)\");\
 	");
 	
-struct lconv *localeconv(void);
-
-
 /***************************/
 /*                         */
 /*                         */
@@ -151,8 +127,3 @@ quote(mli, "(** Specify the character encoding in which the messages from the\
 	if ( _res == NULL )\
 		failwith(\"bind_textdomain_codeset\");\
 	");
-
-quote(ml, "let gettext_noop x = x");
-
-quote(mli, "(** Dummy operation for extracting problematic strings *)");
-quote(mli, "val gettext_noop : string -> string");

@@ -206,31 +206,37 @@ let string_of_mo_header mo_header =
 ;;
 
 let input_mo_untranslated failsafe chn mo_header number = 
-  let offset_pair = 
-    (Int32.to_int mo_header.offset_table_strings) + number * 8
-  in
-  let str = 
-    try
-      seek_in chn offset_pair;
-      input_int32_pair_string chn mo_header.endianess
-    with End_of_file ->
-      raise (InvalidMoStringOutOfBound(in_channel_length chn,offset_pair))
-  in
-  split_plural str
+  if number < (Int32.to_int mo_header.number_of_strings) then
+    let offset_pair = 
+      (Int32.to_int mo_header.offset_table_strings) + number * 8
+    in
+    let str = 
+      try
+        seek_in chn offset_pair;
+        input_int32_pair_string chn mo_header.endianess
+      with End_of_file ->
+        raise (InvalidMoStringOutOfBound(in_channel_length chn,offset_pair))
+    in
+    split_plural str
+  else
+    raise (InvalidMoStringOutOfBound(Int32.to_int mo_header.number_of_strings, number))
 ;;
 
 let input_mo_translated failsafe chn mo_header number = 
-  let offset_pair = 
-    (Int32.to_int mo_header.offset_table_translation) + number * 8
-  in
-  let str = 
-    try
-      seek_in chn offset_pair;
-      input_int32_pair_string chn mo_header.endianess
-    with End_of_file ->
-      raise (InvalidMoTranslationOutOfBound(in_channel_length chn,offset_pair))
-  in
-  split_plural str 
+  if number < (Int32.to_int mo_header.number_of_strings) then
+    let offset_pair = 
+      (Int32.to_int mo_header.offset_table_translation) + number * 8
+    in
+    let str = 
+      try
+        seek_in chn offset_pair;
+        input_int32_pair_string chn mo_header.endianess
+      with End_of_file ->
+        raise (InvalidMoTranslationOutOfBound(in_channel_length chn,offset_pair))
+    in
+    split_plural str 
+  else
+    raise (InvalidMoStringOutOfBound(Int32.to_int mo_header.number_of_strings, number))
 ;;
 
 let input_mo_translation failsafe chn mo_header number =

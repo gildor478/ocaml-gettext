@@ -26,7 +26,7 @@ module Charset : GettextCharset.CHARSET_TYPE =
 ;;
 
 (* BUG : i am not sure i could rely on ocamli18n, it is based on LDML, as we
-   used POSIX convention *).
+   used POSIX convention *)
 module Locale : GettextLocale.LOCALE_TYPE = 
   struct
     
