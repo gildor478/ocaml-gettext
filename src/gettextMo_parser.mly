@@ -1,6 +1,6 @@
 %{
 
-open Camlgettext_types;;
+open GettextTypes;;
 
 %}
 

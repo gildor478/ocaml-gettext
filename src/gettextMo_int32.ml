@@ -1,4 +1,4 @@
-open Camlgettext_types;;
+open GettextTypes;;
 
 let int32_from_byte (a0,a1,a2,a3) = 
   Int32.add 

@@ -26,19 +26,19 @@ MANDIR=@mandir@
 OCAMLFIND_COMMANDS = "ocamlc=@OCAMLC@ \
 	ocamlopt=@OCAMLOPT@ \
 	ocamldep=@OCAMLDEP@"
-OCAMLC   = @OCAMLFIND@ ocamlc 
-OCAMLOPT = @OCAMLFIND@ ocamlopt
-OCAMLDEP = @OCAMLFIND@ ocamldep
-OCAMLBEST = @OCAMLBEST@
+OCAMLC       = @OCAMLFIND@ ocamlc 
+OCAMLOPT     = @OCAMLFIND@ ocamlopt
+OCAMLDEP     = @OCAMLFIND@ ocamldep
+OCAMLBEST    = @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
-OCAMLWIN32 = @OCAMLWIN32@
-OCAMLFIND = @OCAMLFIND@
-OCAMLP4 = @OCAMLP4@
-OCAMLMKLIB = @OCAMLMKLIB@
-CAMLIDL= @CAMLIDL@
-OCAMLYACC=@OCAMLYACC@
-OCAMLLEX=@OCAMLLEX@
-EXE = @EXE@
+OCAMLWIN32   = @OCAMLWIN32@
+OCAMLFIND    = @OCAMLFIND@
+OCAMLP4      = @OCAMLP4@
+OCAMLMKLIB   = @OCAMLMKLIB@
+CAMLIDL      = @CAMLIDL@
+OCAMLYACC    = @OCAMLYACC@
+OCAMLLEX     = @OCAMLLEX@
+EXE          = @EXE@
 
 ifdef REQUIRES
 CLI_REQUIRES = -package "$(REQUIRES)"
@@ -64,23 +64,22 @@ CMX = $(patsubst dll%.so, lib%.a, $(CMO:.cmo=.cmx))
 
 GENERATED = version.ml 
 
-byte: $(if $(LIBRARY), $(NAME).cma, $(NAME).byte)
-opt: $(if $(LIBRARY), $(NAME).cmxa, $(NAME).opt)
+byte: $(if $(LIBRARY), install-buildlib, $(NAME).byte)
+opt:  $(if $(LIBRARY), install-buildlib, $(NAME).opt)
 
 # Build the lib
 
-$(NAME).cmxa $(NAME).cma: $(CMX) $(CMO) $(NAME)_stubs.o
-	$(OCAMLMKLIB) -o $(NAME) $(NAME)_stubs.o $(CMO) $(CMX) \
-	$(STUBSOBJS)
+%.cmxa %.cma: 
+	$(OCAMLMKLIB) -o $* $^ $(STUBSOBJS)
 
 $(TEMPBUILDLIB):
 	mkdir $(TEMPBUILDLIB)
 
-install-buildlib: $(TEMPBUILDLIB) byte opt META
-	-$(OCAMLFIND) remove -ldconf ignore -destdir $(TEMPBUILDLIB) $(NAME) 
-	$(OCAMLFIND) install -ldconf ignore -destdir $(TEMPBUILDLIB) $(NAME) $(INSTALLIB)
+install-buildlib: $(TEMPBUILDLIB) $(INSTALLIB)
+	-$(OCAMLFIND) remove  -destdir $(TEMPBUILDLIB) $(NAME) 
+	$(OCAMLFIND)  install -ldconf ignore -destdir $(TEMPBUILDLIB) $(NAME) $(INSTALLIB)
 
-install-lib: byte opt META
+install-lib: $(INSTALLIB) 
 	$(OCAMLFIND) install -destdir $(LIBDIR) $(NAME) $(INSTALLIB)
 
 uninstall-lib:
@@ -150,11 +149,9 @@ META:
 	$(OCAMLP4) pa_o.cmo pa_zog.cma  pr_o.cmo -impl $< > $@
 	
 clean::
-	rm -f *.cm[iox] *.o *~
+	rm -f *.cm[ioxa] *.o *.cmxa *.a *.so
 	rm -f $(GENERATED) parser.output
 	rm -f $(NAME).byte $(NAME).opt
-	rm -f $(NAME).cma $(NAME).cmxa
-	rm -f $(NAME).a
 
 dist-clean distclean:: clean
 	rm -f TopMakefile Makefile config.cache config.log config.status

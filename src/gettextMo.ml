@@ -1,5 +1,5 @@
-open Camlgettext_types;;
-open Camlgettext_int32;;
+open GettextTypes;;
+open GettextMo_int32;;
  
 let input_mo_header chn = 
   let endianess = 
@@ -86,7 +86,7 @@ let input_mo_translation chn mo_header =
      let lexbuf = Lexing.from_string empty_translation
      in
      try
-       Camlgettext_parser.main Camlgettext_lexer.token_field_name lexbuf
+       GettextMo_parser.main GettextMo_lexer.token_field_name lexbuf
      with 
        Parsing.Parse_error 
      | Failure("lexing: empty token") ->
@@ -111,8 +111,8 @@ let input_mo_translation chn mo_header =
        let lexbuf = Lexing.from_string field_plural_forms
        in
        try
-         Camlgettext_parser.plural_forms
-         Camlgettext_lexer.token_field_plural_value lexbuf 
+         GettextMo_parser.plural_forms
+         GettextMo_lexer.token_field_plural_value lexbuf 
        with 
          Parsing.Parse_error 
        | Failure("lexing: empty token") ->
@@ -137,8 +137,8 @@ let input_mo_translation chn mo_header =
        let lexbuf = Lexing.from_string field_content_type
        in
        try
-         Camlgettext_parser.content_type 
-         Camlgettext_lexer.token_field_content_type lexbuf
+         GettextMo_parser.content_type 
+         GettextMo_lexer.token_field_content_type lexbuf
        with      
          Parsing.Parse_error 
        | Failure("lexing: empty token") ->

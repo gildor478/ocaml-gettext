@@ -1,6 +1,6 @@
 {
 
-open Camlgettext_parser;;
+open GettextMo_parser;;
 
 }
 
