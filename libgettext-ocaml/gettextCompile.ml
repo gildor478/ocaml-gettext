@@ -46,15 +46,8 @@ module MapDomain = Map.Make(struct
     | KeyNoDomain, KeyNoDomain -> 0
 end);;
 
-let add_list map lst =
-  let key_value_of_entry entry =
-    match entry with
-      Domain (str,lst) -> (KeyDomain str,lst)
-    | NoDomain(lst) -> (KeyNoDomain,lst)
-  in
-  let add_list_one map entry =
-    let (key,value) = key_value_of_entry entry
-    in
+let add_po map po =
+  let add_po_one key value map =
     let old_value = 
       try 
         MapDomain.find key map 
@@ -63,19 +56,24 @@ let add_list map lst =
     in
     MapDomain.add key (List.rev_append value old_value) map
   in
-  List.fold_left add_list_one map lst
+  let map = 
+    add_po_one KeyNoDomain po.no_domain map 
+  in
+  List.fold_left ( 
+    fun map (domain,lst) -> 
+      add_po_one (KeyDomain domain) lst map 
+    ) map po.domain
 ;;
 
-let to_list map =
-  let entry_of_key_value key value =
-    match key with 
-      KeyDomain str -> Domain(str, value)
-    | KeyNoDomain -> NoDomain(value)
-  in
+let to_po map =
   MapDomain.fold ( 
-    fun key value lst -> 
-      (entry_of_key_value key value) :: lst
-    ) map []
+    fun key value t -> 
+      match key with 
+        KeyNoDomain ->
+          { t with no_domain = value @ t.no_domain }
+      | KeyDomain domain ->
+          { t with domain = (domain,value) :: t.domain }
+    ) map { no_domain = []; domain = [] }
 ;;
   
 let po_of_filename filename = 
@@ -110,11 +108,11 @@ let extract command default_options filename_options filename_lst filename_pot =
       Unix.open_process_in real_command
     in 
     let value = 
-      (Marshal.from_channel chn : po_content list) 
+      (Marshal.from_channel chn : po_content) 
     in
     match Unix.close_process_in chn with
     | Unix.WEXITED 0 ->
-        add_list map value
+        add_po map value
     | Unix.WEXITED exit_code -> 
         raise (ExtractionFailed(filename,real_command,exit_code))
     | Unix.WSIGNALED signal
@@ -127,7 +125,28 @@ let extract command default_options filename_options filename_lst filename_pot =
   let chn = 
     open_out filename_pot
   in
-  GettextPo.output_po chn (to_list extraction);
+  Printf.fprintf chn "%s" 
+"# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid \"\"
+msgstr \"\"
+\"Project-Id-Version: PACKAGE VERSION\\n\"
+\"Report-Msgid-Bugs-To: \\n\"
+\"POT-Creation-Date: 2005-02-02 00:35+0100\\n\"
+\"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n\"
+\"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n\"
+\"Language-Team: LANGUAGE <LL@li.org>\\n\"
+\"MIME-Version: 1.0\\n\"
+\"Content-Type: text/plain; charset=CHARSET\\n\"
+\"Content-Transfer-Encoding: 8bit\\n\"
+\"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\\n\"
+
+";
+  GettextPo.output_po chn (to_po extraction);
   close_out chn
 ;;
 
@@ -151,7 +170,7 @@ let compile filename_po filename_mo =
     close_out chn
   in
   let domain_merged = 
-    add_list MapDomain.empty po
+    add_po MapDomain.empty po
   in
   MapDomain.iter output_domain domain_merged
 ;;

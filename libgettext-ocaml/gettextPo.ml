@@ -27,24 +27,21 @@ let string_of_exception exc =
 let input_po chn =
   let lexbuf = Lexing.from_channel chn
   in
-  let po = 
-    try 
-      GettextPo_parser.msgfmt GettextPo_lexer.token lexbuf
-    with 
-      Parsing.Parse_error 
-    | Failure("lexing: empty token") ->
-        raise (PoFileInvalid (lexbuf,chn))
-    | InvalidIndex(id,i) ->
-        raise (PoFileInvalidIndex(id,i))
-  in
-  po
+  try 
+    GettextPo_parser.msgfmt GettextPo_lexer.token lexbuf
+  with 
+    Parsing.Parse_error 
+  | Failure("lexing: empty token") ->
+      raise (PoFileInvalid (lexbuf,chn))
+  | InvalidIndex(id,i) ->
+      raise (PoFileInvalidIndex(id,i))
 ;;
 
 let output_po chn po =
   let fpf x = Printf.fprintf chn x
   in
   let rec output_po_entry_aux entry = 
-    fpf "# Location : (this should be the location)\n";
+    fpf "#: (this should be the location)\n";
     (
       match entry with
         Singular(id,str) ->
@@ -67,17 +64,10 @@ let output_po chn po =
     );
     fpf "\n"
   in
-  let rec output_po_aux po = 
-    match po with 
-      Domain (str,lst) ->
-        (
-          fpf "domain %S\n\n" str;
-          List.iter output_po_entry_aux lst
-        )
-    | NoDomain(lst) ->
-        (
-          List.iter output_po_entry_aux lst
-        )
-  in
-  List.iter output_po_aux po
+  List.iter output_po_entry_aux po.no_domain;
+  List.iter ( 
+    fun (domain,lst) ->
+        fpf "domain %S\n\n" domain;
+        List.iter output_po_entry_aux lst
+  ) po.domain
 ;; 

@@ -139,9 +139,10 @@ type translation =
 | Plural of string * string * string list
 ;;
 
-type po_content =
-  Domain of string * (translation list)
-| NoDomain of translation list
+type po_content = {
+  no_domain :  translation list;
+  domain    :  (textdomain * (translation list)) list;
+}
 ;;
 
 

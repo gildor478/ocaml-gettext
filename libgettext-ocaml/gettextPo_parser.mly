@@ -36,17 +36,17 @@ let check_singular id str =
 %token <string> STRING
 %token EOF
 
-%type < GettextTypes.po_content list > msgfmt
+%type < GettextTypes.po_content > msgfmt
 %start msgfmt
 
 %%
 
 msgfmt:
-  msgfmt domain        { let (a,b) = $2 in Domain (a,b) :: $1 } 
-| domain               { let (a,b) = $1 in [Domain (a,b)] }
-| msgfmt message_list  { (NoDomain $2) :: $1 }
-| message_list         { [NoDomain $1] }
-| EOF                  { [] }
+  msgfmt domain        { { $1 with domain = $2 :: $1.domain } } 
+| domain               { { no_domain = []; domain = [$1] } }
+| msgfmt message_list  { { $1 with no_domain = $2 @ $1.no_domain } }
+| message_list         { { no_domain = $1; domain = [] } }
+| EOF                  { { no_domain = []; domain = [] } }
 ;
 
 domain:
