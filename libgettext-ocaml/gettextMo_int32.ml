@@ -74,9 +74,17 @@ let input_int32_pair_string chn endian =
    let (length,offset) = 
      input_int32_pair chn endian
    in
-   let str = String.make (Int32.to_int length) 'X'
+   let (ilength,ioffset) = 
+     (Int32.to_int length,Int32.to_int offset)
    in
-   seek_in chn (Int32.to_int offset);
-   really_input chn str 0 (Int32.to_int length);
-   str
+   if 0 <= ioffset + ilength && ioffset + ilength < in_channel_length chn then
+     let str = String.make ilength 'X'
+     in
+     seek_in chn ioffset;
+     really_input chn str 0 ilength;
+     str
+   else
+     (* We use this exception, because that what should happen if we try to 
+        read the string *)
+     raise End_of_file
 ;;

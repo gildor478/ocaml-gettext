@@ -91,7 +91,7 @@ module Map : TRANSLATE_TYPE =
             in
             informations.GettextTypes.fun_plural_forms
           in
-          for i = 0 to Int32.to_int mo_header.number_of_strings
+          for i = 0 to (Int32.to_int mo_header.number_of_strings) - 1
           do
             let new_translation = 
               input_mo_translation t.GettextTypes.failsafe chn mo_header i

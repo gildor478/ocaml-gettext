@@ -49,3 +49,12 @@ let posix_getenv t category =
           in
           Sys.getenv best_env
 ;;
+
+module Posix : LOCALE_TYPE =
+  struct
+
+    let get_locale t category = 
+      ([posix_getenv t category],t.codeset)
+
+  end
+;;
