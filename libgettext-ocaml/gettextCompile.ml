@@ -129,7 +129,7 @@ let compile filename_po filename_mo =
   in
   let output_one_map filename map = 
     let lst = 
-      MapString.fold ( fun _ (_,e) lst -> e :: lst ) map []
+      MapString.fold ( fun _ (_,_,e) lst -> e :: lst ) map []
     in
     let chn = 
       open_out_bin filename

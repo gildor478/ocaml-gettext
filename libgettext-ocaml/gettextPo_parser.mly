@@ -19,12 +19,12 @@ let check_plural id id_plural lst =
         []
   in
   (* No location, since i won't parse comments to find the previous one *)
-  ([],Plural(id, (check_string_format id id_plural), (check_plural_one 0 lst)))
+  ([], [],PoPlural(id, (check_string_format id id_plural), (check_plural_one 0 lst)))
 ;;
   
 let check_singular id str =
   (* No location, since i won't parse comments to find the previous one *)
-  ([],Singular(id, check_string_format id str))
+  ([], [],PoSingular(id, check_string_format id str))
 ;;
 
 %}
@@ -35,9 +35,13 @@ let check_singular id str =
 %token DOMAIN
 %token LBRACKET
 %token RBRACKET
+%token COLON
 %token <int> NUMBER
 %token <string> STRING
 %token EOF
+%token COMMENT_LOCATION
+%token <string> COMMENT 
+%token <string> FILENAME
 
 %type < GettextTypes.po_content > msgfmt
 %start msgfmt
@@ -45,11 +49,16 @@ let check_singular id str =
 %%
 
 msgfmt:
-  msgfmt domain        { let (d,l) = $2 in List.fold_left (add_po_translation_domain d) $1 l } 
-| domain               { let (d,l) = $1 in List.fold_left (add_po_translation_domain d) empty_po l }
-| msgfmt message_list  { List.fold_left add_po_translation_no_domain $1 $2 }
-| message_list         { List.fold_left add_po_translation_no_domain empty_po $1 }
-| EOF                  { empty_po }
+  msgfmt domain         { let (d,l) = $2 in List.fold_left (add_po_translation_domain d) $1 l } 
+| domain                { let (d,l) = $1 in List.fold_left (add_po_translation_domain d) empty_po l }
+| msgfmt message_list   { List.fold_left add_po_translation_no_domain $1 $2 }
+| message_list          { List.fold_left add_po_translation_no_domain empty_po $1 }
+| EOF                   { empty_po }
+;
+
+comments:
+  comments COMMENT      { $2 :: $1 }
+|                       { [] }
 ;
 
 domain:

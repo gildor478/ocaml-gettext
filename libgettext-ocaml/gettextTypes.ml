@@ -170,26 +170,35 @@ type location = filename * int
 type comments = string list
 ;;
 
-type hyphens = int list
-;;
-
+(** Base type of MO content : translation of string. The first string members are
+    the string identifier ( singular form ). 
+*)
 type translation = 
   Singular of string * string 
 | Plural of string * string * string list
 ;;
 
+(** Types for the PO processing. The main difference with the type translation
+    comes from the necessity of keeping a maximum of comment. 
+*)
 type po_translation = 
-  PoSingular of (string * hyphens) * ( string * hyphens )
-| PoPlural of (string * hyphens) * ( string * hyphens ) * ( string * hyphens ) list
+  PoSingular of (string list) * ( string list )
+| PoPlural of (string list) * ( string list ) * ( string list ) list
 ;;
 
-type translations = (comments * location list * translation) MapString.t
+(** Mapping of PO content using the string identifier as the key.
+*)
+type translations = (comments * location list * po_translation) MapString.t
 ;;
 
+(** Content of a PO file. Since comments should be saved, and that we only save
+    comments before and in message translation, we need to keep trace of the
+    last comments, which is not attached to any translation 
+*)
 type po_content = {
   no_domain    : translations;
   domain       : translations MapTextdomain.t;
-  last_comment : comments;
+  last_comment : comments
 }
 ;;
 

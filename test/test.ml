@@ -252,13 +252,24 @@ let merge_test tests =
                 fl_po_cp^"."^backup_ext
               in
               GettextCompile.merge fl_pot [fl_po_cp] backup_ext;
-              match cmp fl_po fl_backup with
-                Some -1 -> 
-                  assert_failure (fl_po^" or "^fl_backup^" doesn't exist")
-              | Some x ->
-                  assert_failure (fl_po^" differs from "^fl_backup)
-              | None ->
-                  ()
+              (
+                match cmp fl_po fl_po_cp with
+                  Some -1 -> 
+                    assert_failure (fl_po^" or "^fl_po_cp^" doesn't exist")
+                | Some x ->
+                    assert_failure (fl_po^" differs from "^fl_po_cp)
+                | None ->
+                    ()
+              );
+              (
+                match cmp fl_po fl_backup with
+                  Some -1 -> 
+                    assert_failure (fl_po^" or "^fl_backup^" doesn't exist")
+                | Some x ->
+                    assert_failure (fl_po^" differs from "^fl_backup)
+                | None ->
+                    ()
+              )
             with x ->
               assert_failure ("Unexpected error while processing "^fl_po
               ^" ( "^(Printexc.to_string x)^" )")

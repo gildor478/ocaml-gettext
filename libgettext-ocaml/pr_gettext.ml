@@ -36,8 +36,8 @@ let add_translation t loc singular plural domain =
   in
   let translation =
     match plural with 
-      Some plural -> ([location],Plural(singular,plural,["";""]))
-    | None -> ([location],Singular(singular,""))
+      Some plural -> ([],[location],PoPlural([singular],[plural],[[""];[""]]))
+    | None -> ([],[location],PoSingular([singular],[""]))
   in
   match domain with 
     Some domain -> 

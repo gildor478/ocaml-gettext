@@ -5,15 +5,16 @@ exception PoInconsistentMerge of string * string;;
 
 let empty_po = 
   {
-    no_domain = MapString.empty;
-    domain    = MapTextdomain.empty;
+    no_domain    = MapString.empty;
+    domain       = MapTextdomain.empty;
+    last_comment = [];
   }
 ;;
 
 (* See GettextPo for details concerning merge of the translation *)
-let add_po_translation_aux map (location_lst,translation) =
+let add_po_translation_aux map (comment_lst,location_lst,translation) =
   let is_lst_empty lst = 
-    List.for_all ( ( = ) "") lst
+    List.for_all ( fun lst -> (String.concat "" lst) =  "") lst
   in
   let is_lst_same lst1 lst2 = 
     try
@@ -22,69 +23,77 @@ let add_po_translation_aux map (location_lst,translation) =
       false
   in
   let string_of_list lst = 
-    let list_escaped = 
-      List.map ( fun s -> Printf.sprintf "%S" s ) lst
+    let lst_escaped = 
+      List.map ( fun s -> Printf.sprintf "%S" (String.concat "" s) ) lst
     in
-    Printf.sprintf "[ %a ]" ( fun () lst -> String.concat ";" lst) lst
+    Printf.sprintf "[ %a ]" ( fun () lst -> String.concat ";" lst) lst_escaped
   in
   let str_id = 
     match translation with
-      Singular(str,_) 
-    | Plural(str,_,_) -> str
+      PoSingular(str_lst,_) 
+    | PoPlural(str_lst,_,_) -> str_lst
   in
   try
-    let (previous_location_lst,previous_translation) = 
-      MapString.find str_id map
+    let (previous_comment_lst,previous_location_lst,previous_translation) = 
+      MapString.find (String.concat "" str_id) map
     in
     let merged_translation =
       match (previous_translation,translation) with
-        Singular(_,str1), Singular(_,str2) when str1 = str2 ->
-          Singular(str_id,str1)
-      | Singular(_,""), Singular(_,str2) ->
-          Singular(str_id,str2)
-      | Singular(_,str1), Singular(_,"") ->
-          Singular(str_id,str1)
-      | Singular(_,str1), Singular(_,str2) ->
-          raise (PoInconsistentMerge(str1,str2))
-      | Plural(_,str1,lst1), Plural(_,str2,lst2) 
-        when str1 = str2 && is_lst_empty lst1 ->
-          Plural(str_id,str2,lst2)
-      | Plural(_,str1,lst1), Plural(_,str2,lst2) 
-        when str1 = str2 && is_lst_empty lst2 ->
-          Plural(str_id,str1,lst1)
-      | Plural(_,str1,lst1), Plural(_,str2,lst2) 
-        when str1 = str2 && is_lst_same lst1 lst2 ->
-          Plural(str_id,str1,lst1)
-      | Plural(_,str1,lst1), Plural(_,str2,lst2) 
-        when str1 = str2 ->
+        PoSingular(_,str1), PoSingular(_,str2) when is_lst_same str1 str2 ->
+          PoSingular(str_id,str1)
+      | PoSingular(_,[""]), PoSingular(_,str2) ->
+          PoSingular(str_id,str2)
+      | PoSingular(_,str1), PoSingular(_,[""]) ->
+          PoSingular(str_id,str1)
+      | PoSingular(_,str1), PoSingular(_,str2) ->
+          raise (PoInconsistentMerge(String.concat "" str1, String.concat "" str2))
+      | PoPlural(_,str1,lst1), PoPlural(_,str2,lst2) 
+        when is_lst_same str1 str2 && is_lst_empty lst1 ->
+          PoPlural(str_id,str2,lst2)
+      | PoPlural(_,str1,lst1), PoPlural(_,str2,lst2) 
+        when is_lst_same str1 str2 && is_lst_empty lst2 ->
+          PoPlural(str_id,str1,lst1)
+      | PoPlural(_,str1,lst1), PoPlural(_,str2,lst2) 
+        when is_lst_same str1 str2 && is_lst_same lst1 lst2 ->
+          PoPlural(str_id,str1,lst1)
+      | PoPlural(_,str1,lst1), PoPlural(_,str2,lst2) 
+        when is_lst_same str1 str2 ->
           raise (PoInconsistentMerge(string_of_list lst1,string_of_list lst2))
-      | Plural(_,str1,_), Plural(_,str2,_) ->
-          raise (PoInconsistentMerge(str1,str2))
-      | Singular(_,str), Plural(_,str_plural,lst) 
-      | Plural(_,str_plural,lst), Singular(_,str) ->
+      | PoPlural(_,str1,_), PoPlural(_,str2,_) ->
+          raise (PoInconsistentMerge(String.concat "" str1, String.concat "" str2))
+      | PoSingular(_,str), PoPlural(_,str_plural,lst) 
+      | PoPlural(_,str_plural,lst), PoSingular(_,str) ->
           (
             match lst with
-              "" :: tl ->
-                Plural(str_id, str_plural, str :: tl) 
+              x :: tl when (String.concat "" x) = "" ->
+                PoPlural(str_id, str_plural, str :: tl) 
             | [] ->
-                Plural(str_id, str_plural, [ str ])
+                PoPlural(str_id, str_plural, [ str ])
             | _ ->
-                raise (PoInconsistentMerge(str, string_of_list lst))
+                raise (PoInconsistentMerge(String.concat "" str, string_of_list lst))
           )
     in
-    MapString.add str_id (location_lst @ previous_location_lst, merged_translation) map 
+    MapString.add (String.concat "" str_id) (
+      comment_lst @ previous_comment_lst, 
+      location_lst @ previous_location_lst, 
+      merged_translation
+    ) map 
   with Not_found ->
-    MapString.add str_id (location_lst,translation) map
+    MapString.add (String.concat "" str_id) (
+      comment_lst, 
+      location_lst,
+      translation
+    ) map
 ;;
 
-let add_po_translation_no_domain po (location_lst,translation) =
+let add_po_translation_no_domain po po_translation =
   { 
     po with no_domain = 
-      add_po_translation_aux po.no_domain (location_lst,translation)
+      add_po_translation_aux po.no_domain po_translation
   }
 ;;
 
-let add_po_translation_domain domain po (location_lst,translation) =
+let add_po_translation_domain domain po po_translation =
   {
     po with domain =
       let map_domain = 
@@ -94,7 +103,7 @@ let add_po_translation_domain domain po (location_lst,translation) =
           MapString.empty
       in
       let map_domain = 
-        add_po_translation_aux map_domain (location_lst,translation)
+        add_po_translation_aux map_domain po_translation
       in
       MapTextdomain.add domain map_domain po.domain
   }
