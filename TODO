@@ -8,6 +8,8 @@ v 0.2.0 :
 - Write a quick start manual
 - Correct the BUG: related to bug from ocaml-fileutils
 - Reread the code to improve general layout ( naming scheme, exception name... ie better style )
+- Intercept problem when recoding string ( charset ), errors should be wrap inside a failsafe or
+  at least raise a coherent exception.
 
 v 0.3.0 :
 - Better parse comments, to keep licence et al 

@@ -1,7 +1,7 @@
-DOCBOOKTOPDF=docbook2pdf
-DOCBOOKTOHTML=docbook2html
 BUILDHTML=html
 MKDIR=mkdir
+XSLTPROC=xsltproc --nonet --novalid
+HTMLXSL=/usr/share/xml/docbook/stylesheet/nwalsh/xhtml/chunk.xsl
 
 SOURCES=reference-manual.xml
 
@@ -15,22 +15,18 @@ clean: clean-doc-html
 
 install-builddoc-html: $(SOURCES)
 	for i in $^; do                          \
-	  DST=$(BUILDHTML)/$${i%%.xml};          \
+	  DST=$(BUILDHTML)/$${i%%.xml}/;         \
 	  $(MKDIR) -p $$DST;                     \
-	  $(DOCBOOKTOHTML) -o $$DST $$i;         \
+	  $(XSLTPROC) --xinclude                 \
+	    --stringparam base.dir "$$DST"       \
+	    $(HTMLXSL) $$i;                      \
 	done
 
-install-doc-html: $(SOURCES) 
-	for i in $^; do                          \
-	  DST=$(DOCHTML)/$${i%%.xml};            \
-	  $(MKDIR) -p $$DST;                     \
-	  $(DOCBOOKTOHTML) -o $$DST $$i;         \
-	done
+install-doc-html: BUILDHTML=$(DOCHTML)
+install-doc-html: install-builddoc-html
 
-uninstall-doc-html: $(SOURCES)
-	for i in $^; do                         \
-	  $(RM) -r $(DOCHTML)/$${i%%.xml};      \
-	done
+uninstall-doc-html: BUILDHTML=$(DOCHTML)
+uninstall-doc-html: clean-doc-html
 
 clean-doc-html: $(SOURCES)
 	for i in $^; do                         \
