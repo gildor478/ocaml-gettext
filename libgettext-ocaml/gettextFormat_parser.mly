@@ -11,7 +11,7 @@
 %%
 
 main:
-  format_char EOF { List.reverse $1 }
+  format_char EOF { List.rev $1 }
 ;
 
 format_char: 

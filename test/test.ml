@@ -67,6 +67,15 @@ let print_debug tests str =
     ()
 ;;
 
+let string_of_translation trans = 
+  match trans with
+    Singular(str_id, str) ->
+      Printf.sprintf "Singular(%S, %S)" str_id str
+  | Plural(str_id, str_plural, lst) ->
+      Print.sprintf "Plural(%S, %S, [ %a ])" str_id str_plural 
+      (String.concat " ; " (List.map (fun x -> Printf.sprintf "%S" x) lst)) 
+;;
+
 let load_mo_file tests fl_mo = 
   [
     "Loading ( header )" >::
@@ -127,6 +136,28 @@ let load_po_file tests fl_po =
       );
   ] @ (load_mo_file tests fl_mo)
 ;;
+
+(**********************************)
+(* Test of Printf format checking *)
+(**********************************)
+
+let format_test tests =
+  let format_test_one trans_src trans_dst =
+    let str_id = 
+      match trans_src with
+        Singular(str_id,_)
+      | Plural(str_id,_,_) -> str_id
+    in
+    (Print.sprintf "%S format checking" str_id) >::
+      ( fun () ->
+        let trans_res = check_format Ignore trans_src
+        in
+        match (trans_res,trans_src) with
+          Singular(str_id1,str1),Singular(str_id2,str2) when 
+          str_id1 = str_id2 && str1 = str2 ->
+            ()
+        | Plural(str_id1,str_plural1,lst1),Plural(str_id2,str_plural2,lst2) when 
+          str_id1 = str_id2 && str_plural1 = str_plural2 && List.fold
 
 
 (*************************)

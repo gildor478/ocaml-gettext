@@ -4,7 +4,7 @@
 
 }
 
-let flags = ['-''0''+'' ']* ['0'-'9']* ['.' ['0'-'9']*]?
+let flags = ['-''0''+'' ']* ['0'-'9']* ('.'['0'-'9']*)?
 
 rule
 token = parse
@@ -12,7 +12,7 @@ token = parse
 | eof         { EOF }
 | _           { token lexbuf }
 and
-format_char = 
+format_char = parse 
   "d"  as fc
 | "i"  as fc
 | "n"  as fc
@@ -55,4 +55,4 @@ format_char =
 | "t"  as fc  { FORMAT_CHAR fc }
 | '!'    
 | '%'         { token lexbuf }
-;
+

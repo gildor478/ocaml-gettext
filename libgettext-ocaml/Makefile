@@ -15,33 +15,37 @@ distclean::
 # Ocaml Gettext base library #
 ##############################
 
-INSTALLIB +=         \
- gettextBase.cma     \
- gettextBase.cmxa    \
- gettextBase.a       \
- gettextConfig.cmi   \
- gettextTypes.cmi    \
- gettextMo.cmi       \
- gettextModules.cmi  \
- gettextCompat.cmi   \
+INSTALLIB +=              \
+ gettextBase.cma          \
+ gettextBase.cmxa         \
+ gettextBase.a            \
+ gettextConfig.cmi        \
+ gettextTypes.cmi         \
+ gettextModules.cmi       \
+ gettextCompat.cmi        \
  gettext.cmi         
 
-CMO_BASE  =            \
- gettextConfig.cmo     \
- gettextTypes.cmo      \
- gettextUtils.cmo      \
- gettextMo_int32.cmo   \
- gettextMo_parser.cmo  \
- gettextMo_lexer.cmo   \
- gettextMo.cmo         \
- gettextModules.cmo    \
- gettextCompat.cmo     \
+CMO_BASE  =               \
+ gettextConfig.cmo        \
+ gettextTypes.cmo         \
+ gettextUtils.cmo         \
+ gettextFormat_parser.cmo \
+ gettextFormat_lexer.cmo  \
+ gettextFormat.cmo        \
+ gettextMo_int32.cmo      \
+ gettextMo_parser.cmo     \
+ gettextMo_lexer.cmo      \
+ gettextMo.cmo            \
+ gettextModules.cmo       \
+ gettextCompat.cmo        \
  gettext.cmo           
 
 gettext.cmi: gettext.mli
 gettext.cmo: gettext.cmi
 gettextMo_parser.cmo: gettextMo_parser.cmi
 gettextMo_parser.cmx: gettextMo_parser.cmi
+gettextFormat_parser.cmo: gettextFormat_parser.cmi
+gettextFormat_parser.cmx: gettextFormat_parser.cmi
 gettextCompat.cmo: gettextCompat.cmi
 gettextBase.cma: $(CMO_BASE)
 gettextBase.cmxa: $(CMO_BASE:.cmo=.cmx)
@@ -58,6 +62,8 @@ INSTALLIB +=           \
  gettextExtension.cma  \
  gettextExtension.cmxa \
  gettextExtension.a    \
+ gettextFormat.cmi     \
+ gettextMo.cmi         \
  gettextCategory.cmi   \
  gettextLocale.cmi     \
  gettextDomain.cmi     \
