@@ -30,6 +30,7 @@ type t
 type t'
 
 type init = textdomain * (codeset option) * (dir option)
+type realize = t -> t'
 
 (** Implementation of gettext functions *)
 
@@ -46,6 +47,7 @@ val create :
   -> ?codesets : (textdomain * codeset) list
   -> ?dirs : (textdomain * dir) list
   -> ?textdomains : textdomain list
+  -> ?codeset : codeset
   -> ?language : locale
   -> textdomain 
   -> t
@@ -53,10 +55,6 @@ val create :
 (** textdomain domain t : Set the current text domain.
 *)
 val textdomain : textdomain -> t -> t
-
-(** add_textdomain domain t : Add a textdomain which could be used
-*)
-val add_textdomain : textdomain -> t -> t
 
 (** get_textdomain t : Returns the current text domain.
 *)
@@ -127,17 +125,14 @@ val dcngettext : t' -> textdomain -> string -> string -> int -> category -> stri
 *)
 val fdcngettext : t' -> textdomain -> string -> string -> int -> category -> ('a, 'b, 'c, 'a) format4
 
-module type TRANSLATOR_TYPE =
-  sig
-    (** realize t : create a translator for all the value defined in t *)
-    val realize : t -> t'
-  end
-;;
+(** High level functions *)
 
+(** Module to handle typical library requirement *)
 module Library =
   functor ( Init : init ) ->
+  fucntor ( InitDependencies : init list ) ->
   sig
-    val init  : init
+    val init  : init list
     val s_    : string -> string 
     val f_    : string -> ('a, 'b, 'c, 'a) format4
     val sn_   : string -> string -> int -> string
@@ -145,16 +140,13 @@ module Library =
   end
 ;;    
 
+(** Module to handle typical program requirement *)
 module Program =
   functor ( Init : init ) ->
-  functor ( Translator : TRANSLATOR_TYPE ) ->
+  functor ( InitDependencies : init list ) ->
+  functor ( Realize : realize ) ->
   sig
-    val init  : 
-      ?failsafe : failsafe
-      -> ?categories : (category * locale) list
-      -> ?language : locale
-      -> ?libraries : init list
-      -> ( (Arg.key * Arg.spec * Arg.doc ) list * string ) * ( unit -> unit )
+    val init  : (Arg.key * Arg.spec * Arg.doc ) list * string 
     val s_    : string -> string 
     val f_    : string -> ('a, 'b, 'c, 'a) format4
     val sn_   : string -> string -> int -> string

@@ -8,16 +8,17 @@ type t = {
   failsafe    = failsafe;
   textdomains = ((codeset option) * (dir option)) MapTextdomain.t;
   categories  = locale MapCategory.t;
-  language    = locale;
+  language    = locale option;
+  codeset     = codeset option;
   default     = textdomain;
 }
 ;;
   
-type t' = textdomain -> string -> string -> int -> category -> string
+type t' = textdomain option -> string -> (string * int) option -> category -> string
 ;;
 
-(* Functions for manipulation the type t : create, textdomain, add_textdomain,
-* get_textdomain, bindtextdomain, bindtextdomain_codeset *)
+(* Functions for manipulation the type t : create, textdomain, get_textdomain, 
+*  bindtextdomain, bindtextdomain_codeset *)
 
 (* Utility functions *)
 let upgrade_textdomain t k value =  
@@ -35,10 +36,6 @@ let upgrade_textdomain t k value =
     | (new_codeset,new_dir) -> (new_codeset,new_dir)
   in
   { t with textdomains = MapTextdomain.add k new_value t.textdomains }
-;;
-
-let add_textdomain textdomain t =
-  upgrade_textdomain t textdomain (None,None)
 ;;
 
 let bindtextdomain textdomain dir t =
@@ -81,79 +78,168 @@ let create
         default = textdomain;
       }
     in
-    let result = 
-      List.fold_left ( 
-        fun t textdomain -> 
-          add_textdomain textdomain t 
-      )
-      result
-      (textdomain :: textdomains)
+    let apply_upgrade t (to_std,lst) =
+      List.fold_left (
+        fun t (textdomain,changes) ->
+          upgrade_textdomain t textdomain changes
+      ) result (List.map to_std lst)
     in
-    let result = 
-      List.fold_left ( 
-        fun t (textdomain,codeset) ->
-          bindtextdomain_codeset textdomain codeset t
-      )
-      result
-      codesets
-    in
-    let result =
-      List.fold_left ( 
-        fun t (textdomain,dir) ->
-          bindtextdomain textdomain dir t
-      )
-      result
-    in
-    result
+    List.fold_left apply_upgrade result [
+      (fun textdomain -> (textdomain,(None,None))), (textdomain :: textdomains);
+      (fun (textdomain,codeset) -> (textdomain,(Some codeset,None))), codeset;
+      (fun (textdomain,dir) -> (textdomain,(None,Some dir))) dirs
+    ]
 ;;
 
 (* Functions for doing real translation *)
+
+let format_of_string = 
+  Obj.magic
+;;
+
+let gettext t' str =
+  t' None str None Locale.messages
+;;
+
+let fgettext t' str =
+  format_of_string gettext
+;;
+  
+let dgettext t' textdomain str =
+  t' (Some domain) str None Locale.messages
+;;
+
+let fdgettext t' domain str =
+  format_of_string dgettext
+;;
+  
+let dcgettext t' textdomain str category = 
+  t' (Some domain) str None category
+;;
+
+let fdcgettext t' domain str category =
+  format_of_string dcgettext
+;;
+  
+let ngettext t' str str_plural n =
+  t' None str (Some(str_plural,n)) Locale.messages
+;;
+
+let fngettext t' str str_plural n =
+  format_of_string ngettext
+;;
+  
+let dngettext t' domain str str_plural n =
+  t' (Some domain) str (Some (str_plural,n)) Locale.messages
+;;
+
+let fdngettext t' domain str str_plural n =
+  format_of_string dngettext
+;;
 
 let dcngettext t' domain str str_plural n category = 
   t' (Some domain) str (Some(str_plural,n)) category
 ;;
   
-let fdcngettext t' domain str str_plural n category =
-  Obj.magic (t' (Some domain) str str_plural n category)
+let fdcngettext =
+  format_of_string dcngettext
 ;;
 
-let gettext t' str =
-  t' None str str 0 Locale.messages
+(* High level functions *)
+
+let global = ref []
 ;;
 
-let fgettext t' str =
-  fdcngettext t' None str str 0 Locale.messages
-;;
-  
-let dgettext t' domain str =
-  translate domain str Locale.messages
-;;
-
-let fdgettext t' domain str =
-  format_of_string (dgettext domain str)
-;;
-  
-let dcgettext t' domain str category = 
-  translate domain str category
+let get_global () = 
+  !critical_section ( 
+    fun () ->
+      !global
+  )
 ;;
 
-let fdcgettext t' domain str category =
-  format_of_string (dcgettext domain str category)
-;;
-  
-let ngettext t' str str_plural n =
-  translate (get_textdomain ()) str ~plural_form:(str_plural,n) Locale.messages
-;;
-
-let fngettext t' str str_plural n =
-  format_of_string (ngettext str str_plural n)
-;;
-  
-let dngettext t' domain str str_plural n =
-  translate domain str ~plural_form:(str_plural,n) Locale.messages
+let set_global glb = 
+  !critical_section (
+    fun () ->
+      global := glb
+  )
 ;;
 
-let fdngettext t' domain str str_plural n =
-  format_of_string (dngettext domain str str_plural n)
+let get_global_t' 
+      
+
+module Library =
+  functor ( Init : init ) ->
+  functor ( InitDependencies : init list ) ->
+  struct
+    let textdomain = 
+      let (textdomain,_,_) = Init 
+      in
+      textdomain
+
+    let init = Init :: InitDependencies
+
+    let s_   = dgettext (get_global_t' ()) textdomain 
+    val f_   = fdgettext (get_global_t' ()) textdomain
+    val sn_  = dngettext (get_global_t' ()) textdomain
+    val fn_  = fdngettext (get_global_t' ()) textdomain
+  end
 ;;
 
+module Program = 
+  functor ( Init : init ) ->
+  functor ( InitDependencies : init list ) ->
+  functor ( Realize : realize ) ->
+  struct
+    let textdomain = 
+      let (textdomain,_,_) = Init
+      in
+      textdomain
+
+    let init = [  
+      (
+        "--gettext-failsafe",
+        ( Arg.Symbol 
+          (
+            ["ignore"; "inform-stderr"; "raise-exception"],
+            ( fun s ->
+              let new_t = 
+                match s with
+                "ignore" ->  { get_global_t () with failsafe = Ignore }
+                | "inform-stderr" -> { get_global_t () with failsafe = InformStderr }
+                | "raise-exception" -> { get_global_t () with failsafe = RaiseException }
+              in
+              set_global_t new_t
+            )
+          )
+        ),
+        "Choose how to handle failure in gettext ( ignore, stderr, exception )" 
+      );
+      (
+        "--gettext-domain-dir",
+        (Arg.Tuple (Arg.String , Arg.String ))
+        "Set a dir to search gettext files for the specified domain"
+      );
+      (
+        "--gettext-dir",
+        (Arg.String),
+        "Set the default dir to search gettext files"
+      );
+      (
+        "--gettext-language",
+        (Arg.String),
+        "Set the default language for gettext"
+      );
+      (
+        "--gettext-codeset",
+        (Arg.String),
+        "Set the default codeset for outputting string with gettext"
+      );
+      ]
+      
+    let s_   = dgettext (get_global_t' ()) textdomain 
+    val f_   = fdgettext (get_global_t' ()) textdomain
+    val sn_  = dngettext (get_global_t' ()) textdomain
+    val fn_  = fdngettext (get_global_t' ()) textdomain
+
+  end
+;;
