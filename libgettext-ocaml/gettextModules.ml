@@ -191,6 +191,8 @@ module Generic : META_GETTEXT_TYPE =
     let set_global_gettext gtxt = 
       global_gettext := Some gtxt
     
+    let format_of_string = Obj.magic 
+      
     let fail_or_continue failsafe exc cont_value =
       GettextUtils.fail_or_continue failsafe string_of_exception exc cont_value
       
@@ -332,43 +334,33 @@ module Generic : META_GETTEXT_TYPE =
       let gtxt = get_global_gettext ()
       in
       (* First of all, try to find the translation type *)
-      let _ = print_endline "DEBUG 2" in
       let translation = 
         try 
-          let _ = print_endline "DEBUG 2.1" in
           MapDomainCategory.find (textdomain,category) gtxt.translations
         with Not_found ->
           try 
-            let _ = print_endline "DEBUG 2.2" in
             let new_mo_file = 
               Domain.compute_path textdomain category gtxt.domain
             in
-            let _ = print_endline "DEBUG 2.3" in
             let chn = open_in_bin new_mo_file 
             in
-            let _ = print_endline "DEBUG 2.4" in
             let mo_header = input_mo_header chn
             in
-            let _ = print_endline "DEBUG 2.5" in
             let mo_informations = input_mo_informations gtxt.failsafe chn mo_header
             in
             (* BUG : we don't check that there is a specific which could prevent
                recoding of string. *)
-            let _ = print_endline "DEBUG 2.6" in
-            let _ = print_endline ("DEBUG : encoding "^mo_informations.content_type_charset) in
             let charset = 
               Charset.create 
               gtxt.failsafe
               mo_informations.content_type_charset
               (Locale.default_charset gtxt.locale)
             in
-            let _ = print_endline "DEBUG 2.7" in
             Some (new_mo_file, chn, mo_informations,Translate.create gtxt.failsafe chn charset)
           with GettextDomain.DomainFileDoesntExist _ 
           | GettextDomain.DomainLanguageNotSet _ ->
             fail_or_continue gtxt.failsafe GettextMoFileNotFound None
       in
-      let _ = print_endline "DEBUG 3" in
       (* Really translate *)
       let (result,new_translation) = 
         match (translation,str,plural_form) with
@@ -380,40 +372,41 @@ module Generic : META_GETTEXT_TYPE =
             else 
               (str_plural,None)
         | (Some(file,chn,info,tbl),str,Some(str_plural,n)) -> 
-            (
-              try
-                let (res,new_tbl) = Translate.translate str tbl
-                in
-                (
-                  get_translated_value gtxt.failsafe res (info.fun_plural_forms n), 
-                  Some(file, chn, info, new_tbl)
-                )
-              with Not_found ->
-                fail_or_continue gtxt.failsafe 
-                (GettextNoTranslation str)
-                (
-                  if info.fun_plural_forms n = 0 then
-                    (str,translation)
-                  else
-                    (str_plural,translation)
-                )
+          (
+            let (res,new_tbl) = Translate.translate str tbl
+            in
+            let new_str =
+              match res with 
+                Some trsl ->
+                  get_translated_value gtxt.failsafe trsl (info.fun_plural_forms n)
+              | None ->
+                  fail_or_continue gtxt.failsafe 
+                  (GettextNoTranslation str)
+                  (
+                    if info.fun_plural_forms n = 0 then
+                      str
+                    else
+                      str_plural
+                  )
+              in
+              (new_str,Some(file, chn, info, new_tbl))
             )
         | (Some(file,chn,info,tbl),str,None) ->
             (
-              try
-                let (res,new_tbl) = Translate.translate str tbl
-                in
-                (
-                  get_translated_value gtxt.failsafe res 0, 
-                  Some(file, chn, info, new_tbl)
-                )
-              with Not_found ->
-                fail_or_continue gtxt.failsafe
-                (GettextNoTranslation str)
-                (str,translation)
+              let (res,new_tbl) = Translate.translate str tbl
+              in
+              let new_str =
+                match res with 
+                  Some trsl ->
+                    get_translated_value gtxt.failsafe trsl 0
+                | None ->
+                    fail_or_continue gtxt.failsafe
+                    (GettextNoTranslation str)
+                    str
+              in
+              (new_str, Some(file, chn, info, new_tbl))
             )
       in
-      let _ = print_endline "DEBUG 4" in
       (* Reinject the changed entry *)
       set_global_gettext {
           failsafe     = gtxt.failsafe;
@@ -428,36 +421,36 @@ module Generic : META_GETTEXT_TYPE =
       translate (get_textdomain ()) str Locale.messages
 
     let fgettext (str : string) =
-      format_of_string "" (*(gettext str)*)
+      format_of_string (gettext str)
       
     let dgettext domain str =
       translate domain str Locale.messages
 
     let fdgettext domain str =
-      format_of_string "" (*(dgettext domain str)*)
+      format_of_string (dgettext domain str)
       
     let dcgettext domain str category = 
       translate domain str category
 
     let fdcgettext domain str category =
-      format_of_string "" (*(dcgettext domain str category)*)
+      format_of_string (dcgettext domain str category)
       
     let ngettext str str_plural n =
       translate (get_textdomain ()) str ~plural_form:(str_plural,n) Locale.messages
 
     let fngettext str str_plural n =
-      format_of_string "" (*(ngettext str str_plural n)*)
+      format_of_string (ngettext str str_plural n)
       
     let dngettext domain str str_plural n =
       translate domain str ~plural_form:(str_plural,n) Locale.messages
 
     let fdngettext domain str str_plural n =
-      format_of_string ""(*(dngettext domain str str_plural n)*)
+      format_of_string (dngettext domain str str_plural n)
       
     let dcngettext domain str str_plural n category = 
       translate domain str ~plural_form:(str_plural,n) category
       
     let fdcngettext domain str str_plural n category =
-      format_of_string ""(*(dcngettext domain str str_plural n category)*)
+      format_of_string (dcngettext domain str str_plural n category)
   end
 ;;

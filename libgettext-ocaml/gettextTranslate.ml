@@ -26,7 +26,7 @@ module type TRANSLATE_TYPE =
          string 
       -> ?plural_form: (string * int)
       -> t 
-      -> translated_type * t
+      -> translated_type option * t
   end
 ;;
 
@@ -41,13 +41,13 @@ module Dummy : TRANSLATE_TYPE =
       match plural_form with
         None 
       | Some(_,0) ->
-          ( Singular(str,Charset.recode str charset), charset )
+          ( Some (Singular(str,Charset.recode str charset)), charset )
       | Some(str_plural,_) ->
-          ( Plural
+          ( Some(Plural
             (
               str,str_plural,
               [Charset.recode str charset ; Charset.recode str_plural charset]
-            ), 
+            )), 
             charset
           )
   end
@@ -76,7 +76,9 @@ module Map : TRANSLATE_TYPE =
 
     let rec translate str ?plural_form mp = 
       try 
-        (MapString.find str mp.map, mp)
+        let new_translation = MapString.find str mp.map
+        in
+        (Some new_translation, mp)
       with Not_found ->
         if mp.last < Int32.to_int mp.mo_header.number_of_strings then
           let new_translation = 
@@ -113,9 +115,9 @@ module Map : TRANSLATE_TYPE =
             ^"\"");
           match new_translation with
             Singular(id,_) when id = str ->
-              (new_translation,new_mp)
+              (Some new_translation,new_mp)
           | Plural(id,_,_) when id = str ->
-              (new_translation,new_mp)
+              (Some new_translation,new_mp)
           | _ ->
               (
                 match plural_form with
@@ -127,7 +129,7 @@ module Map : TRANSLATE_TYPE =
         else
           (* BUG : on ne retient pas la mémorisation des chaines parcourue
           * pendant la recherche *)
-          raise Not_found
+          (None, mp)
             
   end
 ;;
