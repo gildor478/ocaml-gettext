@@ -30,7 +30,7 @@ module Library :
     val s_    : string -> string 
     val f_    : string -> ('a, 'b, 'c, 'd) format4
     val sn_   : string -> string -> int -> string
-    val fn_   : string -> string -> int -> ('a, 'b, 'c, 'a) format4
+    val fn_   : string -> string -> int -> ('a, 'b, 'c, 'd) format4
   end
 ;;    
 
@@ -40,8 +40,8 @@ module Program :
   sig
     val init  : (Arg.key * Arg.spec * Arg.doc ) list * string 
     val s_    : string -> string 
-    val f_    : string -> ('a, 'b, 'c, 'a) format4
+    val f_    : string -> ('a, 'b, 'c, 'd) format4
     val sn_   : string -> string -> int -> string
-    val fn_   : string -> string -> int -> ('a, 'b, 'c, 'a) format4
+    val fn_   : string -> string -> int -> ('a, 'b, 'c, 'd) format4
   end
 ;;

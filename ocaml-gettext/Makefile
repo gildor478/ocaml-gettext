@@ -18,9 +18,10 @@ distclean::
 
 NAME       = ocaml-gettext
 CMO        = ocaml-gettext.cmo      
-REQUIRES   = gettext fileutils
+REQUIRES   = gettext.extension fileutils
 PREDICATES =
 
+REQUIRES   += gettext-camomile
 
 #################################
 # Ocaml Gettext extract program #

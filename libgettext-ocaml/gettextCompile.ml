@@ -29,7 +29,7 @@ let po_of_filename filename =
   *)
 let extract command default_options filename_options filename_lst filename_pot =
   let make_command options filename = 
-    command^" "^options^" "^filename
+    Printf.sprintf "%s %s %s" command options filename
   in
   let extract_one po filename =
     let options = 

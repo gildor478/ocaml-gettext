@@ -8,9 +8,13 @@ AC_ARG_WITH(builddir,
 	AC_HELP_STRING([--with-builddir=dir], [Location of the build ( default is ${topdir}/build )]),
 	BUILDDIR=$withval, BUILDDIR=`pwd`/build)
 
+AC_ARG_WITH(defaultlocaledir,
+	AC_HELP_STRING([--with-defaultlocaledir=dir], [Location of the default locale dir ( default is /usr/share/locale )]),
+	DEFAULTLOCALEDIR="\"$withval\"", DEFAULTLOCALEDIR="\"/usr/share/locale\"")
+
 AC_ARG_WITH(localedir,
-	AC_HELP_STRING([--with-localedir=dir], [Location of the locale dir ( default is /usr/share/locale and /usr/local/share/locale )]),
-	LOCALEDIR=$LOCALEDIR "\"$withval\";", LOCALEDIR="\"/usr/share/locale\"; \"/usr/local/share/locale\"")
+	AC_HELP_STRING([--with-localedir=dir], [Additional location of the locale dir ( default is /usr/local/share/locale )]),
+	LOCALEDIR=$LOCALEDIR "\"$withval\";", LOCALEDIR="\"/usr/local/share/locale\"")
 
 AC_ARG_WITH(codeset,
 	AC_HELP_STRING([--with-codeset=codeset], [Default codeset to use ( default is ANSI_X3.4-1968 )]),
@@ -159,6 +163,7 @@ AC_SUBST(MKCAMLP4)
 AC_SUBST(CAMLIDL)
 AC_SUBST(OCAMLMKLIB)
 AC_SUBST(EXE)
+AC_SUBST(DEFAULTLOCALEDIR)
 AC_SUBST(LOCALEDIR)
 AC_SUBST(CODESET)
 AC_SUBST(DATE)

@@ -1,5 +1,8 @@
 
-let default_path = [ @LOCALEDIR@ ]
+let default_dir = @DEFAULTLOCALEDIR@
+;;
+
+let default_path = default_dir :: [ @LOCALEDIR@ ]
 ;;
 
 let default_codeset = "@CODESET@" 
