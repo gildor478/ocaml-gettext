@@ -1,6 +1,4 @@
 v 0.2.0 : 
-- Correct problem regarding the parsing of the PO file after having merge it
-- Remove dependency on ocamli18n : parsing POSIX compliant locale is not the aim of ocamli18n
 - Benchmark GettextCamomile/GettextStub 
 - Remove \t in all the code, find a the good settings to work with vim and use a tags in each file to made it clear
 - Add a header to each source code file concerning the licence ( LGPL + Ocaml + copyright )

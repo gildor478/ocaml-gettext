@@ -280,12 +280,14 @@ exception InvalidMoTranslationOutOfBound of int * int;;
 exception CannotOpenMoFile of string;;
 
 (** From GettextPo *)
-exception PoFileInvalid of string * Lexing.lexbuf * in_channel ;;
+exception PoFileInvalid of string * Lexing.lexbuf * in_channel;;
 exception PoFileInvalidIndex of string * int;;
 exception PoFileDoesntExist of string;;
 exception PoInconsistentMerge of string * string;;
 
 (** From GettextTranslate *)
-exception GettextTranslateStringNotFound of string ;;
+exception GettextTranslateStringNotFound of string;;
 
+(** From GettextLocale *)
+exception LocalePosixUnparseable of string;;
 

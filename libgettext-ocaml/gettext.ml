@@ -228,6 +228,9 @@ let string_of_exception exc =
   | GettextTranslateStringNotFound str ->
       spf (f_ "Cannot find string %S.")
       str
+  | LocalePosixUnparseable str ->
+      spf (f_ "Unable to parse the POSIX language environment variable %s")
+      str
   | _ ->
       Printexc.to_string exc
 ;;

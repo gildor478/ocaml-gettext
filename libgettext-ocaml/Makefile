@@ -38,15 +38,14 @@ CMO_BASE  =               \
  gettextMo_lexer.cmo      \
  gettextMo.cmo            
 
-gettext.cmi: gettext.mli
-gettext.cmo: gettext.cmi
+gettextCompat.cmo: gettextCompat.cmi 
+gettextCompat.cmx: gettextCompat.cmi 
+gettext.cmo: gettext.cmi 
+gettext.cmx: gettext.cmi 
 gettextMo_parser.cmo: gettextMo_parser.cmi
 gettextMo_parser.cmx: gettextMo_parser.cmi
-gettextMo.cmo : gettextMo_parser.cmi 
-gettextMo.cmx : gettextMo_parser.cmi
 gettextFormat_parser.cmo: gettextFormat_parser.cmi
 gettextFormat_parser.cmx: gettextFormat_parser.cmi
-gettextCompat.cmo: gettextCompat.cmi
 gettextBase.cma: $(CMO_BASE)
 gettextBase.cmxa: $(CMO_BASE:.cmo=.cmx)
 
@@ -76,21 +75,26 @@ INSTALLIB +=           \
  gettextUtils.cmi      \
  gettextCompile.cmi         
 
-CMO_EXTENSION=         \
- gettextCategory.cmo   \
- gettextLocale.cmo     \
- gettextDomain.cmo     \
- gettextCharset.cmo    \
- gettextTranslate.cmo  \
- gettextRealize.cmo    \
- gettextPo_utils.cmo   \
- gettextPo_parser.cmo  \
- gettextPo_lexer.cmo   \
- gettextPo.cmo         \
+CMO_EXTENSION=            \
+ gettextCategory.cmo      \
+ gettextLocale_types.cmo  \
+ gettextLocale_parser.cmo \
+ gettextLocale_lexer.cmo  \
+ gettextLocale.cmo        \
+ gettextDomain.cmo        \
+ gettextCharset.cmo       \
+ gettextTranslate.cmo     \
+ gettextRealize.cmo       \
+ gettextPo_utils.cmo      \
+ gettextPo_parser.cmo     \
+ gettextPo_lexer.cmo      \
+ gettextPo.cmo            \
  gettextCompile.cmo
 
 gettextPo_parser.cmo: gettextPo_parser.cmi
 gettextPo_parser.cmx: gettextPo_parser.cmi
+gettextLocale_parser.cmo: gettextLocale_parser.cmi
+gettextLocale_parser.cmx: gettextLocale_parser.cmi
 gettextExtension.cma: $(CMO_EXTENSION)
 gettextExtension.cmxa: $(CMO_EXTENSION:.cmo=.cmx)
 

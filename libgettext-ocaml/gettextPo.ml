@@ -169,18 +169,20 @@ let output_po chn po =
         List.iter ( fun s -> Printf.fprintf chn "\n%S" s) tl
   in
   let rec output_po_translation_aux _ (location_lst,translation) = 
-    let string_location = 
+    (
       match location_lst with
-        [] -> "unknown"
+        [] -> 
+          ()
       | lst ->
+        fpf "#: %s\n" (
           String.concat " " (
             List.map ( 
               fun (str,line) -> 
                 str^":"^(string_of_int line) 
-              ) lst
+            ) lst
           )
-    in
-    fpf "#: %s\n" string_location;
+        )
+    );
     (
       match translation with
         PoSingular(id,str) ->
