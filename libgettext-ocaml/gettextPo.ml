@@ -24,49 +24,6 @@ let string_of_exception exc =
       raise exc
 ;;
 
-let string_of_po po = 
-  let buffer = Buffer.create 256
-  in
-  let add_value key vl = 
-    Buffer.add_string buffer key;
-    Buffer.add_string buffer " \"";
-    Buffer.add_string buffer vl;
-    Buffer.add_string buffer "\"\n"
-  in
-  let rec string_of_po_entry_aux entry = 
-    match entry with
-      Singular(id,str) ->
-        (
-          add_value "msgid"  id;
-          add_value "msgstr" str
-        )
-    | Plural(id,id_plural,lst) ->
-        (
-          add_value "msgid" id;
-          add_value "msgid_plural" id_plural;
-          let _ = List.fold_left 
-            (fun i s -> add_value ("msgstr["^(string_of_int i)^"]") s; i + 1)
-            0 lst
-          in
-          ()
-        )
-  in
-  let rec string_of_po_aux po = 
-    match po with 
-      Domain (str,lst) ->
-        (
-          add_value "domain" str;
-          List.iter string_of_po_entry_aux lst
-        )
-    | NoDomain(lst) ->
-        (
-          List.iter string_of_po_entry_aux lst
-        )
-  in
-  List.iter string_of_po_aux po;
-  Buffer.contents buffer
-;; 
-
 let input_po chn =
   let lexbuf = Lexing.from_channel chn
   in
@@ -84,5 +41,43 @@ let input_po chn =
 ;;
 
 let output_po chn po =
-  output_string chn (string_of_po po)
-;;
+  let fpf x = Printf.fprintf chn x
+  in
+  let rec output_po_entry_aux entry = 
+    fpf "# Location : (this should be the location)\n";
+    (
+      match entry with
+        Singular(id,str) ->
+          (
+            fpf "msgid %S\n" id;
+            fpf "msgstr %S\n" str
+          )
+      | Plural(id,id_plural,lst) ->
+          (
+            fpf "msgid %S\n" id;
+            fpf "msgid_plural %S\n" id_plural;
+            let _ = List.fold_left 
+              ( fun i s -> 
+                fpf "msgstr[%i] %S\n" i s; 
+                i + 1
+              ) 0 lst
+            in
+            ()
+          )
+    );
+    fpf "\n"
+  in
+  let rec output_po_aux po = 
+    match po with 
+      Domain (str,lst) ->
+        (
+          fpf "domain %S\n\n" str;
+          List.iter output_po_entry_aux lst
+        )
+    | NoDomain(lst) ->
+        (
+          List.iter output_po_entry_aux lst
+        )
+  in
+  List.iter output_po_aux po
+;; 

@@ -1,4 +1,5 @@
-(* Extract the string which should be used for a gettext translation. 
+(* Extract the string which should be used for a gettext translation. Output a
+   po_content list through the function Marshal.to_channel
    Functions that are looked for :
 Functions     Arg 1      Arg 2      Arg 3      Arg 4      Arg 5      Arg 6   ...
 s_            singular
@@ -21,26 +22,29 @@ fdcngettext   _          domain     singular   plural     _          _
 
 open MLast;;
 open Format;;
+open GettextTypes;;
 
-module MapString = Map.Make(struct
-  type t = string 
-  let  compare s1 s2 = 
-    String.compare s1 s2
-end)
-;;
-
-type translations = ( MLast.loc * string option * string option ) list MapString.t
+type translations = po_content list 
 ;;
 
 let add_translation t loc singular plural domain =
-  let elem = (loc,plural,domain)
+  let translation =
+    match plural with 
+      Some plural -> Plural(singular,plural,[])
+    | None -> Singular(singular,"")
   in
-  try
-    let lst = MapString.find singular t
-    in
-    MapString.add singular ( elem :: lst ) t
-  with Not_found ->
-    MapString.add singular [elem] t
+  let elem = 
+    match domain with 
+      Some domain -> Domain(domain,[translation])
+    | None -> NoDomain([translation])
+  in
+  match (t,elem) with
+   (Domain(d1,lst) :: tl, Domain(d2,[e])) when d1 = d2 ->
+     Domain(d1, e :: lst) :: tl
+  | (NoDomain(lst) :: tl, NoDomain([e])) ->
+      NoDomain(e :: lst) :: tl
+  | _, _ ->
+      elem :: t
 ;;
 
 module AstGettextMatch =
@@ -142,27 +146,7 @@ let output_translations m =
       Some f -> (open_out f,true)
     | None -> (stdout,false)
   in
-  (
-    if false then
-      MapString.iter ( fun singular lst ->
-        List.iter ( fun (loc,plural,domain) ->
-          (
-            match domain with 
-              Some d -> output_string fd ("Domain: "^d^"\n")
-            | None -> ()
-          );
-          output_string fd ("Singular: "^singular^"\n");
-          (
-            match plural with
-              Some p -> output_string fd ("Plural: "^p^"\n")
-            | None -> ()
-          );
-          output_string fd "\n";
-        ) lst
-      ) m
-    else
-      output_value fd m
-  );
+  Marshal.to_channel fd m [];
   flush fd;
   if close_on_exit then
     close_out fd
@@ -172,11 +156,11 @@ let output_translations m =
     
 
 let gettext_interf lst =
-  output_translations (AstGettext.interf MapString.empty lst)
+  output_translations (AstGettext.interf [] lst)
 ;;
 
 let gettext_implem lst = 
-  output_translations (AstGettext.implem MapString.empty lst)
+  output_translations (AstGettext.implem [] lst)
 ;;
 
 (* Register Pcaml printer *)

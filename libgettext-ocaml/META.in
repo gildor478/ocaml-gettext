@@ -8,13 +8,6 @@ package "base" (
   archive(native) = "gettextBase.cmxa"
 )
 
-package "compile" (
-  version = "@VERSION@"
-  requires = "gettext.base"
-  archive(byte) = "gettextCompile.cma"
-  archive(native) = "gettextCompile.cmxa"
-)
-
 package "extension" (
   version = "@VERSION@"
   requires = "gettext.base"

@@ -50,34 +50,9 @@ clean::
 	-$(RM) gettextMo_parser.output \
 	 gettextMo_parser.ml gettextMo_parser.mli
 
-#################################
-# Ocaml Gettext compile library #
-#################################
-
-INSTALLIB +=           \
- gettextCompile.cma    \
- gettextCompile.cmxa   \
- gettextCompile.a      \
- gettextCompile.cmi         
-
-CMO_COMPILE =          \
- gettextPo_parser.cmo  \
- gettextPo_lexer.cmo   \
- gettextPo.cmo         \
- gettextCompile.cmo
-
-gettextPo_parser.cmo: gettextPo_parser.cmi
-gettextPo_parser.cmx: gettextPo_parser.cmi
-gettextCompile.cma: $(CMO_COMPILE)
-gettextCompile.cmxa: $(CMO_COMPILE:.cmo=.cmx)
-
-clean::
-	-$(RM) gettextPo_parser.output \
-	 gettextPo_parser.ml gettextPo_parser.mli
-
-###############################
-# Ocaml Gettext extension kit #
-###############################
+###################################
+# Ocaml Gettext extension library #
+###################################
 
 INSTALLIB +=           \
  gettextExtension.cma  \
@@ -88,7 +63,9 @@ INSTALLIB +=           \
  gettextDomain.cmi     \
  gettextCharset.cmi    \
  gettextTranslate.cmi  \
- gettextRealize.cmi
+ gettextRealize.cmi    \
+ gettextPo.cmi         \
+ gettextCompile.cmi         
 
 CMO_EXTENSION=         \
  gettextConfig.cmo     \
@@ -97,14 +74,24 @@ CMO_EXTENSION=         \
  gettextDomain.cmo     \
  gettextCharset.cmo    \
  gettextTranslate.cmo  \
- gettextRealize.cmo
+ gettextRealize.cmo    \
+ gettextPo_parser.cmo  \
+ gettextPo_lexer.cmo   \
+ gettextPo.cmo         \
+ gettextCompile.cmo
 
+gettextPo_parser.cmo: gettextPo_parser.cmi
+gettextPo_parser.cmx: gettextPo_parser.cmi
 gettextExtension.cma: $(CMO_EXTENSION)
 gettextExtension.cmxa: $(CMO_EXTENSION:.cmo=.cmx)
 
-###############################
-# Pa_gettext extension        #
-###############################
+clean::
+	-$(RM) gettextPo_parser.output \
+	 gettextPo_parser.ml gettextPo_parser.mli
+
+########################
+# Pa_gettext extension #
+########################
 
 INSTALLIB +=        \
  pr_gettext.cmo    

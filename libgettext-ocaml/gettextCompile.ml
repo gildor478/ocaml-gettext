@@ -9,6 +9,18 @@ exception ExtractionFailed of filename * string * int;;
 (** while extracting filename the command receive signal i *)
 exception ExtractionInterrupted of filename * string * int;;
 
+let string_of_exception exc = 
+  match exc with
+    ProblemReadingFile(fln,error) ->
+      "Problem reading file "^fln^" : "^error
+  | ExtractionFailed(fln,cmd,status) ->
+      "Problem while extracting "^fln^" : command "^cmd^" exits with code "^(string_of_int status)
+  | ExtractionInterrupted(fln,cmd,signal) ->
+      "Problem while extracting "^fln^" : command "^cmd^" killed by signal "^(string_of_int signal)
+  | _ ->
+      raise exc
+;;
+
 (** extract cmd default_option file_options src_files ppf : extract the
     translatable strings from all the src_files provided. Each source file will 
     be extracted using the command cmd, which should be an executable that has
