@@ -42,5 +42,5 @@ let _ = textdomain "prog"
 in
 let _ = bindtextdomain "prog" "."
 in
-print_string (gettext "'Your command, please?', asked the waiter.");
+print_string (_"'Your command, please?', asked the waiter.");
 print_newline ()
