@@ -1,7 +1,7 @@
 NAME       = gettext-camomile
 CMO        =       
 LIBRARY    = true
-REQUIRES   = fileutils gettext.extension camomile
+REQUIRES   = gettext.extension camomile ocamli18n 
 PREDICATES =
 INSTALLIB  = META
 

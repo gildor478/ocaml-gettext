@@ -1,5 +1,5 @@
 version = "@VERSION@"
 predicates = ""
-requires = "gettext.extension camomile"
+requires = "gettext.extension camomile ocamli18n"
 archive(byte) = "gettextCamomile.cma"
 archive(native) = "gettextCamomile.cmxa"

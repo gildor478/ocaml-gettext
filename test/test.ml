@@ -37,7 +37,7 @@ Arg.parse
 ;;
 *)
 
-(*let verbose = ref true
+let verbose = ref false 
 ;;
 
 let po_test = 
@@ -98,8 +98,7 @@ let po_test =
             let mo_header = input_mo_header mo
             in
             let mo_informations = input_mo_informations
-              ~failsafe:GettextTypes.RaiseException
-              mo mo_header
+              GettextTypes.RaiseException mo mo_header
             in
             (
               if !verbose then
@@ -120,11 +119,11 @@ in
 let all_test = po_test
 in
 let _ = 
-  print_endline ("Test            : gettext "^(Version.version));
-  print_endline ("Test build date : "^(Version.date));
+  print_endline ("Test            : ocaml-gettext "^(GettextConfig.version));
+  print_endline ("Test build date : "^(GettextConfig.build_date));
   print_endline ("OS              : "^(Sys.os_type));
   print_endline ("Running...")
 in
 run_test_tt_main all_test
 
-*)
+

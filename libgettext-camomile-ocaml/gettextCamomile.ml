@@ -25,63 +25,41 @@ module Charset : GettextCharset.CHARSET_TYPE =
   end
 ;;
 
-module Locale : GettextLocale.LOCALE_TYPE =
+module Locale : GettextLocale.LOCALE_TYPE = 
   struct
-    type locale   = string
-    type encoding = string
-    type category = Locale.category
-    type t = failsafe
-
-    let create failsafe = failsafe
-   
-    let compare_category c1 c2 = 
-      let category_value c = 
-        match c with 
-          Locale.LC_ALL       -> 0 
-        | Locale.LC_COLLATE   -> 1
-        | Locale.LC_CTYPE     -> 2
-        | Locale.LC_MONETARY  -> 3
-        | Locale.LC_TIME      -> 4
-        | Locale.LC_MESSAGES  -> 5
+    
+    let get_locale t category =
+      let locale_lst = 
+        let value = GettextLocale.posix_getenv t category
+        in
+        let i18n = I18N.Locale.make_posix value
+        in
+        let i18n_lang_country = { 
+          I18N.Locale.root with 
+          I18N.Locale.territory = i18n.I18N.Locale.territory;
+          I18N.Locale.language = i18n.I18N.Locale.language;
+        }
+        in
+        let i18n_lang = {
+          I18N.Locale.root with
+          I18N.Locale.language = i18n.I18N.Locale.language
+        }
+        in
+        [ I18N.Locale.to_string i18n_lang_country ; I18N.Locale.to_string i18n_lang ]
       in
-      compare (category_value c1) (category_value c2)
-
-    let string_of_category cat = 
-      match cat with 
-        Locale.LC_ALL       -> "LC_ALL"
-      | Locale.LC_COLLATE   -> "LC_COLLATE"
-      | Locale.LC_CTYPE     -> "LC_CTYPE"
-      | Locale.LC_MONETARY  -> "LC_MONETARY"
-      | Locale.LC_TIME      -> "LC_TIME"
-      | Locale.LC_MESSAGES  -> "LC_MESSAGES"
-
-    let set_locale cat locale failsafe =
-      Locale.set_locale 
-      cat 
-      ~locale:locale 
-      ~enc:(CharEncoding.name_of CharEncoding.ascii);
-      failsafe
-
-    let get_locale cat failsafe =
-      CharEncoding.recode_string 
-      ~in_enc:CharEncoding.iso_c_locale
-      ~out_enc:CharEncoding.ascii 
-      (Locale.current_locale cat)
-
-    let default_charset failsafe =
-      CharEncoding.current_encname ()
-
-    let messages = Locale.LC_MESSAGES
-
-    let all = Locale.LC_ALL
+      let codeset = 
+        (* BUG: with have got problem trying to fetch the locale system codeset, hope it
+           is provided through t *)
+        t.codeset
+      in
+      (locale_lst,codeset)
   end
 ;;
 
-module Map : GettextModules.GETTEXT_TYPE =
- GettextModules.Generic 
- (Locale)                 (* Camomile locale *)
- (GettextDomain.Generic)  (* Generic domain *)
- (Charset)                (* Camomile charset *)
+module Map : GettextRealize.REALIZE_TYPE =
+ GettextRealize.Generic 
  (GettextTranslate.Map)   (* Generic translation *)
+ (Charset)                (* Camomile charset *)
+ (Locale)                 (* Ocamli18N locale *)
 ;;
   
