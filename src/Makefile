@@ -11,7 +11,7 @@ INSTALLIB = camlgettext.cmi\
  dllcamlgettext.so\
  libcamlgettext.a\
  META
-STUBSOBJS = -L/usr/lib/ocaml/3.06/ -lcamlidl
+STUBSOBJS = -L/usr/lib/ocaml/3.07/ -lcamlidl
 
 all: pa_gettext.cma
 include ../TopMakefile
