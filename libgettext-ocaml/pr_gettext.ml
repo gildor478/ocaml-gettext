@@ -20,10 +20,32 @@ fdcngettext   _          domain     singular   plural     _          _
 *)
 
 open MLast;;
+open Format;;
+
+module MapString = Map.Make(struct
+  type t = string 
+  let  compare s1 s2 = 
+    String.compare s1 s2
+end)
+;;
+
+type translations = ( MLast.loc * string option * string option ) list MapString.t
+;;
+
+let add_translation t loc singular plural domain =
+  let elem = (loc,plural,domain)
+  in
+  try
+    let lst = MapString.find singular t
+    in
+    MapString.add singular ( elem :: lst ) t
+  with Not_found ->
+    MapString.add singular [elem] t
+;;
 
 module AstGettextMatch =
   struct
-    type t = unit
+    type t = translations
     
     let s_functions = ref [ "s_"; "f_" ]
 
@@ -64,59 +86,37 @@ module AstGettextMatch =
     let expr t e = 
       match e with
         ExApp(_, 
-          e, ExStr(_, singular)
+          e, ExStr(loc, singular)
           ) when is_like e s_functions ->
           (* Add a singular / default domain string *)
-          print_string ("Singular: "^singular);
-          print_newline ();
-          print_newline ()
+          add_translation t loc singular None None
       | ExApp(_, 
-          ExApp(_, e, _), ExStr(_, singular)
+          ExApp(_, e, _), ExStr(loc, singular)
           ) when is_like e gettext_functions ->
           (* Add a singular / default domain string *)
-          print_string ("Singular: "^singular);
-          print_newline ();
-          print_newline ()
+          add_translation t loc singular None None
       | ExApp(_, 
-          ExApp(_, e, ExStr(_, singular)), ExStr(_, plural)
+          ExApp(_, e, ExStr(loc, singular)), ExStr(_, plural)
           ) when is_like e sn_functions ->
           (* Add a plural / default domain string *)
-          print_string ("Singular: "^singular);
-          print_newline ();
-          print_string ("Plural: "^plural);
-          print_newline ();
-          print_newline ()
+          add_translation t loc singular (Some plural) None
       | ExApp(_, 
-          ExApp(_, ExApp(_, e, _), ExStr(_, singular)), ExStr(_, plural)
+          ExApp(_, ExApp(_, e, _), ExStr(loc, singular)), ExStr(_, plural)
           ) when is_like e ngettext_functions ->
           (* Add a plural / default domain string *)
-          print_string ("Singular: "^singular);
-          print_newline ();
-          print_string ("Plural: "^plural);
-          print_newline ();
-          print_newline ()
+          add_translation t loc singular (Some plural) None
       | ExApp(_, 
-          ExApp(_, ExApp(_, e, _), ExStr(_, domain)), ExStr(_, singular)
+          ExApp(_, ExApp(_, e, _), ExStr(_, domain)), ExStr(loc, singular)
           ) when is_like e dgettext_functions ->
           (* Add a singular / defined domain string *)
-          print_string ("Domain: "^domain);
-          print_newline ();
-          print_string ("Singular: "^singular);
-          print_newline ();
-          print_newline ()
+          add_translation t loc singular None (Some domain)
       | ExApp(_, 
-          ExApp(_, ExApp(_, ExApp(_, e, _), ExStr(_, domain)), ExStr(_, singular)), ExStr(_, plural)
+          ExApp(_, ExApp(_, ExApp(_, e, _), ExStr(_, domain)), ExStr(loc, singular)), ExStr(_, plural)
           ) when is_like e dngettext_functions ->
           (* Add a plural / defined domain string *)
-          print_string ("Domain: "^domain);
-          print_newline ();
-          print_string ("Singular: "^singular);
-          print_newline ();
-          print_string ("Plural: "^plural);
-          print_newline ();
-          print_newline ()
+          add_translation t loc singular (Some plural) (Some domain)
       | _ ->
-          ()
+          t
 
     let module_type = id 
     let sig_item = id 
@@ -136,12 +136,47 @@ module AstGettextMatch =
 module AstGettext = Pr_ast_analyze.AstAnalyze(AstGettextMatch)
 ;;
 
+let output_translations m = 
+  let (fd,close_on_exit) = 
+    match !Pcaml.output_file with
+      Some f -> (open_out f,true)
+    | None -> (stdout,false)
+  in
+  (
+    if false then
+      MapString.iter ( fun singular lst ->
+        List.iter ( fun (loc,plural,domain) ->
+          (
+            match domain with 
+              Some d -> output_string fd ("Domain: "^d^"\n")
+            | None -> ()
+          );
+          output_string fd ("Singular: "^singular^"\n");
+          (
+            match plural with
+              Some p -> output_string fd ("Plural: "^p^"\n")
+            | None -> ()
+          );
+          output_string fd "\n";
+        ) lst
+      ) m
+    else
+      output_value fd m
+  );
+  flush fd;
+  if close_on_exit then
+    close_out fd
+  else
+    ()
+;;
+    
+
 let gettext_interf lst =
-  AstGettext.interf () lst
+  output_translations (AstGettext.interf MapString.empty lst)
 ;;
 
 let gettext_implem lst = 
-  AstGettext.implem () lst
+  output_translations (AstGettext.implem MapString.empty lst)
 ;;
 
 (* Register Pcaml printer *)

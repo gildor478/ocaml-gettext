@@ -19,3 +19,5 @@ test4.opo: test4.ml
 	  `$(OCAMLFIND) query -r -predicates preprocessor,syntax gettext.extract -a-format` \
 	  `$(OCAMLFIND) query -r -predicates preprocessor,syntax gettext.extract -o-format` \
 	  -o $@ $< 
+clean:: 
+	-$(RM) test4.opo
