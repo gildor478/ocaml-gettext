@@ -6,16 +6,16 @@ open FileUtil;;
 open FileUtil.StrUtil;;
 open FilePath.DefaultPath;;
 
-exception PoFileInvalid of Lexing.lexbuf * in_channel ;;
+exception PoFileInvalid of string * Lexing.lexbuf * in_channel ;;
 exception PoFileInvalidIndex of string * int;;
 exception PoFileDoesntExist of string;;
 exception PoInconsistentMerge of string * string;;
 
 let string_of_exception exc = 
   match exc with 
-    PoFileInvalid (lexbuf,chn) ->
-      "Error while processing parsing of PO file : \n"^
-      string_of_pos lexbuf
+    PoFileInvalid (s,lexbuf,chn) ->
+      "Error while processing parsing of PO file : "^s^" at "^
+      (string_of_pos lexbuf)
   | PoFileInvalidIndex (id,i) ->
       "Error while processing parsing of PO file, in msgid "
       ^id^", "^(string_of_int i)^" index is out of bound "
@@ -117,10 +117,10 @@ let merge_pot pot po =
         with Not_found ->
           tl
   in
-  let merge_translation map_lst key (comments_pot,location_pot,translation_pot) =
+  let merge_translation map_lst key (location_pot,translation_pot) =
     let translation_merged = 
       try 
-        let (_,_,translation_po) = 
+        let (_,translation_po) = 
           let map_po = 
             List.find (MapString.mem key) map_lst
           in
@@ -140,7 +140,7 @@ let merge_pot pot po =
         (* Fallback to the translation provided in the POT *)
         translation_pot
     in
-    (comments_pot,location_pot,translation_merged)
+    (location_pot,translation_merged)
   in
   (* We begin with an empty po, and merge everything according to the rule 
      above. *)
@@ -167,9 +167,10 @@ let input_po chn =
   try 
     GettextPo_parser.msgfmt GettextPo_lexer.token lexbuf
   with 
-    Parsing.Parse_error 
-  | Failure("lexing: empty token") ->
-      raise (PoFileInvalid (lexbuf,chn))
+    Parsing.Parse_error ->
+      raise (PoFileInvalid ("parse error",lexbuf,chn))
+  | Failure(s) ->
+      raise (PoFileInvalid (s,lexbuf,chn))
   | InvalidIndex(id,i) ->
       raise (PoFileInvalidIndex(id,i))
   | GettextPo_utils.PoInconsistentMerge(str1,str2) ->
@@ -177,10 +178,21 @@ let input_po chn =
 ;;
 
 let output_po chn po =
-  let fpf x = Printf.fprintf chn x
+  let fpf x = 
+    Printf.fprintf chn x
   in
-  let rec output_po_translation_aux _ (comment_lst,location_lst,translation) = 
-    let string_translation = 
+  let hyphens chn lst = 
+    match lst with
+      [] ->
+        ()
+    | [s] ->
+        Printf.fprintf chn "%S" s
+    | hd :: tl ->
+        Printf.fprintf chn "%S" hd;
+        List.iter ( fun s -> Printf.fprintf chn "\n%S" s) tl
+  in
+  let rec output_po_translation_aux _ (location_lst,translation) = 
+    let string_location = 
       match location_lst with
         [] -> "unknown"
       | lst ->
@@ -191,28 +203,21 @@ let output_po chn po =
               ) lst
           )
     in
-    (
-      match comment_lst with
-        [] ->
-          ()
-      | lst ->
-          fpf "#%s\n" (String.concat "\n#" lst)
-    );
-    fpf "#: %s\n" string_translation;
+    fpf "#: %s\n" string_location;
     (
       match translation with
         PoSingular(id,str) ->
           (
-            fpf "msgid %S\n" (String.concat "" id);
-            fpf "msgstr %S\n" (String.concat "" str)
+            fpf "msgid %a\n" hyphens id;
+            fpf "msgstr %a\n" hyphens str
           )
       | PoPlural(id,id_plural,lst) ->
           (
-            fpf "msgid %S\n" (String.concat "" id);
-            fpf "msgid_plural %S\n" (String.concat "" id_plural);
+            fpf "msgid %a\n" hyphens id;
+            fpf "msgid_plural %a\n" hyphens id_plural;
             let _ = List.fold_left 
               ( fun i s -> 
-                fpf "msgstr[%i] %S\n" i (String.concat "" s); 
+                fpf "msgstr[%i] %a\n" i hyphens s; 
                 i + 1
               ) 0 lst
             in
@@ -228,3 +233,16 @@ let output_po chn po =
         MapString.iter output_po_translation_aux map
   ) po.domain
 ;; 
+
+
+let translation_of_po_translation po_translation = 
+  match po_translation with
+    PoSingular(id, str) ->
+      Singular(String.concat "" id, String.concat "" str)
+  | PoPlural(id, id_plural, lst) ->
+      Plural ( 
+        String.concat "" id, 
+        String.concat "" id_plural, 
+        List.map (String.concat "") lst
+      )
+;;

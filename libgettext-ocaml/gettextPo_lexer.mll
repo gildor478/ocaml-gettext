@@ -2,6 +2,15 @@
 
 open GettextPo_parser;;
 
+let next_line lexbuf = 
+  lexbuf.Lexing.lex_curr_p <-
+  {
+    lexbuf.Lexing.lex_curr_p with
+    Lexing.pos_lnum = lexbuf.Lexing.lex_curr_p.Lexing.pos_lnum + 1;
+    Lexing.pos_bol  = lexbuf.Lexing.lex_curr_p.Lexing.pos_cnum;
+  }
+;;
+
 }
 
 rule
@@ -17,9 +26,11 @@ token = parse
 | '"'                        { STRING (string_val lexbuf) }
 | eof                        { EOF }
 | "#:"                       { COMMENT_LOCATION }
-| '#' ([^'\n']* as str) '\n' { COMMENT(str) }
-| [^' ''\t''\r''\n']* as str { FILENAME(str) }
-| [' ''\t''\r''\n']          { token lexbuf }
+| '#'                        { comment_skip lexbuf }
+| [' ''\t']                  { token lexbuf }
+| ['\r''\n']                 { next_line lexbuf; token lexbuf }
+| ([^' ''\t''\r''\n''"'':''0'-'9''['']''#'][^' ''\t''\r''\n''"'':''['']''#']*) as str 
+                             { FILENAME(str) }
 and
 string_val = parse
   "\\n"              { "\n" ^ ( string_val lexbuf) } 
@@ -53,3 +64,8 @@ string_val = parse
                      }
 | [^'"''\\']+ as str { str ^ (string_val lexbuf) }
 | '"'                { "" }
+and
+comment_skip = parse
+ '\n'          { next_line lexbuf; token lexbuf }
+| _            { comment_skip lexbuf }
+

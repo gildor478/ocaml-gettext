@@ -167,9 +167,6 @@ end)
 type location = filename * int
 ;;
 
-type comments = string list
-;;
-
 (** Base type of MO content : translation of string. The first string members are
     the string identifier ( singular form ). 
 *)
@@ -188,7 +185,7 @@ type po_translation =
 
 (** Mapping of PO content using the string identifier as the key.
 *)
-type translations = (comments * location list * po_translation) MapString.t
+type translations = (location list * po_translation) MapString.t
 ;;
 
 (** Content of a PO file. Since comments should be saved, and that we only save
@@ -198,7 +195,6 @@ type translations = (comments * location list * po_translation) MapString.t
 type po_content = {
   no_domain    : translations;
   domain       : translations MapTextdomain.t;
-  last_comment : comments
 }
 ;;
 

@@ -7,12 +7,11 @@ let empty_po =
   {
     no_domain    = MapString.empty;
     domain       = MapTextdomain.empty;
-    last_comment = [];
   }
 ;;
 
 (* See GettextPo for details concerning merge of the translation *)
-let add_po_translation_aux map (comment_lst,location_lst,translation) =
+let add_po_translation_aux map (location_lst,translation) =
   let is_lst_empty lst = 
     List.for_all ( fun lst -> (String.concat "" lst) =  "") lst
   in
@@ -34,7 +33,7 @@ let add_po_translation_aux map (comment_lst,location_lst,translation) =
     | PoPlural(str_lst,_,_) -> str_lst
   in
   try
-    let (previous_comment_lst,previous_location_lst,previous_translation) = 
+    let (previous_location_lst,previous_translation) = 
       MapString.find (String.concat "" str_id) map
     in
     let merged_translation =
@@ -74,13 +73,11 @@ let add_po_translation_aux map (comment_lst,location_lst,translation) =
           )
     in
     MapString.add (String.concat "" str_id) (
-      comment_lst @ previous_comment_lst, 
       location_lst @ previous_location_lst, 
       merged_translation
     ) map 
   with Not_found ->
     MapString.add (String.concat "" str_id) (
-      comment_lst, 
       location_lst,
       translation
     ) map
