@@ -50,7 +50,8 @@ gettextBase.cma gettextBase.cmxa: $(CMO_BASE)
 gettextBase.cma gettextBase.cmxa: $(CMO_BASE:.cmo=.cmx)
 
 clean::
-	-$(RM) gettextParser.mli gettext_parser.output gettext_parser.ml
+	-$(RM) gettextParser.mli gettextMo_parser.output \
+	 gettextMo_parser.ml gettextMo_parser.mli
 
 # Pa_gettext extension #
 INSTALLIB +=        \
