@@ -1,5 +1,6 @@
 v 0.2.0 : 
-- Correct presentation of the help using Arg.align ( ocaml-gettext for example )
+- Define the command uninstall in gettextCompile/ocaml-gettext
+- Remove dependency on ocamli18n : parsing POSIX compliant locale is not the aim of ocamli18n
 - Benchmark GettextCamomile/GettextStub 
 - Remove \t in all the code, find a the good settings to work with vim and use a tags in each file to made it clear
 - Add a header to each source code file concerning the licence ( LGPL + Ocaml + copyright )
@@ -7,7 +8,6 @@ v 0.2.0 :
 - Generate a ocamldoc manual
 - Write a quick start manual
 - Correct the BUG: related to bug from ocaml-fileutils
-- Remove dependency on ocamli18n : parsing POSIX compliant locale is not the aim of ocamli18n
 - Reread the code to improve general layout ( naming scheme, exception name... ie better style )
 
 v 0.3.0 :

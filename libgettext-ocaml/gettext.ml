@@ -156,77 +156,77 @@ let string_of_exception exc =
   in
   match exc with
     ProblemReadingFile(fln,error) ->
-      spf (f_ "Problem reading file %s : %s") fln error
+      spf (f_ "Problem reading file %s: %s.") fln error
   | ExtractionFailed(fln,cmd,status) ->
-      spf (f_ "Problem while extracting %s : command %S exits with code %d")
+      spf (f_ "Problem while extracting %s: command %S exits with code %d.")
       fln cmd status
   | ExtractionInterrupted(fln,cmd,signal) ->
-      spf (f_ "Problem while extracting %s : command %S killed by signal %d")
+      spf (f_ "Problem while extracting %s: command %S killed by signal %d.")
       fln cmd signal
   | DomainFileDoesntExist(lst) ->
-      spf (f_ "Cannot find an approriate gettext compiled file ( %s )")
+      spf (f_ "Cannot find an approriate gettext compiled file ( %s ).")
       (string_of_list lst)
   | GettextUninitialized -> 
-      (s_ "Gettext library is not initialized")
+      (s_ "Ocaml-gettext library is not initialized")
   | InvalidOptions (lexbuf,text) ->
-      spf (f_ "Error while processing parsing of options at %s : %S")
+      spf (f_ "Error while processing parsing of options at %s: %S.")
       (string_of_pos lexbuf)
       text
   | InvalidPlurals (lexbuf,text) ->
-      spf (f_ "Error while processing parsing of plural at %s : %S")
+      spf (f_ "Error while processing parsing of plural at %s: %S.")
       (string_of_pos lexbuf)
       text
   | InvalidContentType (lexbuf,text) ->
-      spf (f_ "Error while processing parsing of content-type at %s : %S")
+      spf (f_ "Error while processing parsing of content-type at %s: %S.")
       (string_of_pos lexbuf)
       text
   | InvalidMoFile ->
-      (s_ "MO file provided is not encoded following gettext convention")
+      (s_ "MO file provided is not encoded following ocaml-gettext convention.")
   | InvalidTranslationSingular (str,x) ->
-      spf (f_ "Trying to fetch the plural form %d of a singular form %S")
+      spf (f_ "Trying to fetch the plural form %d of a singular form %S.")
       x str
   | InvalidTranslationPlural (lst,x) ->
-      spf (f_ "Trying to fetch the plural form %d of plural form %s")
+      spf (f_ "Trying to fetch the plural form %d of plural form %s.")
       x (string_of_list lst)
   | Junk (id,lst) ->
-      spf (f_ "Junk at the end of the plural form id %S: %s")
+      spf (f_ "Junk at the end of the plural form id %S: %s.")
       id (string_of_list lst)
   | EmptyEntry ->
-      (s_ "An empty entry has been encounter")
+      (s_ "An empty entry has been encounter.")
   | InvalidMoHeaderNegativeStrings ->
-      (s_ "Number of strings is negative")
+      (s_ "Number of strings is negative.")
   | InvalidMoHeaderTableStringOutOfBound((b1,e1),(b2,e2)) ->
-      spf (f_ "Offset of string table is out of bound ([%ld,%ld] should be in [%ld,%ld])")
+      spf (f_ "Offset of string table is out of bound ([%ld,%ld] should be in [%ld,%ld]).")
       b1 e1 b2 e2
   | InvalidMoHeaderTableTranslationOutOfBound((b1,e1),(b2,e2)) ->
-      spf (f_ "Offset of translation table is out of bound ([%ld,%ld] should be in [%ld,%dl])")
+      spf (f_ "Offset of translation table is out of bound ([%ld,%ld] should be in [%ld,%dl]).")
       b1 e1 b2 e2
   | InvalidMoHeaderTableTranslationStringOverlap((b1,e1),(b2,e2)) ->
-      spf (f_ "Translation table and string table overlap ([%ld,%ld] and [%ld,%ld] have a non empty intersection)")
+      spf (f_ "Translation table and string table overlap ([%ld,%ld] and [%ld,%ld] have a non empty intersection).")
       b1 e1 b2 e2
   | InvalidMoStringOutOfBound(max,cur) ->
-      spf (f_ "Out of bound access when trying to find a string (%d < %d)")
+      spf (f_ "Out of bound access when trying to find a string (%d < %d).")
       max cur
   | InvalidMoTranslationOutOfBound(max,cur) ->
-      spf (f_ "Out of bound access when trying to find a translation (%d < %d)")
+      spf (f_ "Out of bound access when trying to find a translation (%d < %d).")
       max cur
   | CannotOpenMoFile fln ->
-      spf (f_ "Could not open file %s")
+      spf (f_ "Could not open file %s.")
       fln
   | PoFileInvalid (s,lexbuf,chn) ->
-      spf (f_ "Error while processing parsing of PO file: %S at %s")
+      spf (f_ "Error while processing parsing of PO file: %S at %s.")
       s (string_of_pos lexbuf)
   | PoFileInvalidIndex (id,i) ->
-      spf (f_ "Error while processing parsing of PO file, in msgid %S, %d index is out of bound")
+      spf (f_ "Error while processing parsing of PO file, in msgid %S, %d index is out of bound.")
       id i
   | PoFileDoesntExist fl ->
-      spf (f_ "Error while trying to load PO file %s, file doesn't exist") 
+      spf (f_ "Error while trying to load PO file %s, file doesn't exist.") 
       fl
   | PoInconsistentMerge (str1,str2) ->
-      spf (f_ "Error while merging two PO : %S and %S cannot be merged")
+      spf (f_ "Error while merging two PO files: %S and %S cannot be merged.")
       str1 str2
   | GettextTranslateStringNotFound str ->
-      spf (f_ "Cannot find string %S")
+      spf (f_ "Cannot find string %S.")
       str
   | _ ->
       Printexc.to_string exc
@@ -283,12 +283,12 @@ module Program =
               )
             )
           ),
-          spf (f_ "Choose how to handle failure in gettext ( ignore, stderr, exception ). Default: %s")
+          spf (f_ " Choose how to handle failure in ocaml-gettext. Default: %s.")
           (
             ( function 
                   Ignore -> "ignore" 
-                | InformStderr _ -> "stderr" 
-                | RaiseException -> "exception"    
+                | InformStderr _ -> "inform-stderr" 
+                | RaiseException -> "raise-exception"    
             ) (get_global_t ()).failsafe
           )
         );
@@ -298,7 +298,7 @@ module Program =
             ( fun () -> set_global_realize dummy_realize 
             )
           ),
-          (s_ "Disable the translation perform by gettext. Default: enable")
+          (s_ " Disable the translation perform by ocaml-gettext. Default: enable.")
         );
         (
           "--gettext-domain-dir",
@@ -314,7 +314,7 @@ module Program =
               );
             ]
           ),
-          spf (f_ "Set a dir to search gettext files for the specified domain. Default: %s")
+          spf (f_ "textdomain dir Set a dir to search ocaml-gettext files for the specified domain. Default: %s.")
           (
             string_of_list 
             (
@@ -335,7 +335,7 @@ module Program =
               }
             )
           ),
-          spf (f_ "Add a search dir for gettext files. Default: %s") 
+          spf (f_ "dir Add a search dir for ocaml-gettext files. Default: %s.") 
           (string_of_list (get_global_t ()).path)
         );
         (
@@ -344,7 +344,7 @@ module Program =
             ( fun s -> set_global_t { (get_global_t ()) with language = Some s }
             )
           ),
-          spf (f_ "Set the default language for gettext. Default: %s")
+          spf (f_ "language Set the default language for ocaml-gettext. Default: %s.")
           (
             ( function 
                 Some s -> s
@@ -358,7 +358,7 @@ module Program =
             ( fun s -> set_global_t { (get_global_t ()) with codeset = s }
             )
           ),
-          spf (f_ "Set the default codeset for outputting string with gettext. Default: %s")
+          spf (f_ "codeset Set the default codeset for outputting string with ocaml-gettext. Default: %s.")
           (get_global_t ()).codeset
         );
       ], GettextConfig.copyright

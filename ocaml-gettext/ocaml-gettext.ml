@@ -23,6 +23,8 @@ type action =
   | Compile
   | Install 
   | Merge
+  | Version
+  | VersionShort
 ;;
 
 type t =
@@ -62,9 +64,9 @@ let string_of_exception exc =
       (s_ "You must specify one action.")
   | InstallTooManyFilename ->
       (s_ 
-"You cannot specify both a parameter language, textdomain and 
-provide more than one file to install : all install file will 
-have the same destination  filename.")
+"You cannot specify at the same time a language, a textdomain 
+and provide more than one file to install : all install 
+file will have the same destination  filename.")
   | CompileTooManyFilename ->
       (s_ 
 "You cannot specify a output filename and more than one 
@@ -181,6 +183,19 @@ let do_action t =
       do_install t
   | Some Merge ->
       do_merge t
+  | Some Version ->
+      (
+        let (_,gettext_copyright) = 
+          OcamlGettext.init
+        in
+        print_string gettext_copyright;
+        print_newline ()
+      )
+  | Some VersionShort ->
+      (
+        print_string GettextConfig.version;
+        print_newline ()
+      )
   | None ->
       raise ActionRequired
 ;;
@@ -227,7 +242,7 @@ let () =
     (
       [
         (
-          "-action",
+          "--action",
           Arg.Symbol 
           (
             (List.map fst actions),
@@ -235,7 +250,7 @@ let () =
               try
                 t := { !t with action_option = Some (List.assoc symbol actions) }
               with Not_found ->
-                raise (Arg.Bad (spf (f_ "Invalid action: %s") symbol))
+                raise (Arg.Bad (spf (f_ "Invalid action: %s.") symbol))
             )
           ),
           (
@@ -243,27 +258,27 @@ let () =
           )
         );
         (
-          "-extract-command",
+          "--extract-command",
           Arg.String ( fun cmd ->
             t := { !t with extract_command = cmd }
           ),
           (
-            spf (f_ "Command to extract translatable strings from an OCaml source file. Default: %s.")
+            spf (f_ "cmd Command to extract translatable strings from an OCaml source file. Default: %s.")
             !t.extract_command
           )
         );
         (
-          "-extract-default-option",
+          "--extract-default-option",
           Arg.String ( fun default_option ->
             t := { !t with extract_default_option = default_option }
           ),
           (
-            spf (f_ "Default option used when extracting translatable strings.  Default: %S.")
+            spf (f_ "options Default option used when extracting translatable strings. Default: %S.")
             !t.extract_default_option
           )
         );
         (
-          "-extract-filename-option",
+          "--extract-filename-option",
           Arg.Tuple (
             let filename = ref ""
             in
@@ -278,7 +293,7 @@ let () =
             ]
           ),
           (
-            spf (f_ "Per filename option used when extracting strings from the specified filename. Default: %s.")
+            spf (f_ "filename options Per filename option used when extracting strings from the specified filename. Default: %s.")
             (string_of_list (
               List.map ( fun (str1,str2) -> 
                 spf "(%s,%s)" str1 str2
@@ -288,81 +303,99 @@ let () =
           )
         );
         (
-          "-extract-pot",
+          "--extract-pot",
           (
             Arg.String ( fun str ->
               t := { !t with extract_pot = str }
             )
           ),
-          spf (f_ "POT file to write when extracting translatable strings. Default: %s.")
+          spf (f_ "filename POT file to write when extracting translatable strings. Default: %s.")
           !t.extract_pot
         );
         (
-          "-compile-output",
+          "--compile-output",
           (
             Arg.String ( fun str ->
               t := { !t with compile_output_file_option = Some str }
             )
           ),
-          (s_ "MO file to write when compiling a PO file. Default: name of the PO file with \".mo\" extension.")
+          (s_ "filename MO file to write when compiling a PO file. Default: name of the PO file with \".mo\" extension.")
         );
         (
-          "-install-language",
+          "--install-language",
           (
             Arg.String ( fun str ->
               t := { !t with install_language_option = Some str }
             )
           ),
-          (s_ "Language to use when installing a MO file. Default: try to guess it from the name of the MO file.")
+          (s_ "language Language to use when installing a MO file. Default: try to guess it from the name of the MO file.")
         );
         (
-          "-install-category",
+          "--install-category",
           (
             Arg.String ( fun str ->
               t := { !t with install_category = GettextCategory.category_of_string str }
             )
           ),
-          spf (f_ "Category to use when installing a MO file. Default: %s")
+          spf (f_ "category Category to use when installing a MO file. Default: %s")
           (GettextCategory.string_of_category !t.install_category)
         );
         (
-          "-install-textdomain",
+          "--install-textdomain",
           (
             Arg.String ( fun str ->
               t := { !t with install_textdomain_option = Some str }
             )
           ),
-          (s_ "Textdomain to use when installing a MO file. Default: try to guess it from the name of the MO file.")
+          (s_ "textdomain Textdomain to use when installing a MO file. Default: try to guess it from the name of the MO file.")
         );
         (
-          "-install-destdir",
+          "--install-destdir",
           (
             Arg.String ( fun str ->
               t := { !t with install_destdir = str }
             )
           ),
-          spf (f_ "Base dir used when isntalling a MO file. Default: %s.")
+          spf (f_ "dirname Base dir used when installing a MO file. Default: %s.")
           !t.install_destdir
         );
         (
-          "-merge-pot",
+          "--merge-pot",
           ( 
             Arg.String ( fun str ->
               t := { !t with merge_filename_pot = str }
             )
           ),
-          spf (f_ "POT file to use as a master for merging PO file. Default: %s.")
+          spf (f_ "filename POT file to use as a master for merging PO file. Default: %s.")
           !t.merge_filename_pot
         );
         (
-          "-merge-backup-extension",
+          "--merge-backup-extension",
           (
             Arg.String ( fun str ->
               t := { !t with merge_backup_extension = str }
             )
           ),
-          spf (f_ "Backup extension to use when moving PO file which have been merged. Default: %s.")
+          spf (f_ "extension Backup extension to use when moving PO file which have been merged. Default: %s.")
           !t.merge_backup_extension
+        );
+        (
+          "--version",
+          (
+            Arg.Unit ( fun () ->
+              t := { !t with action_option = Some Version }
+            )
+          ),
+          (s_ " Returns version information on ocaml-gettext.")
+        );
+        (
+          "--short-version",
+          (
+            Arg.Unit ( fun () ->
+              t := { !t with action_option = Some VersionShort }
+            )
+          ),
+          (s_ " Returns only the version string of ocaml-gettext.")
         );
     ] @ gettext_args
   )
