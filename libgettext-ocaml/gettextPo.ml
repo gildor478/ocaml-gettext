@@ -100,7 +100,8 @@ let compile_po ?(default_domain = "messages.mo") ?(output_dir = current_dir) po 
     match domain with
       (* BUG : utiliser add_extension *)
       Domain(str,lst) -> MapString.add (str^".mo") lst map
-    | NoDomain lst -> MapString.add default_domain lst map
+      (* BUG : probleme de typage *)
+    | NoDomain lst -> MapString.add (default_domain^"") lst map
   in
   let merged_domain = List.fold_left merge_domain MapString.empty po
   in

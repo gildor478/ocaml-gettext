@@ -268,7 +268,7 @@ let input_mo_informations ?(failsafe = Ignore) chn mo_header =
    }
 ;;
 
-let string_of_mo_translation ?(omit_translation=true) ?(compute_plurals=(0,3)) mo_translation = 
+let string_of_mo_informations ?(compute_plurals=(0,3)) mo_translation = 
   let buff = Buffer.create 1024
   in
   let p = Printf.bprintf 
@@ -288,18 +288,24 @@ let string_of_mo_translation ?(omit_translation=true) ?(compute_plurals=(0,3)) m
   p buff "Content-Type              : %s\n" (extract_string mo_translation.content_type);
   p buff "Plurals-Forms             : %s\n" (extract_string mo_translation.plural_forms);
   p buff "Content-Transfer-Encoding : %s\n" (extract_string mo_translation.content_transfer_encoding);
-  p buff "Content-Type-Charsert     : %s\n" mo_translation.content_type_charset;
+  p buff "Content-Type-Charset      : %s\n" mo_translation.content_type_charset;
   p buff "NPlurals                  : %d\n" mo_translation.nplurals;
-  p buff "Fun plural                : \n";
-  let (a,b) = compute_plurals
-  in
-  for i = a to b do 
-    p buff "%d -> %d\n" i (mo_translation.fun_plural_forms i);
-  done;
+  p buff "Fun plural                : ";
+  (
+    let (a,b) = compute_plurals
+    in
+    for i = a to b do 
+      p buff "%d -> %d ; " i (mo_translation.fun_plural_forms i);
+    done;
+  );
+  p buff "\n";
   Buffer.contents buff
 ;;
 
 let output_mo ?(endianess = LittleEndian) chn lst =
+  (* There could have potential issue with alignment, but it seems to be fixed
+  * at 1 in gettext-0.14.1/gettext-tools/configure.ac, so there is no probleme
+  * *)
   let null_terminated lst = 
     List.map ( fun str -> str^"\000" ) lst
   in
@@ -308,7 +314,8 @@ let output_mo ?(endianess = LittleEndian) chn lst =
       List.map String.length lst
     in
     let compute_offset (current_pos,lst_pos) length = 
-      ( current_pos + length, (current_pos,length) :: lst_pos )
+      (* Remove 1 since we have NULL terminated strings *)
+      ( current_pos + length, (length - 1,current_pos) :: lst_pos )
     in
     let (final_pos, lst_rev) = 
       List.fold_left compute_offset (start_pos, []) (compute_length lst)
@@ -369,13 +376,10 @@ let output_mo ?(endianess = LittleEndian) chn lst =
   }
   in
   output_mo_header chn header;
-  output_int32 chn endianess Int32.zero; (* Probably padding *)
   List.iter (
     List.iter (
       fun (a,b) -> 
         output_int32_pair chn endianess (Int32.of_int a,Int32.of_int b);
-        Printf.printf "Entry pos    : %x\n" a;
-        Printf.printf "Entry length : %x\n" b;
       ) 
   ) [ untranslated_table ; translated_table ];
   List.iter (output_string chn) untranslated;

@@ -2,6 +2,8 @@ open OUnit;;
 
 open FileUtil;;
 open FileUtil.StrUtil;;
+open FilePath;;
+open FilePath.DefaultPath;;
 
 open GettextMo;;
 open GettextPo;;
@@ -35,8 +37,14 @@ Arg.parse
 ;;
 *)
 
+let verbose = ref true
+;;
+
 let po_test = 
   let po_test_one fl = 
+    (* BUG : should use extension *)
+    let fl_mo = ((chop_extension fl)^".mo")
+    in
     fl >:::
       [
         "Parsing" >:: 
@@ -53,13 +61,57 @@ let po_test =
         "Compiling" >::
         ( fun () ->
           try
-            let _ = compile_po (po_of_file fl)
+            let _ = compile_po 
+              ~default_domain:fl_mo
+              (po_of_file fl)
             in
             () 
           with x ->
             print_endline (GettextPo.string_of_exception x);
             assert_failure (fl^" doesn't compile correctly")
-        )
+        );
+
+        "Loading ( header )" >::
+        ( fun () ->
+          try
+            let mo = open_in_bin fl_mo
+            in
+            let mo_header = input_mo_header mo
+            in
+            (
+              if !verbose then
+                print_endline (string_of_mo_header mo_header)
+              else
+                ()
+            );
+            close_in mo
+          with x ->
+            print_endline (GettextMo.string_of_exception x);
+            assert_failure (fl_mo^" doesn't load properly");
+        );
+
+        "Loading ( informations ) " >::
+        ( fun () ->
+          try
+            let mo = open_in_bin fl_mo
+            in
+            let mo_header = input_mo_header mo
+            in
+            let mo_informations = input_mo_informations
+              ~failsafe:GettextTypes.RaiseException
+              mo mo_header
+            in
+            (
+              if !verbose then
+                print_endline (string_of_mo_informations mo_informations)
+              else
+                ()
+            );
+            close_in mo
+          with x ->
+            print_endline (GettextMo.string_of_exception x);
+            assert_failure (fl_mo^" doesn't load properly");
+        );
       ]
   in
   "Self test" >:::
