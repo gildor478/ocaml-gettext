@@ -53,6 +53,6 @@ format_char = parse
 | "Lo" as fc
 | "a"  as fc
 | "t"  as fc  { FORMAT_CHAR fc }
-| '!'    
-| '%'         { token lexbuf }
+| "!"    
+| "%"         { token lexbuf }
 

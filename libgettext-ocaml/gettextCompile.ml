@@ -167,6 +167,22 @@ let install destdir language category textdomain filename_mo_src =
   let dirname_mo_dst =
     dirname filename_mo_dst
   in
+  (* Test of the mo file, it will raise an exception if there is any problem 
+     in the MO structure *)
+  let chn = 
+    open_in_bin filename_mo_src 
+  in
+  let mo_hdr =
+    GettextMo.input_mo_header chn
+  in
+  let mo_info =
+    GettextMo.input_mo_informations RaiseException chn mo_hdr
+  in
+  for i = 0 to (Int32.to_int mo_hdr.number_of_strings) - 1 do
+    let _ = GettextMo.input_mo_translation RaiseException chn mo_hdr
+    in
+    ()
+  done;
   mkdir ~parent:true dirname_mo_dst;
   cp [filename_mo_src] filename_mo_dst
 ;;

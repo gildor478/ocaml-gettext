@@ -72,7 +72,7 @@ let string_of_translation trans =
     Singular(str_id, str) ->
       Printf.sprintf "Singular(%S, %S)" str_id str
   | Plural(str_id, str_plural, lst) ->
-      Print.sprintf "Plural(%S, %S, [ %a ])" str_id str_plural 
+      Printf.sprintf "Plural(%S, %S, [ %s ])" str_id str_plural 
       (String.concat " ; " (List.map (fun x -> Printf.sprintf "%S" x) lst)) 
 ;;
 
@@ -142,22 +142,222 @@ let load_po_file tests fl_po =
 (**********************************)
 
 let format_test tests =
-  let format_test_one trans_src trans_dst =
+  let format_test_one (trans_src,trans_dst) =
+    let lst_str_equal lst1 lst2 =
+      try
+        List.fold_left2 ( fun b str1 str2 -> b && str1 = str2 ) 
+        true lst1 lst2
+      with Invalid_argument _ ->
+        false
+    in
     let str_id = 
       match trans_src with
         Singular(str_id,_)
       | Plural(str_id,_,_) -> str_id
     in
-    (Print.sprintf "%S format checking" str_id) >::
+    (Printf.sprintf "%s -> %s format checking" 
+    (string_of_translation trans_src)
+    (string_of_translation trans_dst)) >::
       ( fun () ->
-        let trans_res = check_format Ignore trans_src
+        let trans_res = 
+          GettextFormat.check_format Ignore trans_src
         in
-        match (trans_res,trans_src) with
+        match (trans_res,trans_dst) with
           Singular(str_id1,str1),Singular(str_id2,str2) when 
           str_id1 = str_id2 && str1 = str2 ->
             ()
         | Plural(str_id1,str_plural1,lst1),Plural(str_id2,str_plural2,lst2) when 
-          str_id1 = str_id2 && str_plural1 = str_plural2 && List.fold
+          str_id1 = str_id2 && str_plural1 = str_plural2 
+          && lst_str_equal lst1 lst2 ->
+            ()
+        | trans1, trans2 ->
+            assert_failure ((string_of_translation trans1)
+            ^" differs from "
+            ^(string_of_translation trans2))
+      )
+  in
+  "Printf format test" >:::
+    (
+      List.map format_test_one
+      [
+        (* Identity *)
+        Singular("%d" ,"%d" ),Singular("%d" ,"%d" );
+        Singular("%i" ,"%i" ),Singular("%i" ,"%i" );
+        Singular("%n" ,"%n" ),Singular("%n" ,"%n" );
+        Singular("%N" ,"%N" ),Singular("%N" ,"%N" );
+        Singular("%u" ,"%u" ),Singular("%u" ,"%u" );
+        Singular("%x" ,"%x" ),Singular("%x" ,"%x" );
+        Singular("%X" ,"%X" ),Singular("%X" ,"%X" );
+        Singular("%o" ,"%o" ),Singular("%o" ,"%o" );
+        Singular("%s" ,"%s" ),Singular("%s" ,"%s" );
+        Singular("%S" ,"%S" ),Singular("%S" ,"%S" );
+        Singular("%c" ,"%c" ),Singular("%c" ,"%c" );
+        Singular("%C" ,"%C" ),Singular("%C" ,"%C" );
+        Singular("%f" ,"%f" ),Singular("%f" ,"%f" );
+        Singular("%F" ,"%F" ),Singular("%F" ,"%F" );
+        Singular("%e" ,"%e" ),Singular("%e" ,"%e" );
+        Singular("%E" ,"%E" ),Singular("%E" ,"%E" );
+        Singular("%g" ,"%g" ),Singular("%g" ,"%g" );
+        Singular("%G" ,"%G" ),Singular("%G" ,"%G" );
+        Singular("%B" ,"%B" ),Singular("%B" ,"%B" );
+        Singular("%b" ,"%b" ),Singular("%b" ,"%b" );
+        Singular("%ld","%ld"),Singular("%ld","%ld");
+        Singular("%li","%li"),Singular("%li","%li");
+        Singular("%lu","%lu"),Singular("%lu","%lu");
+        Singular("%lx","%lx"),Singular("%lx","%lx");
+        Singular("%lX","%lX"),Singular("%lX","%lX");
+        Singular("%lo","%lo"),Singular("%lo","%lo");
+        Singular("%nd","%nd"),Singular("%nd","%nd");
+        Singular("%ni","%ni"),Singular("%ni","%ni");
+        Singular("%nu","%nu"),Singular("%nu","%nu");
+        Singular("%nx","%nx"),Singular("%nx","%nx");
+        Singular("%nX","%nX"),Singular("%nX","%nX");
+        Singular("%no","%no"),Singular("%no","%no");
+        Singular("%Ld","%Ld"),Singular("%Ld","%Ld");
+        Singular("%Li","%Li"),Singular("%Li","%Li");
+        Singular("%Lu","%Lu"),Singular("%Lu","%Lu");
+        Singular("%Lx","%Lx"),Singular("%Lx","%Lx");
+        Singular("%LX","%LX"),Singular("%LX","%LX");
+        Singular("%Lo","%Lo"),Singular("%Lo","%Lo");
+        Singular("%a" ,"%a" ),Singular("%a" ,"%a" );
+        Singular("%t" ,"%t" ),Singular("%t" ,"%t" );
+        Singular("%!" ,"%!" ),Singular("%!" ,"%!" );
+        Singular("%%" ,"%%" ),Singular("%%" ,"%%" );
+
+        (* Always fails *)
+        Singular("%d" ,"" ),Singular("%d" ,"%d" );
+        Singular("%i" ,"" ),Singular("%i" ,"%i" );
+        Singular("%n" ,"" ),Singular("%n" ,"%n" );
+        Singular("%N" ,"" ),Singular("%N" ,"%N" );
+        Singular("%u" ,"" ),Singular("%u" ,"%u" );
+        Singular("%x" ,"" ),Singular("%x" ,"%x" );
+        Singular("%X" ,"" ),Singular("%X" ,"%X" );
+        Singular("%o" ,"" ),Singular("%o" ,"%o" );
+        Singular("%s" ,"" ),Singular("%s" ,"%s" );
+        Singular("%S" ,"" ),Singular("%S" ,"%S" );
+        Singular("%c" ,"" ),Singular("%c" ,"%c" );
+        Singular("%C" ,"" ),Singular("%C" ,"%C" );
+        Singular("%f" ,"" ),Singular("%f" ,"%f" );
+        Singular("%F" ,"" ),Singular("%F" ,"%F" );
+        Singular("%e" ,"" ),Singular("%e" ,"%e" );
+        Singular("%E" ,"" ),Singular("%E" ,"%E" );
+        Singular("%g" ,"" ),Singular("%g" ,"%g" );
+        Singular("%G" ,"" ),Singular("%G" ,"%G" );
+        Singular("%B" ,"" ),Singular("%B" ,"%B" );
+        Singular("%b" ,"" ),Singular("%b" ,"%b" );
+        Singular("%ld","" ),Singular("%ld","%ld");
+        Singular("%li","" ),Singular("%li","%li");
+        Singular("%lu","" ),Singular("%lu","%lu");
+        Singular("%lx","" ),Singular("%lx","%lx");
+        Singular("%lX","" ),Singular("%lX","%lX");
+        Singular("%lo","" ),Singular("%lo","%lo");
+        Singular("%nd","" ),Singular("%nd","%nd");
+        Singular("%ni","" ),Singular("%ni","%ni");
+        Singular("%nu","" ),Singular("%nu","%nu");
+        Singular("%nx","" ),Singular("%nx","%nx");
+        Singular("%nX","" ),Singular("%nX","%nX");
+        Singular("%no","" ),Singular("%no","%no");
+        Singular("%Ld","" ),Singular("%Ld","%Ld");
+        Singular("%Li","" ),Singular("%Li","%Li");
+        Singular("%Lu","" ),Singular("%Lu","%Lu");
+        Singular("%Lx","" ),Singular("%Lx","%Lx");
+        Singular("%LX","" ),Singular("%LX","%LX");
+        Singular("%Lo","" ),Singular("%Lo","%Lo");
+        Singular("%a" ,"" ),Singular("%a" ,"%a" );
+        Singular("%t" ,"" ),Singular("%t" ,"%t" );
+
+        (* Mismatch *)
+        Singular("%d" ,"%i" ),Singular("%d" ,"%d" );
+        Singular("%i" ,"%d" ),Singular("%i" ,"%i" );
+        Singular("%n" ,"%d" ),Singular("%n" ,"%n" );
+        Singular("%N" ,"%d" ),Singular("%N" ,"%N" );
+        Singular("%u" ,"%d" ),Singular("%u" ,"%u" );
+        Singular("%x" ,"%d" ),Singular("%x" ,"%x" );
+        Singular("%X" ,"%d" ),Singular("%X" ,"%X" );
+        Singular("%o" ,"%d" ),Singular("%o" ,"%o" );
+        Singular("%s" ,"%d" ),Singular("%s" ,"%s" );
+        Singular("%S" ,"%d" ),Singular("%S" ,"%S" );
+        Singular("%c" ,"%d" ),Singular("%c" ,"%c" );
+        Singular("%C" ,"%d" ),Singular("%C" ,"%C" );
+        Singular("%f" ,"%d" ),Singular("%f" ,"%f" );
+        Singular("%F" ,"%d" ),Singular("%F" ,"%F" );
+        Singular("%e" ,"%d" ),Singular("%e" ,"%e" );
+        Singular("%E" ,"%d" ),Singular("%E" ,"%E" );
+        Singular("%g" ,"%d" ),Singular("%g" ,"%g" );
+        Singular("%G" ,"%d" ),Singular("%G" ,"%G" );
+        Singular("%B" ,"%d" ),Singular("%B" ,"%B" );
+        Singular("%b" ,"%d" ),Singular("%b" ,"%b" );
+        Singular("%ld","%d" ),Singular("%ld","%ld");
+        Singular("%li","%d" ),Singular("%li","%li");
+        Singular("%lu","%d" ),Singular("%lu","%lu");
+        Singular("%lx","%d" ),Singular("%lx","%lx");
+        Singular("%lX","%d" ),Singular("%lX","%lX");
+        Singular("%lo","%d" ),Singular("%lo","%lo");
+        Singular("%nd","%d" ),Singular("%nd","%nd");
+        Singular("%ni","%d" ),Singular("%ni","%ni");
+        Singular("%nu","%d" ),Singular("%nu","%nu");
+        Singular("%nx","%d" ),Singular("%nx","%nx");
+        Singular("%nX","%d" ),Singular("%nX","%nX");
+        Singular("%no","%d" ),Singular("%no","%no");
+        Singular("%Ld","%d" ),Singular("%Ld","%Ld");
+        Singular("%Li","%d" ),Singular("%Li","%Li");
+        Singular("%Lu","%d" ),Singular("%Lu","%Lu");
+        Singular("%Lx","%d" ),Singular("%Lx","%Lx");
+        Singular("%LX","%d" ),Singular("%LX","%LX");
+        Singular("%Lo","%d" ),Singular("%Lo","%Lo");
+        Singular("%a" ,"%d" ),Singular("%a" ,"%a" );
+        Singular("%t" ,"%d" ),Singular("%t" ,"%t" );
+        Singular("%!" ,"%d" ),Singular("%!" ,"%!" );
+        Singular("%%" ,"%d" ),Singular("%%" ,"%%" );
+
+        (* All in one *)
+        Singular("%d %i %n %N %u %x %X %o %s %S %c %C "
+        ^"%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
+        ^"%lo %nd %ni %nu %nx %nX %no %Ld %Li %Lu %Lx "
+        ^"%LX %Lo %a %t %! %%", 
+        "%d %i %n %N %u %x %X %o %s %S %c %C "
+        ^"%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
+        ^"%lo %nd %ni %nu %nx %nX %no %Ld %Li %Lu %Lx "
+        ^"%LX %Lo %a %t %! %%"),
+        Singular("%d %i %n %N %u %x %X %o %s %S %c %C "
+        ^"%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
+        ^"%lo %nd %ni %nu %nx %nX %no %Ld %Li %Lu %Lx "
+        ^"%LX %Lo %a %t %! %%", 
+        "%d %i %n %N %u %x %X %o %s %S %c %C "
+        ^"%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
+        ^"%lo %nd %ni %nu %nx %nX %no %Ld %Li %Lu %Lx "
+        ^"%LX %Lo %a %t %! %%");
+        Singular("%d %i %n %N %u %x %X %o %s %S %c %C "
+        ^"%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
+        ^"%lo %nd %ni %nu %nx %nX %no %Ld %Li %Lu %Lx "
+        ^"%LX %Lo %a %t %! %%", 
+        "%d %i %n %N %u %x %X %o %s %S %c %C "
+        ^"%f %F %e %E g %G %B %b %ld %li %lu %lx %lX "
+        ^"lo nd ni nu nx %nX %no %Ld %Li %Lu %Lx "
+        ^"%LX %Lo %a %t %! %%"),
+        Singular("%d %i %n %N %u %x %X %o %s %S %c %C "
+        ^"%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
+        ^"%lo %nd %ni %nu %nx %nX %no %Ld %Li %Lu %Lx "
+        ^"%LX %Lo %a %t %! %%", 
+        "%d %i %n %N %u %x %X %o %s %S %c %C "
+        ^"%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
+        ^"%lo %nd %ni %nu %nx %nX %no %Ld %Li %Lu %Lx "
+        ^"%LX %Lo %a %t %! %%");
+
+        (* Plural forms *)
+        Plural("singular %d","plural %i",["%d";"%d"]),Plural("singular %d","singular %d",["%d";"%d"]);
+        Plural("singular %d","plural %d",["%i";"%d"]),Plural("singular %d","plural %d",["singular %d";"%d"]);
+        Plural("singular %d","plural %d",["%d";"%i"]),Plural("singular %d","plural %d",["%d";"plural %d"]);
+        Plural("singular %d","plural %d",["%d";"%d"]),Plural("singular %d","plural %d",["%d";"%d"]);
+
+        (* Idem potent *)
+        Singular("%%",""),Singular("%%","");
+        Singular("%!",""),Singular("%!","");
+        Singular("",""),Singular("","");
+        Singular("a","b"),Singular("a","b");
+      ]
+    )
+;;
 
 
 (*************************)
@@ -223,41 +423,67 @@ let extract_test tests =
 
 let install_test tests =
   let install_test_one (language, category, textdomain, fl_mo, fl_dst) =  
-    fl_mo >:::
-      [
-        "Installing" >::
-          ( fun () ->
-            try 
-              GettextCompile.install tests.test_dir language category textdomain fl_mo;
-              if test Exists fl_dst then
-                ()
-              else
-                assert_failure (fl_mo^" is not installed at "^fl_dst)
-            with x ->
-              assert_failure ("Unexpected error while processing "^fl_mo
-              ^" ( "^(Printexc.to_string x)^" )")
-          )
-      ]
+    fl_mo >::
+      ( fun () ->
+        try 
+          GettextCompile.install tests.test_dir language category textdomain fl_mo;
+          if test Exists fl_dst then
+            ()
+          else
+            assert_failure (fl_mo^" is not installed at "^fl_dst)
+        with x ->
+          assert_failure ("Unexpected error while processing "^fl_mo
+          ^" ( "^(Printexc.to_string x)^" )")
+      )
+  in
+  let install_fail_test_one (fl_mo,exc,error) =
+    (fl_mo^" ( "^error^" ) ") >::
+      ( fun () ->
+        try
+          GettextCompile.install tests.test_dir "fr" LC_MESSAGES "gettext-fail" fl_mo;
+          assert_failure 
+          ("Installation of "^fl_mo^" should have failed with error "^error)
+        with x when x = exc ->
+          ()
+      )
   in
   "MO file installation test" >:::
-    List.map install_test_one [
-      (
-        "fr",LC_MESSAGES, "gettext-test1", concat tests.test_dir "test1.mo", 
-        make_filename [ tests.test_dir ; "fr" ; "LC_MESSAGES" ; "gettext-test1.mo" ]
-      );
-      (
-        "fr_FR",LC_MESSAGES, "gettext-test2", concat tests.test_dir "test2.mo", 
-        make_filename [ tests.test_dir ; "fr_FR" ; "LC_MESSAGES" ; "gettext-test2.mo"]
-      );
-      (
-        "fr",LC_TIME, "gettext-test3", concat tests.test_dir "test3.mo", 
-        make_filename [ tests.test_dir ; "fr" ; "LC_TIME" ; "gettext-test3.mo" ]
-      );
-      (
-        "fr_FR@euro",LC_MESSAGES, "gettext-test4", concat tests.test_dir "test4.mo",
-        make_filename [ tests.test_dir ; "fr_FR@euro" ; "LC_MESSAGES" ; "gettext-test4.mo" ]
-      );
-    ]
+    (
+      List.map install_test_one [
+        (
+          "fr",LC_MESSAGES, "gettext-test1", concat tests.test_dir "test1.mo", 
+          make_filename [ tests.test_dir ; "fr" ; "LC_MESSAGES" ; "gettext-test1.mo" ]
+        );
+        (
+          "fr_FR",LC_MESSAGES, "gettext-test2", concat tests.test_dir "test2.mo", 
+          make_filename [ tests.test_dir ; "fr_FR" ; "LC_MESSAGES" ; "gettext-test2.mo"]
+        );
+        (
+          "fr",LC_TIME, "gettext-test3", concat tests.test_dir "test3.mo", 
+          make_filename [ tests.test_dir ; "fr" ; "LC_TIME" ; "gettext-test3.mo" ]
+        );
+        (
+          "fr_FR@euro",LC_MESSAGES, "gettext-test4", concat tests.test_dir "test4.mo",
+          make_filename [ tests.test_dir ; "fr_FR@euro" ; "LC_MESSAGES" ; "gettext-test4.mo" ]
+        );
+      ]
+    ) @
+    (
+      let i32 = Int32.of_int
+      in
+      List.map install_fail_test_one [
+        "test5.mo",GettextMo.InvalidMoFile,
+          "MO file invalid ( magic number )";
+        "test6.mo",GettextMo.InvalidMoHeaderTableStringOutOfBound((i32 28, i32 2626),(i32 (-1), i32 159)),
+          "Offset of table with original strings is out of bound";
+        "test7.mo",GettextMo.InvalidMoHeaderTableTranslationOutOfBound((i32 28, i32 2626),(i32 (-49), i32 111)),
+          "Offset of table with translation strings is out of bound";
+        "test8.mo",GettextMo.InvalidMoStringOutOfBound(2626, 196),
+          "Offset of first string is out of bound";
+        "test9.mo",GettextMo.InvalidMoTranslationOutOfBound(2626, 196),
+          "Offset of first translation is out of bound";
+      ]
+    )
 ;;
 
 (************************)
@@ -320,6 +546,7 @@ in
 let all_test = 
   "Test ocaml-gettext" >::: 
     [
+      format_test        tests;
       po_test            tests; 
       compatibility_test tests;
       extract_test       tests;

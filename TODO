@@ -1,6 +1,6 @@
 v 0.2.0 : 
-- Write gettextFormat : check format of ocaml string ( concerning %s, %a... )
-- Test MO file before installing it
+- Use gettextFormat to produce translation which could be used with printf like functions ( differentiate printf like 
+  function and normal print function in t' ).
 - Test GettextCamomile
 - Write GettextTranslate.hashtable
 - Write GettextTranslate.open ( base on file opening when a translation is required )
@@ -10,11 +10,11 @@ v 0.2.0 :
 - Complete ocaml-gettext executable
 - Benchmark GettextCamomile/GettextStub 
 - Move all exception declaration to gettextTypes, string_of_exception to Gettext
+- Remove \t in all the code, find a the good settings to work with vim and use a tags in each file to made it clear
 - Add a header to each source code file concerning the licence ( LGPL + Ocaml + copyright )
 - Write a quick start manual
 - Generate a ocamldoc manual
 - Correct the BUG: related to bug from ocaml-fileutils
-- Remove \t in all the code, find a the good settings to work with vim and use a tags in each file to made it clear
 
 v 0.3.0 :
 - Better parse comments, to keep licence et al 
