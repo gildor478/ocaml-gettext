@@ -5,9 +5,11 @@ module type TRANSLATE_TYPE =
   sig
     type t
 
-    (** create chn charset : create a translation table using chn as 
+    (** create chn charset : Create a translation table using chn as 
         the file descriptor for a mo file and charset as the charset 
-        transcoder 
+        transcoder. If chn is closed, any subsequent action could
+        failed ( ie, if the asked elements is cached, it could not 
+        failed, for example ).
     *)
     val create : in_channel -> Charset.t -> t
 

@@ -10,6 +10,11 @@ module type CHARSET_TYPE =
     *)
     val create : string -> string -> t
 
+    (** create_default in_enc : create a new charset converter from charset
+        in_enc to out_enc.
+      *)
+    val create_default : string -> t
+
     (** recode str enc : return a transcoded string according to enc.
     *)
     val recode : string -> t -> string
@@ -22,6 +27,8 @@ module Dummy : CHARSET_TYPE =
     type t = ()
 
     let create in_enc out_enc = ()
+
+    let create_default in_enc = ()
 
     let recode str () = str
   end

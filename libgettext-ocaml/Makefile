@@ -93,13 +93,17 @@ INSTALLIB +=           \
  gettextExtension.cmxa \
  gettextExtension.a    \
  gettextCategory.cmi   \
+ gettextDomain.cmi     \
+ gettextCharset.cmi    \
+ gettextTranslate.cmi  \
  gettextModules.cmi    
 
 CMO_EXTENSION=         \
  gettextCategory.cmo   \
  gettextDomain.cmo     \
  gettextCharset.cmo    \
- gettextTranslate.cmo  
+ gettextTranslate.cmo  \
+ gettextModules.cmo 
 
 gettextExtension.cma gettextExtension.cmxa: $(CMO_EXTENSION)
 gettextExtension.cma gettextExtension.cmxa: $(CMO_EXTENSION:.cmo=.cmx)
