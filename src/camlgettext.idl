@@ -51,6 +51,7 @@ struct lconv *localeconv(void);
 /*                         */
 /***************************/
 
+quote(c, "#include <libintl.h>");
 
 quote(mli, "(** Look up MSGID in the current default message \
 catalog for the current LC_MESSAGES locale.  If not found, \
