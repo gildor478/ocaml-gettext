@@ -1,17 +1,17 @@
 REQUIRES   = fileutils gettext.extension gettext-camomile gettext-stub oUnit benchmark
 TESTDIR    = tests
-CMO        = common.cmo benchmark.cmo test.cmo
+CMO        = common.cmo bench.cmo test.cmo
 
-all: all-benchmark
+all: all-bench
 	$(MAKE) all-test
 
-install: install-benchmark
+install: install-bench
 	$(MAKE) install-test
 
-uninstall: uninstall-benchmark
+uninstall: uninstall-bench
 	$(MAKE) uninstall-test
 
-clean:: clean-benchmark
+clean:: clean-bench
 	$(MAKE) clean-test
 	-$(RM) -r $(TESTDIR)
 
@@ -19,12 +19,12 @@ distclean::
 	
 include ../TopMakefile
 
-all-benchmark install-benchmark uninstall-benchmark clean-benchmark: NAME = benchmark
-all-benchmark install-benchmark uninstall-benchmark clean-benchmark: CMO  = common.cmo benchmark.cmo
-all-benchmark: all-$(OCAMLBEST)
-install-benchmark: install-$(OCAMLBEST)
-uninstall-benchmark: uninstall-prog
-clean-benchmark: clean-prog
+all-bench install-bench uninstall-bench clean-bench: NAME = bench
+all-bench install-bench uninstall-bench clean-bench: CMO  = common.cmo bench.cmo
+all-bench: all-$(OCAMLBEST)
+install-bench: install-$(OCAMLBEST)
+uninstall-bench: uninstall-prog
+clean-bench: clean-prog
 
 all-test install-test uninstall-test clean-test: NAME = test
 all-test install-test uninstall-test clean-test: CMO  = common.cmo test.cmo

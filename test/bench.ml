@@ -78,23 +78,27 @@ let format_bench benchs =
       get_buffer !ref_buffer
     in
     let translation =
-      print_debug ("Checking format of : "^(string_of_translation elem));
+      print_debug benchs ("Checking format of : "^(string_of_translation elem));
       GettextFormat.check_format Ignore elem
     in
-    print_debug ("Result of the check : "^(string_of_translation translation));
+    print_debug benchs ("Result of the check : "^(string_of_translation translation));
     ref_buffer := buffer
   in  
-  print_debug "Benchmarking format :";
+  print_debug benchs "Benchmarking format :";
   throughputN benchs.time [
-    ("Only singular", f, ref (make_buffer format_translation_singular_data));
-    ("Only plural"  , f, ref (make_buffer format_translation_plural_data));
-    ("All"          , f, ref (make_buffer format_translation_all_data));
+    ("Singular", f, ref (make_buffer format_translation_singular_data));
+    ("Plural"  , f, ref (make_buffer format_translation_plural_data));
+    ("All"     , f, ref (make_buffer format_translation_all_data));
   ]
 ;;
 
 (***************************)
 (* Performance of realize  *)
 (***************************)
+
+let realize_bench benchs = 
+  let f =
+
 
 (**********************)
 (* Performance of s_  *)
