@@ -181,7 +181,8 @@ type t = {
   textdomains : ((codeset option) * (dir option)) MapTextdomain.t;
   categories  : locale MapCategory.t;
   language    : locale option;
-  codeset     : codeset option;
+  codeset     : codeset;
+  dirs        : dir list;
   default     : textdomain;
 }
 ;;

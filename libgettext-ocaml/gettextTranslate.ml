@@ -18,17 +18,14 @@ let string_of_exception exc =
 ;;
           
 module type TRANSLATE_TYPE =
-  functor ( Charset : GettextCharset.CHARSET_TYPE ) ->
   sig
-    type t
+    type u
 
-    (** create chn charset : Create a translation table using chn as 
-        the file descriptor for a mo file and charset as the charset 
-        transcoder. If chn is closed, any subsequent action could
-        failed ( ie, if the asked elements is cached, it could not 
-        failed, for example ).
+    (** create t filename charset : Create a translation 
+        table using filename as the mo file and charset as the charset 
+        converter. 
     *)
-    val create : failsafe -> filename -> Charset.t -> t
+    val create : t -> filename -> (string -> string) -> u
 
     (** translate str (plural_form,number) tbl : translate the string 
         str using tbl. It is possible that the operation modify tbl, 
@@ -36,7 +33,7 @@ module type TRANSLATE_TYPE =
         form of the translated string using plural_form and number.
     *)
     val translate : 
-         t
+         u
       -> string 
       -> (string * int) option
       -> translation option 
@@ -44,35 +41,31 @@ module type TRANSLATE_TYPE =
 ;;
 
 module Dummy : TRANSLATE_TYPE =
-  functor ( Charset : GettextCharset.CHARSET_TYPE ) ->
   struct
-    type t = Charset.t
+    type u = string -> string
 
-    let create failsafe filename charset = charset
+    let create t filename charset = charset
 
     let translate charset str plural_form = 
       match plural_form with
         None 
       | Some(_,0) ->
-          Some(Singular(str,Charset.recode charset str))
+          Some(Singular(str,charset str))
       | Some(str_plural,_) ->
-          Some(Plural(str,str_plural,[Charset.recode charset str; Charset.recode
-          charset str_plural]))
+          Some(Plural(str,str_plural,[charset str;charset str_plural]))
   end
 ;;
 
 module Map : TRANSLATE_TYPE =
-  functor ( Charset : GettextCharset.CHARSET_TYPE ) ->
   struct
-    module MapDummy = Dummy (Charset)
     
-    type t = {
-      dummy     : MapDummy.t;
+    type u = {
+      dummy     : Dummy.u;
       map       : translation MapString.t;
       failsafe  : failsafe;
     }
 
-    let create failsafe filename charset =
+    let create t filename charset =
       let map = ref MapString.empty
       in
       let () = 
@@ -84,38 +77,38 @@ module Map : TRANSLATE_TYPE =
           for i = 0 to Int32.to_int mo_header.number_of_strings
           do
             let new_translation = 
-              input_mo_translation failsafe chn mo_header i
+              input_mo_translation t.failsafe chn mo_header i
             in
             map :=
               match new_translation with
                 Singular(id,str) ->
                 MapString.add id 
-                (Singular(id, Charset.recode charset str)) 
+                (Singular(id, charset str)) 
                 !map
               | Plural(id,id_plural,lst) ->
                 MapString.add id 
-                (Plural (id, id_plural, List.map (Charset.recode charset) lst)) 
+                (Plural (id, id_plural, List.map charset lst)) 
                 !map
           done
         with (Sys_error _) ->
-          fail_or_continue failsafe
+          fail_or_continue t.failsafe
           string_of_exception
           (GettextTranslateCouldNotOpenFile filename)
           ()
       in
       {
-        dummy    = MapDummy.create failsafe filename charset;
+        dummy    = Dummy.create failsafe filename charset;
         map      = !map;
-        failsafe = failsafe;
+        failsafe = t.failsafe;
       }
       
-    let translate t str plural_form =
+    let translate u str plural_form =
       try
-        Some(MapString.find str t.map)
+        Some(MapString.find str u.map)
       with Not_found ->
-        fail_or_continue t.failsafe
+        fail_or_continue u.failsafe
         string_of_exception
         (GettextTranslateStringNotFound str)
-        (MapDummy.translate t.dummy str plural_form)
+        (Dummy.translate u.dummy str plural_form)
   end
 ;;

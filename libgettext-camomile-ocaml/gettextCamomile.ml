@@ -20,7 +20,7 @@ module Charset : GettextCharset.CHARSET_TYPE =
       out_enc  = CharEncoding.of_name out_enc;
     }
 
-    let recode str chrst = 
+    let recode chrst str = 
       CharEncoding.recode_string chrst.in_enc chrst.out_enc str
   end
 ;;

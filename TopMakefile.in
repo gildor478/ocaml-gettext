@@ -125,7 +125,6 @@ install-buildprog-byte: $(BUILDBIN) $(CMO)
 	$(OCAMLC) -o $(NAME) $(INCLUDES) -package "$(REQUIRES)" -linkpkg \
 	-predicates "$(PREDICATES)" $(BLIBS) $(CMO)
 	$(CP) $(NAME) $(BUILDBIN)
-	$(TOUCH) $@
 
 install-prog-byte: install-buildprog-byte
 	$(CP) $(NAME) $(BINDIR)
@@ -136,14 +135,13 @@ install-buildprog-opt: $(BUILDBIN) $(CMX)
 	$(OCAMLOPT) -o $(NAME) $(INCLUDES) -package "$(REQUIRES)" -linkpkg \
 	-predicates "$(PREDICATES)" $(OLIBS) $(CMX)
 	$(CP) $(NAME) $(BUILDBIN)
-	$(TOUCH) $@
 
 install-prog-opt: install-buildprog-opt
 	$(CP) $(NAME) $(BINDIR)
 
 clean-prog:
-	-$(RM) $(NAME).byte $(NAME).opt
-	-$(RM) $(BUILDBIN)/$(NAME).byte $(BUILDBIN)/$(NAME).opt
+	-$(RM) $(NAME)
+	-$(RM) $(BUILDBIN)/$(NAME)
 	-$(if $(wildcard $(BUILDBIN)/*), ,$(RM) -r $(BUILDBIN))
 	-$(if $(wildcard $(BUILDDIR)/*), ,$(RM) -r $(BUILDDIR))
 

@@ -82,6 +82,7 @@ INSTALLIB +=           \
  gettextExtension.cma  \
  gettextExtension.cmxa \
  gettextExtension.a    \
+ gettextCategory.cmi   \
  gettextLocale.cmi     \
  gettextDomain.cmi     \
  gettextCharset.cmi    \
@@ -89,6 +90,7 @@ INSTALLIB +=           \
 
 CMO_EXTENSION=         \
  gettextConfig.cmo     \
+ gettextCategory.cmo   \
  gettextLocale.cmo     \
  gettextDomain.cmo     \
  gettextCharset.cmo    \
