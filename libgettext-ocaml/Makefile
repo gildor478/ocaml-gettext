@@ -19,14 +19,15 @@ INSTALLIB +=         \
  gettextBase.cma     \
  gettextBase.cmxa    \
  gettextBase.a       \
+ gettextConfig.cmi   \
  gettextTypes.cmi    \
  gettextMo.cmi       \
  gettextModules.cmi  \
  gettextCompat.cmi   \
- gettextConfig.cmi   \
  gettext.cmi         
 
 CMO_BASE  =            \
+ gettextConfig.cmo     \
  gettextTypes.cmo      \
  gettextUtils.cmo      \
  gettextMo_int32.cmo   \
@@ -35,7 +36,6 @@ CMO_BASE  =            \
  gettextMo.cmo         \
  gettextModules.cmo    \
  gettextCompat.cmo     \
- gettextConfig.cmo     \
  gettext.cmo           
 
 gettext.cmi: gettext.mli

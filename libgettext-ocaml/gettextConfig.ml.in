@@ -1,5 +1,8 @@
 
-let default_paths = [ @LOCALEDIR@ ]
+let default_path = [ @LOCALEDIR@ ]
+;;
+
+let default_codeset = "@CODESET@" 
 ;;
 
 let version = "@VERSION@"
@@ -9,6 +12,7 @@ let build_date = "@DATE@"
 ;;
 
 let copyright = 
-  "ocaml-gettext v @VERSION@ ( build on @DATE@ ) "
-  ^"by Sylvain Le Gall <sylvain@le-gall.net>"
+   "ocaml-gettext v@VERSION@ ( build on @DATE@ )\n"
+  ^"Copyright 2004,2005 by Sylvain Le Gall <sylvain@le-gall.net>\n"
+  ^"Licenced under LGPL v2.1 with Ocaml exception"
 ;;

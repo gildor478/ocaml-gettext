@@ -12,6 +12,10 @@ AC_ARG_WITH(localedir,
 	AC_HELP_STRING([--with-localedir=dir], [Location of the locale dir ( default is /usr/share/locale and /usr/local/share/locale )]),
 	LOCALEDIR=$LOCALEDIR "\"$withval\";", LOCALEDIR="\"/usr/share/locale\"; \"/usr/local/share/locale\"")
 
+AC_ARG_WITH(codeset,
+	AC_HELP_STRING([--with-codeset=codeset], [Default codeset to use ( default is ANSI_X3.4-1968 )]),
+	CODESET=$withval, CODESET="ANSI_X3.4-1968")
+
 VERSION=0.1.1
 DATE=`date`
 
@@ -156,6 +160,7 @@ AC_SUBST(CAMLIDL)
 AC_SUBST(OCAMLMKLIB)
 AC_SUBST(EXE)
 AC_SUBST(LOCALEDIR)
+AC_SUBST(CODESET)
 AC_SUBST(DATE)
 AC_SUBST(VERSION)
 

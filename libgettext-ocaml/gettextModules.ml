@@ -46,7 +46,8 @@ let create
   ?(codesets = [])
   ?(dirs = []) 
   ?(textdomains = [])
-  ?(codeset)
+  ?(codeset = GettextConfig.default_codeset )
+  ?(path = GettextConfig.default_path )
   ?(language)
   textdomain =
     let map_categories = 
@@ -64,6 +65,7 @@ let create
         categories  = map_categories;
         language    = language;
         codeset     = codeset;
+        path        = path;
         default     = textdomain;
       }
     in

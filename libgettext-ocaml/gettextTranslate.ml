@@ -77,7 +77,7 @@ module Map : TRANSLATE_TYPE =
           for i = 0 to Int32.to_int mo_header.number_of_strings
           do
             let new_translation = 
-              input_mo_translation t.failsafe chn mo_header i
+              input_mo_translation t.GettextTypes.failsafe chn mo_header i
             in
             map :=
               match new_translation with
@@ -91,15 +91,15 @@ module Map : TRANSLATE_TYPE =
                 !map
           done
         with (Sys_error _) ->
-          fail_or_continue t.failsafe
+          fail_or_continue t.GettextTypes.failsafe
           string_of_exception
           (GettextTranslateCouldNotOpenFile filename)
           ()
       in
       {
-        dummy    = Dummy.create failsafe filename charset;
+        dummy    = Dummy.create t filename charset;
         map      = !map;
-        failsafe = t.failsafe;
+        failsafe = t.GettextTypes.failsafe;
       }
       
     let translate u str plural_form =

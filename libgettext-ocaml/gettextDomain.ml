@@ -21,7 +21,17 @@ exception DomainFileDoesntExist of string * string;;
     DomainLanguageNotSet is thrown.
 *)
 
-let compute_path t lst_locale category textdomain = 
+let make_filename dir language category textdomain = 
+  (* http://www.gnu.org/software/gettext/manual/html_mono/gettext.html#SEC148 
+    dir_name/locale/LC_category/domain_name.mo *)
+  make_filename [
+    (* BUG : should use add_extension *)
+    dir; language; string_of_category category; textdomain ^ ".mo" 
+  ]
+;;
+
+
+let find t languages category textdomain = 
   let search_path =
     (
       try 
@@ -30,44 +40,36 @@ let compute_path t lst_locale category textdomain =
         | (_,None) -> []
       with Not_found ->
         []
-      ) @ t.dirs
-  in
-  (* http://www.gnu.org/software/gettext/manual/html_mono/gettext.html#SEC148 
-    dir_name/locale/LC_category/domain_name.mo *)
-  let make_path dir language = 
-    make_filename [
-      (* BUG : should use add_extension *)
-      dir; language; string_of_category category; textdomain ^ ".mo" 
-    ]
+      ) @ t.path
   in
   let ctest = test (And(Exists,Is_readable))
   in
-  let rec find_mo_file_aux path language =
-    match language with 
-     lang :: tl ->
-       let current_path = make_path path lang
+  let rec find_mo_file_aux dir languages =
+    match languages with 
+     language :: tl ->
+       let current_filename = make_filename dir language category textdomain
        in
-       if ctest current_path then
-         current_path
+       if ctest current_filename then
+         current_filename
        else
-         find_mo_file_aux path tl
+         find_mo_file_aux dir tl
     |  [] ->
         raise Not_found
   in
-  let rec find_mo_file all_language all_path =
-    match search_path with
-      path :: tl ->
+  let rec find_mo_file path languages =
+    match path with
+      dir :: tl ->
         (
           try
-            find_mo_file_aux path all_language
+            find_mo_file_aux dir languages
           with Not_found ->
-            find_mo_file all_language tl
+            find_mo_file tl languages
         )
     | [] ->
         raise Not_found 
   in
   try
-    find_mo_file lst_locale search_path
+    find_mo_file search_path languages
   with Not_found ->
     raise (DomainFileDoesntExist(textdomain,string_of_category category))
 ;;

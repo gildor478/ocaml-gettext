@@ -176,14 +176,17 @@ module Program =
           ),
           "Set a dir to search gettext files for the specified domain"
         );
-        (* BUG: a reactiver 
+        (
           "--gettext-dir",
           ( Arg.String
-            ( fun s -> set_global_t { (get_global_t ()) with dir = s }
+            ( fun s -> set_global_t { 
+                (get_global_t ()) with 
+                path = s :: (get_global_t ()).path 
+              }
             )
           ),
-          "Set the default dir to search gettext files"
-        );*)
+          "Add a search dir for gettext files"
+        );
         (
           "--gettext-language",
           ( Arg.String
@@ -195,7 +198,7 @@ module Program =
         (
           "--gettext-codeset",
           ( Arg.String
-            ( fun s -> set_global_t { (get_global_t ()) with codeset = Some s }
+            ( fun s -> set_global_t { (get_global_t ()) with codeset = s }
             )
           ),
           "Set the default codeset for outputting string with gettext"

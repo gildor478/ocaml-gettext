@@ -182,7 +182,7 @@ type t = {
   categories  : locale MapCategory.t;
   language    : locale option;
   codeset     : codeset;
-  dirs        : dir list;
+  path        : dir list;
   default     : textdomain;
 }
 ;;
