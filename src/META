@@ -1,0 +1,7 @@
+requires = "camlp4"
+version = "0.1"
+predicates = ""
+archive(byte) = "camlgettext.cma"
+archive(native) = "camlgettext.cmxa"
+archive(syntax,toplevel) = "pa_gettext.cma"
+archive(syntax,preprocessor) = "pa_gettext.cma"
