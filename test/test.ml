@@ -537,15 +537,16 @@ let merge_test tests =
     List.map merge_one [ (concat tests.test_dir "test4.pot","test4.po", "bak") ]
 ;;
 
-(***************************)
-(* Test of GettextCamomile *)
-(***************************)
+(**********************************)
+(* Test of Gettext implementation *)
+(**********************************)
 
-let camomile_test tests =
-  (* File scheme : 
-    base_dir/lang/category/domain.mo
-  *)
-  let realize_test_load_one (realize_str,realize) fl_mo =
+let implementation_test tests =
+  (* Function for extracting all information of MO file *)
+  let extract_parameters fl_mo =
+    (* File scheme : 
+      base_dir/lang/category/domain.mo
+     *)
     let textdomain = 
       chop_extension (basename fl_mo)
     in
@@ -565,20 +566,6 @@ let camomile_test tests =
       print_debug tests ("Language:   "^language);
       print_debug tests ("Base dir:   "^base_dir)
     in
-    let t =
-      (* We use a UTF-8 binding, this is the most generic encoding
-         for all strings *)
-      GettextModules.create 
-      ~failsafe:RaiseException
-      ~codesets:[(textdomain,"UTF-8")] 
-      ~path:[base_dir] 
-      ~language:language 
-      textdomain
-    in
-    let t' =
-      print_debug tests ("Creation of the "^realize_str^" translator");
-      realize t
-    in
     let mo = 
       print_debug tests ("Opening "^fl_mo);
       open_in_bin fl_mo
@@ -592,48 +579,133 @@ let camomile_test tests =
       GettextMo.input_mo_informations
       RaiseException mo mo_header
     in
-    let test_cases = ref []
+    let test_translations = ref []
     in
     for i = 0 to (Int32.to_int mo_header.number_of_strings) - 1 do
       let translation = 
         print_debug tests ("Fetching translation n°"^(string_of_int i));
         GettextMo.input_mo_translation RaiseException mo mo_header i
       in
-      let func = 
-        print_debug tests (
-          "Building function for testing translation "
-          ^(string_of_translation translation));
-        match translation with
-        (* We cannot compare directly extracted values and t' extracted
-           value , since we have a charset translation *)
-          Singular(str_id,_) ->
-            fun () -> ignore(GettextCompat.gettext t' str_id)
-        | Plural(str_id,str_plural,_) ->
-            (* Using values from 0 to 2, we cover most of the plural cases *)
-            fun () -> (
-              ignore(GettextCompat.ngettext t' str_id str_plural 0);
-              ignore(GettextCompat.ngettext t' str_id str_plural 1);
-              ignore(GettextCompat.ngettext t' str_id str_plural 2)
-            )
-      in
-      test_cases := 
-        (
-          print_debug tests 
-          ("Building test case for translation "^(string_of_translation translation));
-          ((string_of_translation translation) >:: func) 
-          :: !test_cases
-        )
+      test_translations := translation :: !test_translations
     done;
     print_debug tests ("Closing file "^fl_mo);
     close_in mo;
-    fl_mo >::: !test_cases
+    (fl_mo,base_dir,language,category,textdomain,!test_translations)
   in
-  "GettextCamomile test" >:::
-    List.map camomile_test_one [
-      make_filename ["." ; "fr" ; "LC_MESSAGES" ; "test1.mo" ];
-      make_filename ["." ; "fr" ; "LC_MESSAGES" ; "test2.mo" ];
-      make_filename ["." ; "fr" ; "LC_MESSAGES" ; "test3.mo" ];
-      make_filename ["." ; "fr" ; "LC_MESSAGES" ; "test4.mo" ];
+  (* Build the parameter t out of parameters extracted above *)
+  let t_of_parameters parameters =
+    let (fl_mo,base_dir,language,category,textdomain,test_translations) = 
+      parameters
+    in
+    (* We use a UTF-8 binding, this is the most generic encoding
+      for all strings *)
+    GettextModules.create 
+    ~failsafe:RaiseException
+    ~codesets:[(textdomain,"UTF-8")] 
+    ~path:[base_dir] 
+    ~language:language
+    textdomain
+  in
+  (* Generate a test case of simple load of a MO file using an implementation *)
+  let test_load parameters_lst (realize_str,realize) = 
+    let test_load_one realize parameters =
+      (* Extract usefull information out of parameters *)
+      let (fl_mo,_,_,_,_,test_translations) = 
+        parameters
+      in
+      (* Build t *)
+      let t =
+        t_of_parameters parameters
+      in
+      (* Build t' *)
+      let t' =
+        realize t
+      in
+      let test_one_translation translation =
+        (* We cannot compare directly extracted values and t' extracted
+           value , since we have a charset translation *)
+        try 
+          match translation with 
+            Singular(str_id,_) ->
+              ignore(GettextCompat.gettext t' str_id)
+          | Plural(str_id,str_plural,_) ->
+              (* Using values from 0 to 2, we cover most of the plural cases *)
+              ignore(GettextCompat.ngettext t' str_id str_plural 0);
+              ignore(GettextCompat.ngettext t' str_id str_plural 1);
+              ignore(GettextCompat.ngettext t' str_id str_plural 2)
+        with exc ->
+          assert_failure ((Printexc.to_string exc)^" in "
+          ^(string_of_translation translation))
+      in
+      fl_mo >::
+        ( fun () ->
+          List.iter test_one_translation test_translations
+        )
+    in
+    realize_str >:::
+      List.map (test_load_one realize) parameters_lst
+  in
+  (* Generate a cross test of string extracted, using different implementation *)
+  let test_cross implementation_lst parameters = 
+    (* Extract usefull information out of parameters *)
+    let (fl_mo,_,_,_,_,test_translations) = 
+      parameters
+    in
+    (* Build t *)
+    let t =
+      t_of_parameters parameters
+    in
+    (* Build all t' *)
+    let t'_lst = 
+      List.map 
+      (fun (realize_str,realize) -> (realize_str,realize t)) 
+      implementation_lst
+    in
+    let check_translation str lst = 
+      
+    let test_cross_one translation = 
+      match translation with
+        Singular(str_id,_) ->
+          List.map ( 
+            fun (realize_str,t') -> 
+              (realize_str,GettextCompat.gettext t' str_id)
+          ) t'_lst
+      | Plural(str_id,str_plural,_) ->
+          List.iter ( 
+            fun n ->
+              List.map ( 
+                fun (realize_str,t') ->
+                  (realize_str,GettextCompat.ngettext t' str_id str_plural n)
+              ) t'_lst
+          ) [ 0 ; 1 ; 2 ]
+    in
+    fl_mo >::
+      ( fun () ->
+        List.iter test_cross_one test_translations
+      )
+  in
+  (* Extract and test *)
+  let parameters = 
+    List.map extract_parameters [
+      make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test1.mo" ];
+      make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test2.mo" ];
+      make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test3.mo" ];
+      make_filename ["." ; "fr_FR" ; "LC_MESSAGES" ; "test4.mo" ];
+    ]
+  in
+  let implementation = 
+    [
+      ("GettextCamomile.Map.realize", GettextCamomile.Map.realize);
+      ("GettextStub.Native.realize",  GettextStub.Native.realize);
+      ("GettextStub.Preload.realize", GettextStub.Preload.realize);
+    ]
+  in
+  "Gettext implementation test" >:::
+    [
+      "Load" >:::
+        List.map (test_load parameters) implementation;
+      "Cross check" >:::
+        List.map 
     ]
 ;;
 
@@ -646,14 +718,14 @@ in
 let all_test = 
   "Test ocaml-gettext" >::: 
     [
-      format_test        tests;
-      po_test            tests; 
-      compatibility_test tests;
-      extract_test       tests;
-      install_test       tests;
+      format_test         tests;
+      po_test             tests; 
+      compatibility_test  tests;
+      extract_test        tests;
+      install_test        tests;
+      implementation_test tests;
       (* BUG : to reenable when releasing v 0.3 *)
       (*merge_test         tests;*)
-      camomile_test      tests;
     ]
 in
 let () = 

@@ -3,6 +3,7 @@
 *)
 
 open GettextTypes;;
+open GettextUtils;;
 
 (** Native implementation of gettext. All translation are bound to C library
     call. Still use check_format, to ensure that strings follow printf format.
@@ -54,15 +55,20 @@ module Native : GettextRealize.REALIZE_TYPE =
       let str : string = 
         GettextStubCompat.textdomain t.default
       in
-      let () = 
-        match t.language with
-          Some language ->
-            let str : string =
-              GettextStubCompat.setlocale GettextStubCompat.LC_ALL language
-            in
-            ()
-        | None ->
-            ()
+      let old_language : string = 
+          match t.language with
+            Some language ->
+              (
+                try
+                  GettextStubCompat.setlocale GettextStubCompat.LC_ALL language
+                with Failure("setlocale(invalid localization)" as str) as exc ->
+                  let () = 
+                    fail_or_continue t.failsafe ( fun _ -> str ) exc () 
+                  in
+                  GettextStubCompat.setlocale GettextStubCompat.LC_ALL ""
+              )
+          | None ->
+              GettextStubCompat.setlocale GettextStubCompat.LC_ALL ""
       in
       let () = 
         MapCategory.iter ( fun cat locale -> 

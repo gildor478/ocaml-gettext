@@ -71,6 +71,7 @@ INSTALLIB +=           \
  gettextTranslate.cmi  \
  gettextRealize.cmi    \
  gettextPo.cmi         \
+ gettextUtils.cmi      \
  gettextCompile.cmi         
 
 CMO_EXTENSION=         \

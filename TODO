@@ -5,12 +5,13 @@ v 0.2.0 :
 - Write GettextTranslate.open ( base on file opening when a translation is required )
 - Add gettextGettext : i18n/l10n for ocaml-gettext ( if it can bootstrap easily )
 - Complete ocaml-gettext executable
-- Benchmark GettextCamomile/GettextStub 
 - Move all exception declaration to gettextTypes, string_of_exception to Gettext
+- Benchmark GettextCamomile/GettextStub 
 - Remove \t in all the code, find a the good settings to work with vim and use a tags in each file to made it clear
 - Add a header to each source code file concerning the licence ( LGPL + Ocaml + copyright )
-- Write a quick start manual
+- Check all exported functions ( cf GettextUtils )
 - Generate a ocamldoc manual
+- Write a quick start manual
 - Correct the BUG: related to bug from ocaml-fileutils
 
 v 0.3.0 :
