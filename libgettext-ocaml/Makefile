@@ -7,7 +7,10 @@ INSTALLIB  = META
 
 all:
 
-# Stub library #
+##############################
+# Stub library               #
+##############################
+
 INSTALLIB +=         \
  gettextStub.cmi     \
  gettextStub.cmxa    \
@@ -29,7 +32,9 @@ gettextStub.cma gettextStub.cmxa: STUBSOBJS = -L/usr/lib/ocaml/3.07/ -lcamlidl
 clean::
 	-$(RM) gettextStub.ml gettextStub.mli gettextStub.h gettextStub_stubs.c 
 
+##############################
 # Ocaml Gettext base library #
+##############################
 
 INSTALLIB +=         \
  gettextBase.cma     \
@@ -55,7 +60,9 @@ clean::
 	-$(RM) gettextMo_parser.output \
 	 gettextMo_parser.ml gettextMo_parser.mli
 
-# Ocaml Gettext compile library */
+#################################
+# Ocaml Gettext compile library #
+#################################
 
 INSTALLIB +=           \
  gettextCompile.cma    \
@@ -77,7 +84,30 @@ clean::
 	-$(RM) gettextPo_parser.output \
 	 gettextPo_parser.ml gettextPo_parser.mli
 
-# Pa_gettext extension #
+###############################
+# Ocaml Gettext extension kit #
+###############################
+
+INSTALLIB +=           \
+ gettextExtension.cma  \
+ gettextExtension.cmxa \
+ gettextExtension.a    \
+ gettextCategory.cmi   \
+ gettextModules.cmi    
+
+CMO_EXTENSION=         \
+ gettextCategory.cmo   \
+ gettextDomain.cmo     \
+ gettextCharset.cmo    \
+ gettextTranslate.cmo  
+
+gettextExtension.cma gettextExtension.cmxa: $(CMO_EXTENSION)
+gettextExtension.cma gettextExtension.cmxa: $(CMO_EXTENSION:.cmo=.cmx)
+
+###############################
+# Pa_gettext extension        #
+###############################
+
 INSTALLIB +=        \
  pa_gettext.cma    
 

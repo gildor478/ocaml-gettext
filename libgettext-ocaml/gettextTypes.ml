@@ -1,4 +1,13 @@
-
+type locale_category_type =
+    LC_CTYPE
+  | LC_NUMERIC
+  | LC_TIME
+  | LC_COLLATE
+  | LC_MONETARY
+  | LC_MESSAGES
+  | LC_ALL
+;;
+  
 type failsafe = 
     Ignore 
   | InformStderr 

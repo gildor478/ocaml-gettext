@@ -1,17 +1,20 @@
 (** Interface of all module implementing gettext functions *)
 
-(** init default_lang textdomain categories : Initialize the library globally.
-    default_lang should be a well formed ISO code for language. If you use None
-    for default_lang, a value should be guessed using environnement, falling
+(** init categories language textdomain : Initialize the library globally.
+    language should be a well formed ISO code one. If you use None
+    for language, a value should be guessed using environnement, falling
     back to C default if guess failed. textdomain is the default catalog used 
     to lookup string. You can define more category binding usnig categories.
 *)
 val init : 
-     string option
+     ?categories : (GettextTypes.locale_category_type * string) list 
+  -> ?language : string option
   -> string 
-  -> ?(categories : (GettextTypes.locale_category_type * string) list) 
   -> unit 
 
+(** close () : close the current gettext working environnement *)
+val close : unit -> unit
+  
 (** gettext str : Translate the string str 
 *)
 val gettext : string -> string
