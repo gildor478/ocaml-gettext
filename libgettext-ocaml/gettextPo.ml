@@ -28,7 +28,7 @@ let empty_po =
 let add_po_translation_no_domain po po_translation =
   try 
     GettextPo_utils.add_po_translation_no_domain po po_translation
-  with GettextPo_utils.PoInconsistentMerge(str1,str2) ->
+  with PoInconsistentMerge(str1,str2) ->
     raise (PoInconsistentMerge(str1,str2))
 ;;
 
@@ -39,7 +39,7 @@ let add_po_translation_no_domain po po_translation =
 let add_po_translation_domain po domain po_translation =
   try
     GettextPo_utils.add_po_translation_domain po domain po_translation
-  with GettextPo_utils.PoInconsistentMerge(str1,str2) ->
+  with PoInconsistentMerge(str1,str2) ->
     raise (PoInconsistentMerge(str1,str2))
 ;;
 
@@ -150,9 +150,7 @@ let input_po chn =
       raise (PoFileInvalid ("parse error",lexbuf,chn))
   | Failure(s) ->
       raise (PoFileInvalid (s,lexbuf,chn))
-  | InvalidIndex(id,i) ->
-      raise (PoFileInvalidIndex(id,i))
-  | GettextPo_utils.PoInconsistentMerge(str1,str2) ->
+  | PoInconsistentMerge(str1,str2) ->
       raise (PoInconsistentMerge(str1,str2))
 ;;
 

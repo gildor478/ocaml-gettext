@@ -199,9 +199,3 @@ clean:: $(if $(LIBRARY),clean-lib,clean-prog)
 	rm -f $(GENERATED) parser.output
 
 distclean:: clean
-
-.depend:: $(GENERATED)
-	rm -f .depend
-	$(OCAMLDEP) $(INCLUDES) $(CLI_REQUIRES) $(CLI_SYNTAX) *.ml *.mli > .depend
-
-include .depend

@@ -1,19 +1,4 @@
-open Lexing;;
 open GettextTypes;;
-
-(* For communication between gettextPo_parser / gettextPo *)
-exception InvalidIndex of string * int;;
-
- 
-let string_of_pos lexbuf = 
-  let char_pos = lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol
-  in
-  let line_pos = lexbuf.lex_curr_p.pos_lnum
-  in
-  "line "^(string_of_int line_pos)
-  ^" character "
-  ^(string_of_int char_pos)
-;;
 
 let split_plural str =
   let rec split_plural_one start =
@@ -33,11 +18,11 @@ let split_plural str =
   split_plural_one 0
 ;;
 
-let fail_or_continue failsafe exc_printer exc cont_value =
+let fail_or_continue failsafe exc cont_value =
   match failsafe with
     Ignore ->
       cont_value
-  | InformStderr ->
+  | InformStderr exc_printer ->
       (
         prerr_string (exc_printer exc);
         prerr_newline ();
@@ -46,5 +31,4 @@ let fail_or_continue failsafe exc_printer exc cont_value =
   | RaiseException ->
       raise exc
 ;;
-
 

@@ -19,15 +19,16 @@ INSTALLIB +=              \
  gettextBase.cma          \
  gettextBase.cmxa         \
  gettextBase.a            \
- gettextConfig.cmi        \
  gettextTypes.cmi         \
- gettextModules.cmi       \
  gettextCompat.cmi        \
  gettext.cmi         
 
 CMO_BASE  =               \
  gettextConfig.cmo        \
  gettextTypes.cmo         \
+ gettextModules.cmo       \
+ gettextCompat.cmo        \
+ gettext.cmo              \
  gettextUtils.cmo         \
  gettextFormat_parser.cmo \
  gettextFormat_lexer.cmo  \
@@ -35,15 +36,14 @@ CMO_BASE  =               \
  gettextMo_int32.cmo      \
  gettextMo_parser.cmo     \
  gettextMo_lexer.cmo      \
- gettextMo.cmo            \
- gettextModules.cmo       \
- gettextCompat.cmo        \
- gettext.cmo           
+ gettextMo.cmo            
 
 gettext.cmi: gettext.mli
 gettext.cmo: gettext.cmi
 gettextMo_parser.cmo: gettextMo_parser.cmi
 gettextMo_parser.cmx: gettextMo_parser.cmi
+gettextMo.cmo : gettextMo_parser.cmi 
+gettextMo.cmx : gettextMo_parser.cmi
 gettextFormat_parser.cmo: gettextFormat_parser.cmi
 gettextFormat_parser.cmx: gettextFormat_parser.cmi
 gettextCompat.cmo: gettextCompat.cmi
@@ -62,6 +62,8 @@ INSTALLIB +=           \
  gettextExtension.cma  \
  gettextExtension.cmxa \
  gettextExtension.a    \
+ gettextConfig.cmi     \
+ gettextModules.cmi    \
  gettextFormat.cmi     \
  gettextMo.cmi         \
  gettextCategory.cmi   \

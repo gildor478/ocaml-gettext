@@ -29,7 +29,6 @@ let check_format failsafe translation =
   let choose_format lst_ref str_ref str =
     if check_format_lst_str lst_ref str then
       fail_or_continue failsafe 
-      string_of_exception 
       (FormatInconsistent(str,str_ref))
       str_ref
     else

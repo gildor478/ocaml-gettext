@@ -82,7 +82,7 @@ module Native : GettextRealize.REALIZE_TYPE =
                   GettextStubCompat.setlocale GettextStubCompat.LC_ALL language
                 with Failure("setlocale(invalid localization)" as str) as exc ->
                   let () = 
-                    fail_or_continue t.failsafe ( fun _ -> str ) exc () 
+                    fail_or_continue t.failsafe exc () 
                   in
                   GettextStubCompat.setlocale GettextStubCompat.LC_ALL ""
               )

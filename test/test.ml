@@ -88,7 +88,7 @@ let load_mo_file tests fl_mo =
         print_debug tests (GettextMo.string_of_mo_header mo_header);
         close_in mo
       with x ->
-        assert_failure (fl_mo^" doesn't load properly: "^(GettextMo.string_of_exception x))
+        assert_failure (fl_mo^" doesn't load properly: "^(Gettext.string_of_exception x))
     );
 
     "Loading ( informations )" >::
@@ -104,7 +104,7 @@ let load_mo_file tests fl_mo =
         print_debug tests (GettextMo.string_of_mo_informations mo_informations);
         close_in mo
       with x ->
-        assert_failure (fl_mo^" doesn't load properly: "^(GettextMo.string_of_exception x))
+        assert_failure (fl_mo^" doesn't load properly: "^(Gettext.string_of_exception x))
     );
   ]
 ;;
@@ -122,7 +122,7 @@ let load_po_file tests fl_po =
           ignore (GettextPo.input_po chn);
           close_in chn
         with x ->
-          assert_failure (fl_po^" doesn't parse correctly: "^(GettextPo.string_of_exception x))
+          assert_failure (fl_po^" doesn't parse correctly: "^(Gettext.string_of_exception x))
       );
 
       "Compiling" >::
@@ -132,7 +132,7 @@ let load_po_file tests fl_po =
           in
           () 
         with x ->
-          assert_failure (fl_po^" doesn't compile correctly"^(GettextCompile.string_of_exception x))
+          assert_failure (fl_po^" doesn't compile correctly"^(Gettext.string_of_exception x))
       );
   ] @ (load_mo_file tests fl_mo)
 ;;
@@ -434,7 +434,7 @@ let extract_test tests =
             try
               GettextCompile.extract tests.ocaml_xgettext default_options filename_options [fl_ml] fl_pot
             with x ->
-              assert_failure (fl_ml^" doesn't extract correctly: "^(GettextCompile.string_of_exception x))
+              assert_failure (fl_ml^" doesn't extract correctly: "^(Gettext.string_of_exception x))
           )
       ]
   in
@@ -497,15 +497,15 @@ let install_test tests =
       let i32 = Int32.of_int
       in
       List.map install_fail_test_one [
-        "test5.mo",GettextMo.InvalidMoFile,
+        "test5.mo",InvalidMoFile,
           "MO file invalid ( magic number )";
-        "test6.mo",GettextMo.InvalidMoHeaderTableStringOutOfBound((i32 28, i32 2626),(i32 (-1), i32 159)),
+        "test6.mo",InvalidMoHeaderTableStringOutOfBound((i32 28, i32 2626),(i32 (-1), i32 159)),
           "Offset of table with original strings is out of bound";
-        "test7.mo",GettextMo.InvalidMoHeaderTableTranslationOutOfBound((i32 28, i32 2626),(i32 (-49), i32 111)),
+        "test7.mo",InvalidMoHeaderTableTranslationOutOfBound((i32 28, i32 2626),(i32 (-49), i32 111)),
           "Offset of table with translation strings is out of bound";
-        "test8.mo",GettextMo.InvalidMoStringOutOfBound(2626, 36),
+        "test8.mo",InvalidMoStringOutOfBound(2626, 36),
           "Offset of first string is out of bound";
-        "test9.mo",GettextMo.InvalidMoTranslationOutOfBound(2626, 196),
+        "test9.mo",InvalidMoTranslationOutOfBound(2626, 196),
           "Offset of first translation is out of bound";
       ]
     )

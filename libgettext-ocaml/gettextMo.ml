@@ -2,10 +2,6 @@ open GettextUtils;;
 open GettextTypes;;
 open GettextMo_int32;;
 
-type range = Int32.t * Int32.t 
-;;
-
-
 let mo_sig_be = int32_of_byte (0x95, 0x04, 0x12, 0xde)
 ;;
 
@@ -177,12 +173,10 @@ let input_mo_translation failsafe chn mo_header number =
   | id :: id_plural :: [] -> Plural ( id, id_plural, translated )
   | id :: id_plural :: tl ->
       fail_or_continue failsafe 
-      string_of_exception
       (Junk (id, tl)) 
       (Plural (id, id_plural, translated))
   | [] ->
       fail_or_continue failsafe
-      string_of_exception
       EmptyEntry
       (Singular ( "", ""))
 ;;
@@ -193,7 +187,6 @@ let get_translated_value failsafe translation plural_number =
       str
   | ((Singular (_,str)), x) ->
       fail_or_continue failsafe
-      string_of_exception
       (InvalidTranslationSingular(str,x))
       str
   | ((Plural (str,str_plural,[])),x) ->
@@ -205,7 +198,6 @@ let get_translated_value failsafe translation plural_number =
       List.nth lst x 
   | ((Plural (_,_,lst)), x) ->
       fail_or_continue failsafe
-      string_of_exception
       (InvalidTranslationPlural(lst,x))
       List.nth lst 0
 ;;
@@ -231,7 +223,6 @@ let input_mo_informations failsafe chn mo_header =
       Parsing.Parse_error 
     | Failure("lexing: empty token") ->
         fail_or_continue failsafe 
-        string_of_exception
         (InvalidOptions (lexbuf,empty_translation)) 
         []
   in
@@ -248,7 +239,6 @@ let input_mo_informations failsafe chn mo_header =
         Parsing.Parse_error 
       | Failure("lexing: empty token") ->
           fail_or_continue failsafe 
-          string_of_exception
           (InvalidPlurals(lexbuf,field_plural_forms))
           (2,germanic_plural)
     with Not_found ->
@@ -269,7 +259,6 @@ let input_mo_informations failsafe chn mo_header =
         Parsing.Parse_error 
       | Failure("lexing: empty token") ->
           fail_or_continue failsafe
-          string_of_exception
           (InvalidContentType(lexbuf,field_content_type))
           gettext_content
     with Not_found ->
@@ -448,7 +437,6 @@ let fold_mo failsafe f init fl_mo =
     (translations,fun_plural_forms)
   with (Sys_error _) ->
     fail_or_continue failsafe
-    string_of_exception
     (CannotOpenMoFile fl_mo)
     (init,germanic_plural)
 ;;

@@ -16,7 +16,7 @@ let check_plural locations id id_plural lst =
           if index + 1 = cur_index then
             (cur_index, (check_string_format id cur_elem) :: lst)
           else
-            raise (InvalidIndex(String.concat "" id,cur_index))
+            raise (PoFileInvalidIndex(String.concat "" id,cur_index))
         ) (index,[]) lst
       )
     )

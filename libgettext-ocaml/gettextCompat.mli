@@ -26,7 +26,7 @@ val gettext : t' -> string -> string
 
 (** fgettext t' str : gettext returning format.
 *)
-val fgettext : t' -> string -> ('a, 'b, 'c, 'a) format4
+val fgettext : t' -> string -> ('a, 'b, 'c, 'd) format4
 
 (** dgettext t' textdomain str : Translate the string str for the specified domain.
 *)
@@ -34,7 +34,7 @@ val dgettext : t' -> textdomain -> string -> string
 
 (** fdgettext t' textdomain str : dgettext returning fformat.
 *)
-val fdgettext : t' -> textdomain -> string -> ('a, 'b, 'c, 'a) format4
+val fdgettext : t' -> textdomain -> string -> ('a, 'b, 'c, 'd) format4
 
 (** dcgettext t' textdomain str category : Translate the string str for the specified
     domain and category.
@@ -43,7 +43,7 @@ val dcgettext : t' -> textdomain -> string -> category -> string
 
 (** fdcgettext t' textdomain str category : dcgettext returning fformat.
 *)
-val fdcgettext : t' -> textdomain -> string -> category -> ('a, 'b, 'c, 'a) format4
+val fdcgettext : t' -> textdomain -> string -> category -> ('a, 'b, 'c, 'd) format4
 
 (** ngettext t' str str_plural n : Translate the string str using a plural form.
     str_plural is the default english plural. n is the relevant number for plural
@@ -53,7 +53,7 @@ val ngettext : t' -> string -> string -> int -> string
 
 (** fngettext t' str str_plural n : ngettext returning fformat.
 *)
-val fngettext : t' -> string -> string -> int -> ('a, 'b, 'c, 'a) format4
+val fngettext : t' -> string -> string -> int -> ('a, 'b, 'c, 'd) format4
 
 (** dngettext t' textdomain str str_plural n : Translate the string str using a plural
     form for the specified domain.
@@ -62,7 +62,7 @@ val dngettext : t' -> textdomain -> string -> string -> int -> string
 
 (** fdngettext t' textdomain str str_plural n : dngettext returning format.
 *)
-val fdngettext : t' -> textdomain -> string -> string -> int -> ('a, 'b, 'c, 'a) format4
+val fdngettext : t' -> textdomain -> string -> string -> int -> ('a, 'b, 'c, 'd) format4
 
 (** dcngettext t' textdomain str str_plural n category : Translate the string str
     using a plural form for the specified domain and category.
@@ -72,6 +72,6 @@ val dcngettext : t' -> textdomain -> string -> string -> int -> category -> stri
 (** fdcngettext t' textdomain str str_plural n category : dcngettext returning
     fformat.
 *)
-val fdcngettext : t' -> textdomain -> string -> string -> int -> category -> ('a, 'b, 'c, 'a) format4
+val fdcngettext : t' -> textdomain -> string -> string -> int -> category -> ('a, 'b, 'c, 'd) format4
 
 

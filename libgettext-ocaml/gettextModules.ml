@@ -1,6 +1,5 @@
 open FileUtil;;
 open FileUtil.StrUtil;;
-open GettextMo;;
 open GettextTypes;;
 
 (** Function for manipulation the type t *)
