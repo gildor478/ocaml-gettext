@@ -21,12 +21,13 @@ module type TRANSLATE_TYPE =
   sig
     type u
 
-    (** create t filename charset : Create a translation 
-        table using filename as the mo file and charset as the charset 
+    (** create t filename recode : Create a translation 
+        table using filename as the mo file and recode as the encoding
         converter. 
     *)
     val create : t -> filename -> (string -> string) -> u
 
+    (* BUG : need update *)
     (** translate str (plural_form,number) tbl : translate the string 
         str using tbl. It is possible that the operation modify tbl, 
         so it is returned also. It is also possible to get the plural 

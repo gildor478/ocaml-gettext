@@ -23,3 +23,17 @@ let categories = [
   LC_ALL 
 ]
 ;;
+
+let compare c1 c2 = 
+  let val_category x = 
+    match x with 
+      LC_CTYPE    -> 0 
+    | LC_NUMERIC  -> 1
+    | LC_TIME     -> 2
+    | LC_COLLATE  -> 3
+    | LC_MONETARY -> 4
+    | LC_MESSAGES -> 5
+    | LC_ALL      -> 6
+  in
+  compare (val_category c1) (val_category c2)
+;;

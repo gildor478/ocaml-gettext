@@ -8,7 +8,16 @@ open GettextTypes;;
 open GettextUtils;;
 open GettextCategory;;
 
-exception DomainFileDoesntExist of string * string;; 
+exception DomainFileDoesntExist of filename list;; 
+
+let string_of_exception e = 
+  match e with
+    DomainFileDoesntExist(lst) ->
+      "Cannot find an approriate gettext compiled file ( "
+      ^(String.concat ", " lst)^" )"
+  | _ -> 
+      ""
+;;
 
 (* BUG : a mettre à jour *)
 (** compute_path textdomain category t : return the path to the 
@@ -71,5 +80,16 @@ let find t languages category textdomain =
   try
     find_mo_file search_path languages
   with Not_found ->
-    raise (DomainFileDoesntExist(textdomain,string_of_category category))
+    raise (DomainFileDoesntExist(
+        List.flatten (
+          List.map ( 
+            fun dir ->
+              List.map (
+                fun language ->
+                  make_filename dir language category textdomain
+            ) languages
+          ) search_path
+        )
+      )
+    )
 ;;

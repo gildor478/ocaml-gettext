@@ -86,7 +86,8 @@ INSTALLIB +=           \
  gettextLocale.cmi     \
  gettextDomain.cmi     \
  gettextCharset.cmi    \
- gettextTranslate.cmi  
+ gettextTranslate.cmi  \
+ gettextRealize.cmi
 
 CMO_EXTENSION=         \
  gettextConfig.cmo     \
@@ -94,7 +95,8 @@ CMO_EXTENSION=         \
  gettextLocale.cmo     \
  gettextDomain.cmo     \
  gettextCharset.cmo    \
- gettextTranslate.cmo  
+ gettextTranslate.cmo  \
+ gettextRealize.cmo
 
 gettextExtension.cma: $(CMO_EXTENSION)
 gettextExtension.cmxa: $(CMO_EXTENSION:.cmo=.cmx)
