@@ -1,12 +1,9 @@
 (* Create the module Gettext, using the textdomain "mydomain" *)
-module Gettext = Gettext.Program(struct
+module Gettext = Gettext.Library(struct
   let textdomain   = "mydomain"
-  let codeset      = None
+  let codeset      = Some "UTF-8"
   let dir          = None
-  let dependencies = Library.init @ Gui.init
-  (* I do prefer fully ocaml implementation, so choose the 
-     GettextCamomile module *)
-  let realize      = GettextCamomile.Map.realize
+  let dependencies = Gettext.init
 end)
 ;;
 

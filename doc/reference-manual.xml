@@ -581,15 +581,11 @@
       </warning>
       <example>
         <title><filename>library.ml</filename></title>
-        <programlisting>
-          &library-ml;
-        </programlisting>
+        <programlisting>&library-ml;</programlisting>
       </example>
       <example>
         <title><filename>libraryGettext.ml</filename></title>
-        <programlisting>
-          &library-gettext-ml;
-        </programlisting>
+        <programlisting>&library-gettext-ml;</programlisting>
       </example>
       <para>
         All the calls to the translation function, use the textdomain provided in <varname>Init</varname>.
@@ -619,21 +615,18 @@
       </para>
       <example>
         <title><filename>program.ml</filename></title>
-        <programlisting>
-          &program-ml;
-        </programlisting>
+        <programlisting>&program-ml;</programlisting>
       </example>
       <example>
         <title><filename>programGettext.ml</filename></title>
-        <programlisting>
-          &program-gettext-ml;
-        </programlisting>
+        <programlisting>&program-gettext-ml;</programlisting>
       </example>
       <example>
         <title>Output of <command>program <option>--help</option></command></title>
         <screen>
           <prompt>$></prompt><command>./program <option>--help</option></command>
           <computeroutput>
+              --my-name name                      Your name. Default : ""
               --gettext-failsafe {ignore|inform-stderr|raise-exception}  
                                                   Choose how to handle failure in ocaml-gettext. Default: ignore.
               --gettext-disable                   Disable the translation perform by ocaml-gettext. Default: enable.
@@ -655,9 +648,7 @@
       </para>
       <example>
         <title><filename>program.xml</filename> : Docbook manpage</title>
-        <programlisting>
-          &program-xml;
-        </programlisting>
+        <programlisting>&program-xml;</programlisting>
       </example>
       <para>
         You should take care of what implementation of ocaml-gettext you are using. In order to choose the right implementation
@@ -904,16 +895,17 @@
       <title>Graphical user interface</title>
       <para>
         Graphical user interface works just as program or library. The only difference is that the file which contains
-        the graphical user interface is not coded in OCaml. You have two choices :
+        the graphical user interface should not be written in OCaml. You have two cases :
         <itemizedlist>
           <listitem>
             <para>
-              Extract the string from the original GUI file,
+              You use glade file, so you should extract the strings from this file using <command>xgettext</command>
             </para>
           </listitem>
           <listitem>
             <para>
-              Extract the string from the coded generated using the GUI file.
+              You use a hand written interface written in OCaml, the extraction of the strings follow the same way
+              as a library.
             </para>
           </listitem>
         </itemizedlist>
@@ -926,7 +918,13 @@
       </para>
       <para>
         But, for now you can only use the second alternative, because OCaml is not yet supported in <command>xgettext</command>. This
-        should be fixed, once <command>ocaml-gettext</command> will be enough stable to become a backend for <command>xgettext</command>.
+        should be fixed, once <command>ocaml-gettext</command> will be enough stable to become a backend for <command>xgettext</command>
+        <footnote>
+          <para>
+            For now, extracting strings from OCaml source file and glade file, requires to patch <productname>gettext</productname>. 
+            You can find this path in patches. This patch will be send to upstream author once it will be considered enough stable.
+          </para>
+        </footnote>.
       </para>
       <para>
         In the two case, you just have to add your GUI file ( in OCaml or native form ) to <filename>POTFILES</filename>.
@@ -935,42 +933,35 @@
         Graphical user interfaces are good candidate for settings a fixed <varname>Init.codeset</varname>. Typically, GTK2 interfaces require 
         to have this parameters set to UTF-8.
       </para>
-      <para>
-        Following the recommendation describe in <link linkend="gettext-documentation">gettext documentation</link>, a special function
-        <varname>g_</varname> permits to decode strings used in the interface. This strip the leading part of the strings, which should
-        begin with &quot;string_specific|string_to_translate&quot;. The returned string will be string_to_translate, but the search will
-        be performed on string_specific|string_to_translate, allowing to differentiate certain strings which can occurs in different
-        element of the interface, but that should be translated differently. The full string should be provided in the original GUI file.
-        Only the last part of the string, not containing any &quot;|&quot;, is returned.
-      </para>
 
       <example>
-        <title><filename>gui.glade</filename> : original GUI file</title>
-        <programlisting>
-          &gui-glade;
-        </programlisting>
+        <title><filename>gui.ml</filename></title>
+        <programlisting>&gui-ml;</programlisting>
       </example>
 
       <example>
-        <title><filename>gui.ml</filename> : source file from the original GUI file</title>
-        <programlisting>
-          &gui-ml;
-        </programlisting>
+        <title><command>./program --gettext-dir ../build/share/locale --gettext-lang C --my-name Sylvain</command></title>
+        <screenshot>
+          <graphic fileref="gui.png" format="PNG"/>
+        </screenshot>
       </example>
 
       <example>
-        <title><filename>Makefile</filename> : makefile for glade file</title>
-        <programlisting>
-          &makefile-gui;
-        </programlisting>
+        <title><command>./program --gettext-dir ../build/share/locale --gettext-lang fr --my-name Sylvain</command></title>
+        <screenshot>
+          <graphic fileref="gui-fr.png" format="PNG"/>
+        </screenshot>
       </example>
 
-      <note>
+      <warning>
         <para>
-          For now, generating OCaml source file out of glade file, requires to patch <command>lablgladecc2</command>. This patch
-          will be send to upstream author.
+          If you build <productname>lablgtk</productname> application, you must keep in mind that some locale settings are made
+          in the function <varname>GMain.Init</varname>. Those settings could override those done through the command line
+          options. In order to correctly use ocaml-gettext, you must be sure to call <varname>GMain.Init</varname> before 
+          using <varname>Arg.parse</varname> with the ocaml-gettext args.
         </para>
-      </note>
+      </warning>
+
     </section>
   </chapter>
   <chapter>

@@ -66,3 +66,5 @@ distclean: clean
 	-$(RM) test/.depend
 	-$(RM) -r autom4te.cache config.log config.cache config.status
 
+examples: all
+	cd examples                  && $(MAKE) all
