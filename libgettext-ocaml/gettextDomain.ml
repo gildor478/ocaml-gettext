@@ -8,17 +8,6 @@ open GettextTypes;;
 open GettextUtils;;
 open GettextCategory;;
 
-exception DomainFileDoesntExist of filename list;; 
-
-let string_of_exception e = 
-  match e with
-    DomainFileDoesntExist(lst) ->
-      "Cannot find an approriate gettext compiled file ( "
-      ^(String.concat ", " lst)^" )"
-  | _ -> 
-      ""
-;;
-
 (* BUG : a mettre à jour *)
 (** compute_path textdomain category t : return the path to the 
     mo file corresponding to textdomain and category. Language is 

@@ -60,8 +60,22 @@ module Locale : GettextLocale.LOCALE_TYPE =
 
 module Map : GettextRealize.REALIZE_TYPE =
  GettextRealize.Generic 
- (GettextTranslate.Map)   (* Generic translation *)
- (Charset)                (* Camomile charset *)
- (Locale)                 (* Ocamli18N locale *)
+ (GettextTranslate.Map)     (* Map translation *)
+ (Charset)                  (* Camomile charset *)
+ (Locale)                   (* Ocamli18N locale *)
+;;
+ 
+module Hashtbl : GettextRealize.REALIZE_TYPE =
+ GettextRealize.Generic 
+ (GettextTranslate.Hashtbl) (* Hashtbl translation *)
+ (Charset)                  (* Camomile charset *)
+ (Locale)                   (* Ocamli18N locale *)
+;;
+ 
+module Open : GettextRealize.REALIZE_TYPE =
+ GettextRealize.Generic 
+ (GettextTranslate.Open)    (* Open translation *)
+ (Charset)                  (* Camomile charset *)
+ (Locale)                   (* Ocamli18N locale *)
 ;;
   

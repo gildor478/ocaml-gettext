@@ -5,16 +5,6 @@ open GettextUtils;;
 open GettextMo;;
 open GettextFormat;;
 
-exception GettextTranslateStringNotFound of string ;;
-
-let string_of_exception exc =
-  match exc with
-  | GettextTranslateStringNotFound str ->
-      "Cannot find string "^str
-  | _ ->
-      ""
-;;
-          
 module type TRANSLATE_TYPE =
   sig
     type u
@@ -203,21 +193,19 @@ module Open : TRANSLATE_TYPE =
       let chn =
         open_in filename
       in
-      let mo_header = input_mo_header chn
+      let header = 
+        input_mo_header chn
       in
       let informations = 
-        input_mo_informations t.GettextTypes.failsafe chn mo_header
-      in
-      let fun_plural_forms = 
-        informations.GettextTypes.fun_plural_forms
+        input_mo_informations t.GettextTypes.failsafe chn header
       in
       {
-        dummy            = Dummy.create t filename charset;
-        filename         = filename;
-        charset          = charset;
-        failsafe         = t.GettextTypes.failsafe;
-        fun_plural_forms = fun_plural_forms;
-        number_of_strings= 
+        dummy             = Dummy.create t filename charset;
+        filename          = filename;
+        charset           = charset;
+        failsafe          = t.GettextTypes.failsafe;
+        fun_plural_forms  = informations.GettextTypes.fun_plural_forms;
+        number_of_strings = Int32.to_int header.GettextTypes.number_of_strings;
       }
       
     let translate u printf_format str plural_form =
@@ -235,11 +223,57 @@ module Open : TRANSLATE_TYPE =
           else
             fun x -> x
         in
-        get_translated_value u.failsafe (check (Hashtbl.find u.hashtbl str)) plural_number
+        let chn = 
+          open_in_bin u.filename 
+        in
+        let header = 
+          input_mo_header chn
+        in
+        let rec find_str_id (start_index,end_index) = 
+          let middle_index = 
+            (start_index + end_index) / 2
+          in
+          let str_id = 
+            let lst_str_id = 
+              input_mo_untranslated u.failsafe chn header middle_index
+            in
+            match lst_str_id with
+              str_id :: _ ->
+                str_id
+            | [] ->
+                (* BUG : should be a real exception *)
+                raise Not_found
+          in
+          match String.compare str str_id with
+            x when x < 0 && start_index <= middle_index - 1 ->
+              find_str_id (start_index,middle_index - 1)
+          | x when x > 0 && middle_index + 1 <= end_index->
+              find_str_id (middle_index + 1,end_index)
+          | x when x = 0 ->
+              middle_index
+          | _ ->
+              raise Not_found
+        in
+        let translation = 
+          let translation = 
+            input_mo_translation 
+            u.failsafe 
+            chn 
+            header 
+            (find_str_id (0,u.number_of_strings-1))
+          in
+          match translation with
+            Singular(str_id, str) ->
+              Singular(str_id, u.charset str)
+          | Plural(str_id,str_plural,lst) ->
+              Plural(str_id, str_plural, List.map u.charset lst)
+        in
+        close_in chn;
+        get_translated_value u.failsafe translation plural_number
       with Not_found ->
         fail_or_continue u.failsafe
         string_of_exception
         (GettextTranslateStringNotFound str)
         (Dummy.translate u.dummy printf_format str plural_form)
   end
-;
+;;

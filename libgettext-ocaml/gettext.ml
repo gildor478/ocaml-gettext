@@ -1,16 +1,6 @@
 open GettextTypes;;
 open GettextCompat;;
 
-(* Exceptions *)
-
-exception GettextUninitialized;;
-
-let string_of_exception exc = 
-  match exc with 
-    GettextUninitialized -> "Gettext library is not initialized"
-  | _ -> ""
-;;
-
 (* Function the main global variable of gettext with/without thread *)
 
 type global_type = {

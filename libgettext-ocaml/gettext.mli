@@ -9,12 +9,6 @@
 * GettextDummy, GettextCamomile and GettextStub ).
 **)
 
-(** Exceptions *)
-
-exception GettextUninitialized;;
-
-val string_of_exception : exn -> string
-
 (** Implementation of gettext functions *)
 
 (* create failsafe categories codesets dirs language textdomain : Initialize the library globally.

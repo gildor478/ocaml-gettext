@@ -6,27 +6,6 @@ open FileUtil;;
 open FileUtil.StrUtil;;
 open FilePath.DefaultPath;;
 
-exception PoFileInvalid of string * Lexing.lexbuf * in_channel ;;
-exception PoFileInvalidIndex of string * int;;
-exception PoFileDoesntExist of string;;
-exception PoInconsistentMerge of string * string;;
-
-let string_of_exception exc = 
-  match exc with 
-    PoFileInvalid (s,lexbuf,chn) ->
-      "Error while processing parsing of PO file : "^s^" at "^
-      (string_of_pos lexbuf)
-  | PoFileInvalidIndex (id,i) ->
-      "Error while processing parsing of PO file, in msgid "
-      ^id^", "^(string_of_int i)^" index is out of bound "
-  | PoFileDoesntExist fl ->
-      "Error while trying to load PO file "^fl^", file doesn't exist"
-  | PoInconsistentMerge (str1,str2) ->
-      "Error while merging two PO : "^str1^" and "^str2^" cannot be merged"
-  | _ ->
-      raise exc
-;;
-
 (** empty_po : value representing an empty PO *)
 let empty_po = 
   GettextPo_utils.empty_po

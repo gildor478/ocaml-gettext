@@ -3,16 +3,6 @@
 open GettextTypes;;
 open GettextUtils;;
 
-exception FormatInconsistent of string * string;;
-
-let string_of_exception exc =
-  match exc with
-    FormatInconsistent (s1,s2) ->
-      Printf.sprintf "Strings %S and %S doesn't use the same printf format" s1 s2
-  | _ ->
-      ""
-;;
-
 (** check_format failsafe translation : returns a translation structure
     if all the string contained in the translation are equivalent of
     str_id, regarding printf format. If not, replace each string which conflict

@@ -1,8 +1,5 @@
 open GettextTypes;;
 
-(* BUG : this exception is defined here, but should be defined in GettextTypes *)
-exception PoInconsistentMerge of string * string;;
-
 let empty_po = 
   {
     no_domain    = MapString.empty;

@@ -5,88 +5,11 @@ open GettextMo_int32;;
 type range = Int32.t * Int32.t 
 ;;
 
-exception InvalidOptions of Lexing.lexbuf * string;;
-exception InvalidPlurals of Lexing.lexbuf * string;;
-exception InvalidContentType of Lexing.lexbuf * string;;
-exception InvalidTranslationSingular of string * int;;
-exception InvalidTranslationPlural of (string list) * int;;
-exception Junk of string * string list;;
-exception EmptyEntry;;
-exception InvalidMoFile;;
-exception InvalidMoHeaderNegativeStrings;; 
-exception InvalidMoHeaderTableStringOutOfBound of range * range;;
-exception InvalidMoHeaderTableTranslationOutOfBound of range * range;;
-exception InvalidMoHeaderTableTranslationStringOverlap of range * range;;
-exception InvalidMoStringOutOfBound of int * int;;
-exception InvalidMoTranslationOutOfBound of int * int;;
-exception CannotOpenMoFile of string;;
-
 
 let mo_sig_be = int32_of_byte (0x95, 0x04, 0x12, 0xde)
 ;;
 
 let mo_sig_le = int32_of_byte (0xde, 0x12, 0x04, 0x95)
-;;
-
-
-let string_of_exception exc =   
-  let string_of_range (start_bound,end_bound) = 
-    "["^(Int32.to_string start_bound)^"; "^(Int32.to_string end_bound)^"]"
-  in
-  let string_of_list lst = 
-    "[ \""^(String.concat "\"; \"" lst)^"\" ]"
-  in
-  match exc with
-    InvalidOptions (lexbuf,text) ->
-      "Error while processing parsing of options : "
-      ^(string_of_pos lexbuf)^"\n"
-      ^text
-  | InvalidPlurals (lexbuf,text) ->
-      "Error while processing parsing of plural : "
-      ^(string_of_pos lexbuf)^"\n"
-      ^text
-  | InvalidContentType (lexbuf,text) ->
-      "Error while processing parsing of content-type : "
-      ^(string_of_pos lexbuf)^" "
-      ^text
-  | InvalidMoFile ->
-      "MO file provided is not encoded following gettext convention"
-  | InvalidTranslationSingular (str,x) ->
-      "Trying to fetch the plural form "
-      ^(string_of_int x)
-      ^" of a singular form \""
-      ^str^"\""
-  | InvalidTranslationPlural (lst,x) ->
-      "Trying to fetch the plural form "
-      ^(string_of_int x)
-      ^" of plural form "^(string_of_list lst)
-  | Junk (id,lst) ->
-      "Junk at the end of the plural form id "
-      ^id^" : "^(string_of_list lst)
-  | EmptyEntry ->
-      "An empty entry has been encounter"
-  | InvalidMoHeaderNegativeStrings ->
-      "Number of strings is negative"
-  | InvalidMoHeaderTableStringOutOfBound(r1,r2) ->
-      "Offset of string table is out of bound ("^
-      (string_of_range r2)^" should be in "^(string_of_range r1)^")"
-  | InvalidMoHeaderTableTranslationOutOfBound(r1,r2) ->
-      "Offset of translation table is out of bound ("^
-      (string_of_range r2)^" should be in "^(string_of_range r1)^")"
-  | InvalidMoHeaderTableTranslationStringOverlap(r1,r2) ->
-      "Translation table and string table overlap ("^
-      (string_of_range r1)^" and "^(string_of_range r2)^
-      " have a non empty intersection)"
-  | InvalidMoStringOutOfBound(max,cur) ->
-      "Out of bound access when trying to find a string ("
-      ^(string_of_int max)^" < "^(string_of_int cur)^")"
-  | InvalidMoTranslationOutOfBound(max,cur) ->
-      "Out of bound access when trying to find a translation ("
-      ^(string_of_int max)^" < "^(string_of_int cur)^")"
-  | CannotOpenMoFile fln ->
-      "Could not open file "^fln
-  | _ ->
-      ""
 ;;
 
 let check_mo_header chn hdr =

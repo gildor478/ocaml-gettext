@@ -3,25 +3,6 @@ open GettextTypes;;
 open FileUtil.StrUtil;;
 open FilePath.DefaultPath;;
 
-(** filename wich generates the error message str *)
-exception ProblemReadingFile of filename * string;;
-(** while extracting filename the command str returns exit code i *)
-exception ExtractionFailed of filename * string * int;;
-(** while extracting filename the command receive signal i *)
-exception ExtractionInterrupted of filename * string * int;;
-
-let string_of_exception exc = 
-  match exc with
-    ProblemReadingFile(fln,error) ->
-      "Problem reading file "^fln^" : "^error
-  | ExtractionFailed(fln,cmd,status) ->
-      "Problem while extracting "^fln^" : command "^cmd^" exits with code "^(string_of_int status)
-  | ExtractionInterrupted(fln,cmd,signal) ->
-      "Problem while extracting "^fln^" : command "^cmd^" killed by signal "^(string_of_int signal)
-  | _ ->
-      raise exc
-;;
-
 let po_of_filename filename = 
   let chn = 
     try

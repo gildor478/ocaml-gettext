@@ -1,3 +1,139 @@
+
+(** Exceptions *)
+
+(** From GettextCompile *)
+
+(** filename wich generates the error message str *)
+exception ProblemReadingFile of filename * string;;
+(** while extracting filename the command str returns exit code i *)
+exception ExtractionFailed of filename * string * int;;
+(** while extracting filename the command receive signal i *)
+exception ExtractionInterrupted of filename * string * int;;
+
+(** From GettextDomain *)
+exception DomainFileDoesntExist of filename list;; 
+
+(** From GettextFormat *)
+exception FormatInconsistent of string * string;;
+
+(** From Gettext *)
+exception GettextUninitialized;;
+
+(** From GettextMo *)
+exception InvalidOptions of Lexing.lexbuf * string;;
+exception InvalidPlurals of Lexing.lexbuf * string;;
+exception InvalidContentType of Lexing.lexbuf * string;;
+exception InvalidTranslationSingular of string * int;;
+exception InvalidTranslationPlural of (string list) * int;;
+exception Junk of string * string list;;
+exception EmptyEntry;;
+exception InvalidMoFile;;
+exception InvalidMoHeaderNegativeStrings;; 
+exception InvalidMoHeaderTableStringOutOfBound of range * range;;
+exception InvalidMoHeaderTableTranslationOutOfBound of range * range;;
+exception InvalidMoHeaderTableTranslationStringOverlap of range * range;;
+exception InvalidMoStringOutOfBound of int * int;;
+exception InvalidMoTranslationOutOfBound of int * int;;
+exception CannotOpenMoFile of string;;
+
+(** From GettextPo *)
+exception PoFileInvalid of string * Lexing.lexbuf * in_channel ;;
+exception PoFileInvalidIndex of string * int;;
+exception PoFileDoesntExist of string;;
+exception PoInconsistentMerge of string * string;;
+
+(** From GettextTranslate *)
+exception GettextTranslateStringNotFound of string ;;
+
+let string_of_exception exc = 
+  let f_ x = x
+  in
+  let s_ x = x
+  in
+  let spf x = Printf.sprintf x
+  in
+  let string_of_list lst = 
+    "[ "^(String.concat "; " (List.map (fun str -> spf "%S" str) lst))^" ]"
+  in
+  match exc with
+    ProblemReadingFile(fln,error) ->
+      spf (f_ "Problem reading file %s : %s") fln error
+  | ExtractionFailed(fln,cmd,status) ->
+      spf (f_ "Problem while extracting %s : command %S exits with code %d")
+      fln cmd status
+  | ExtractionInterrupted(fln,cmd,signal) ->
+      spf (f_ "Problem while extracting %s : command %S killed by signal %d")
+      fln cmd signal
+  | DomainFileDoesntExist(lst) ->
+      spf (f_ "Cannot find an approriate gettext compiled file ( %s )")
+      (string_of_list lst)
+  | GettextUninitialized -> 
+      (s_ "Gettext library is not initialized")
+  | InvalidOptions (lexbuf,text) ->
+      spf (f_ "Error while processing parsing of options at %s : %S")
+      (string_of_pos lexbuf)
+      text
+  | InvalidPlurals (lexbuf,text) ->
+      spf (f_ "Error while processing parsing of plural at %s : %S")
+      (string_of_pos lexbuf)
+      text
+  | InvalidContentType (lexbuf,text) ->
+      spf (f_ "Error while processing parsing of content-type at %s : %S")
+      (string_of_pos lexbuf)
+      text
+  | InvalidMoFile ->
+      (s_ "MO file provided is not encoded following gettext convention")
+  | InvalidTranslationSingular (str,x) ->
+      "Trying to fetch the plural form "
+      ^(string_of_int x)
+      ^" of a singular form \""
+      ^str^"\""
+  | InvalidTranslationPlural (lst,x) ->
+      "Trying to fetch the plural form "
+      ^(string_of_int x)
+      ^" of plural form "^(string_of_list lst)
+  | Junk (id,lst) ->
+      "Junk at the end of the plural form id "
+      ^id^" : "^(string_of_list lst)
+  | EmptyEntry ->
+      "An empty entry has been encounter"
+  | InvalidMoHeaderNegativeStrings ->
+      "Number of strings is negative"
+  | InvalidMoHeaderTableStringOutOfBound(r1,r2) ->
+      "Offset of string table is out of bound ("^
+      (string_of_range r2)^" should be in "^(string_of_range r1)^")"
+  | InvalidMoHeaderTableTranslationOutOfBound(r1,r2) ->
+      "Offset of translation table is out of bound ("^
+      (string_of_range r2)^" should be in "^(string_of_range r1)^")"
+  | InvalidMoHeaderTableTranslationStringOverlap(r1,r2) ->
+      "Translation table and string table overlap ("^
+      (string_of_range r1)^" and "^(string_of_range r2)^
+      " have a non empty intersection)"
+  | InvalidMoStringOutOfBound(max,cur) ->
+      "Out of bound access when trying to find a string ("
+      ^(string_of_int max)^" < "^(string_of_int cur)^")"
+  | InvalidMoTranslationOutOfBound(max,cur) ->
+      "Out of bound access when trying to find a translation ("
+      ^(string_of_int max)^" < "^(string_of_int cur)^")"
+  | CannotOpenMoFile fln ->
+      "Could not open file "^fln
+  | PoFileInvalid (s,lexbuf,chn) ->
+      "Error while processing parsing of PO file : "^s^" at "^
+      (string_of_pos lexbuf)
+  | PoFileInvalidIndex (id,i) ->
+      "Error while processing parsing of PO file, in msgid "
+      ^id^", "^(string_of_int i)^" index is out of bound "
+  | PoFileDoesntExist fl ->
+      "Error while trying to load PO file "^fl^", file doesn't exist"
+  | PoInconsistentMerge (str1,str2) ->
+      "Error while merging two PO : "^str1^" and "^str2^" cannot be merged"
+  | GettextTranslateStringNotFound str ->
+      "Cannot find string "^str
+  | _ ->
+      raise exc
+;;
+
+
 type textdomain = string
 ;;
 

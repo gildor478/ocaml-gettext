@@ -3,24 +3,6 @@ open FileUtil.StrUtil;;
 open GettextMo;;
 open GettextTypes;;
 
-(** Exceptions *)
-
-exception GettextUninitialized;;
-exception GettextMoFileNotFound;;
-exception GettextNoTranslation of string;;
-
-let string_of_exception exc =
-  match exc with
-    GettextUninitialized -> 
-      "Gettext is not initialized"
-  | GettextMoFileNotFound -> 
-      "Gettext could not find the corresponding mo file"
-  | GettextNoTranslation str_id -> 
-      "Gettext could not find translation for string id \""^str_id^"\""
-  | _ ->
-      ""
-;;
-
 (** Function for manipulation the type t *)
 
 let upgrade_textdomain t k value =  

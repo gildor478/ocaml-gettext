@@ -1,9 +1,7 @@
 v 0.2.0 : 
-- Write GettextTranslate.hashtable
-- Write GettextTranslate.open ( base on file opening when a translation is required )
+- Move all exception declaration to gettextTypes, string_of_exception to Gettext
 - Add gettextGettext : i18n/l10n for ocaml-gettext ( if it can bootstrap easily )
 - Complete ocaml-gettext executable
-- Move all exception declaration to gettextTypes, string_of_exception to Gettext
 - Benchmark GettextCamomile/GettextStub 
 - Remove \t in all the code, find a the good settings to work with vim and use a tags in each file to made it clear
 - Add a header to each source code file concerning the licence ( LGPL + Ocaml + copyright )
@@ -11,7 +9,8 @@ v 0.2.0 :
 - Generate a ocamldoc manual
 - Write a quick start manual
 - Correct the BUG: related to bug from ocaml-fileutils
-- Remove dependence on ocamli18n : parsing POSIX compliant locale is not the aim of ocamli18n
+- Remove dependency on ocamli18n : parsing POSIX compliant locale is not the aim of ocamli18n
+- Reread the code to improve general layout ( naming scheme, exception name... ie better style )
 
 v 0.3.0 :
 - Better parse comments, to keep licence et al 
