@@ -24,105 +24,33 @@
 
 all:
 
-HTML_SOURCES=reference-manual.xml
-PDF_SOURCES=reference-manual.xml
-ODOC_TARGETS=api api-extended
+# HTML documentation
+HTML_TARGETS=$(call HTML_TARGET,reference-manual.xml)
+$(call HTML_TARGET,reference-manual.xml): IMAGES=gui.png gui-fr.png
 
-# Manpages are a little bit more complicated
+# PDF documentation
+PDF_TARGETS=$(call PDF_TARGET,reference-manual.xml)
+
+ODOC_TARGETS=$(call ODOC_TARGET,gettext) $(call ODOC_TARGET,gettext-ext)
+
+# Manpage documentation
 MAN_TARGETS=ocaml-gettext.1 ocaml-xgettext.1 ocaml-gettext.5
 ocaml-gettext.1: ocaml-gettext.xml
 ocaml-xgettext.1: ocaml-xgettext.xml
 ocaml-gettext.5: ocaml-gettext-options.xml
 
-# Destination dir
-DOCHTML=
-DOCMAN=
+include ../TopMakefile
 
-BUILDHTML=html
-BUILDMAN=man
+ALL_PACKAGES=camomile gettext.base gettext.extension gettext.extract gettext-camomile gettext-stub
 
-# Programs
-MKDIR=mkdir
-XSLTPROC=xsltproc
-XMLLINT=xmllint
-CP=cp
+$(call ODOC_TARGET,gettext): REQUIRES=$(ALL_PACKAGES)
+$(call ODOC_TARGET,gettext):../libgettext-ocaml/gettext.mli 
+$(call ODOC_TARGET,gettext):../libgettext-ocaml/gettextTypes.ml
+$(call ODOC_TARGET,gettext):../libgettext-camomile-ocaml/gettextCamomile.ml
+$(call ODOC_TARGET,gettext):../libgettext-stub-ocaml/gettextStub.ml
+$(call ODOC_TARGET,gettext-ext):OCAMLDOCFLAGS+=-I ../libgettext-ocaml -I ../libgettext-camomile-ocaml -I ../libgettext-stub-ocaml
+$(call ODOC_TARGET,gettext-ext):REQUIRES=$(ALL_PACKAGES)
+$(call ODOC_TARGET,gettext-ext):$(wildcard ../libgettext-ocaml/*.ml)
+$(call ODOC_TARGET,gettext-ext):$(wildcard ../libgettext-ocaml/*.mli)
 
-# Stylesheets
-HTMLXSL=/usr/share/xml/docbook/stylesheet/nwalsh/xhtml/chunk.xsl
-MANXSL=/usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
-PDFXSL=
-
-# Not at the right place 
-$(BUILDHTML)/reference-manual/index.html: IMAGES=gui.png gui-fr.png
-	
-all: install-builddoc-html install-builddoc-man
-
-install: install-doc-html install-doc-man
-
-uninstall: uninstall-doc-html uninstall-doc-man
-
-clean: clean-doc-html clean-doc-man
-	$(RM) -r $(BUILDHTML) $(BUILDMAN)
-
-# Build HTML files
-
-$(BUILDHTML)/%/index.html: %.xml
-	$(XMLLINT) --xinclude --noent --noout --postvalid $^ 
-	$(MKDIR) -p $(dir $@)
-	$(XSLTPROC) --xinclude --stringparam base.dir "$(dir $@)" $(HTMLXSL) $^
-	$(if $(IMAGES),$(CP) $(IMAGES) $(dir $@))
-
-install-builddoc-html: $(patsubst %.xml,$(BUILDHTML)/%/index.html,$(HTML_SOURCES))
-
-clean-doc-html: 
-	-$(RM) -r $(patsubst %.xml,$(BUILDHTML)/%,$(HTML_SOURCES))
-	
-install-doc-html: install-builddoc-html
-	$(CP) -r $(patsubst %.xml,$(BUILDHTML)/%,$(HTML_SOURCES)) $(DOCHTML)
-
-uninstall-doc-html: clean-doc-html
-	-$(RM) -r $(patsubst %.xml,$(DOCHTML)/%,$(HTML_SOURCES))
-
-# Build MAN files
-
-MAN_SECTION=man$(patsubst .%,%,$(suffix $(1)))
-MAN_BUILD_TARGETS=$(BUILDMAN)/$(call MAN_SECTION,$(1))/$(1)
-MAN_INSTALL_TARGETS=$(DOCMAN)/$(call MAN_SECTION,$(1))/$(1)
-
-define PROCESS_MAN
-	$(XMLLINT) --xinclude --noent --noout --postvalid $^
-	$(XSLTPROC) --xinclude $(MANXSL) $^
-	$(MKDIR) -p $(dir $(call MAN_BUILD_TARGETS,$@))
-	$(CP) $@ $(call MAN_BUILD_TARGETS,$@) 
-endef
-
-%.1:
-	$(PROCESS_MAN)
-%.2:
-	$(PROCESS_MAN)
-%.3:
-	$(PROCESS_MAN)
-%.4:
-	$(PROCESS_MAN)
-%.5:
-	$(PROCESS_MAN)
-%.6:
-	$(PROCESS_MAN)
-%.7:
-	$(PROCESS_MAN)
-%.8:
-	$(PROCESS_MAN)
-%.9:
-	$(PROCESS_MAN)
-	
-install-builddoc-man: $(MAN_TARGETS)
-
-clean-doc-man:
-	-$(RM) $(MAN_TARGETS) $(foreach i,$(MAN_TARGETS),$(call MAN_BUILD_TARGETS,$(i)))
-
-install-doc-man: install-builddoc-man
-	$(CP) -r $(BUILDMAN) $(DOCMAN)
-
-uninstall-doc-man: clean-doc-man
-	-$(RM) $(foreach i,$(MAN_TARGETS),$(call MAN_INSTALL_TARGETS,$(i)))
 

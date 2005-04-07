@@ -1,5 +1,4 @@
 v 0.2.0 : 
-- Generate a ocamldoc manual
 - Check all exported functions ( cf GettextUtils )
 - Add option to configure where gettext can be found
 - Add option not to compile gettext/camomile and configure ocaml-gettext to use the default

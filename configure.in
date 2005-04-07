@@ -41,9 +41,11 @@ AC_ARG_WITH(localedir,
 	AC_HELP_STRING([--with-localedir=dir], [Additional location of the locale dir ( default is /usr/local/share/locale )]),
 	LOCALEDIR=$LOCALEDIR "\"$withval\";", LOCALEDIR="\"/usr/local/share/locale\"")
 
-AC_ARG_WITH(codeset,
-	AC_HELP_STRING([--with-codeset=codeset], [Default codeset to use ( default is ISO-8859-1 )]),
-	CODESET=$withval, CODESET="ISO-8859-1")
+AC_ARG_WITH(gettext-cflags,
+	AC_HELP_STRING([--with-gettext-cflags=codeset], [Flags to use when compiling gettext-stub]),
+	GETTEXT_CFLAGS=$withval, GETTEXT_CFLAGS="")
+
+AM_GNU_GETTEXT(external, need-ngettext)
 
 VERSION=0.1.1
 DATE=`date`
@@ -193,6 +195,7 @@ AC_SUBST(LOCALEDIR)
 AC_SUBST(CODESET)
 AC_SUBST(DATE)
 AC_SUBST(VERSION)
+AC_SUBST(GETTEXT_CFLAGS)
 
 # Finally create the Makefile from Makefile.in
 OUTPUT="TopMakefile                 \

@@ -35,7 +35,7 @@
   
   <refnamediv>
     <refname><command>ocaml-gettext</command></refname>
-    <refpurpose>program to manage PO and MO files for OCaml source files.</refpurpose>
+    <refpurpose>program to manage PO and MO files for Ocaml source files.</refpurpose>
   </refnamediv>
 
   <refsynopsisdiv>
@@ -107,10 +107,10 @@
         </term> 
         <listitem>
           <para>
-            Files provided are considered to be OCaml source files and <command>ocaml-gettext</command>
-            try to extract translatable strings of it. The output of the command is a POT file. As a 
+            Files provided are considered to be Ocaml source files and <command>ocaml-gettext</command>
+            tries to extract translatable strings of it. The output of the command is a POT file. As a 
             special case, if a file named <filename>POTFILES</filename> is in the list of the file 
-            provided, every lines of it are considered as files to be searched.
+            provided, every line of it is considered as a file to be searched.
           </para>
         </listitem>
       </varlistentry>
@@ -142,7 +142,7 @@
         </term>
         <listitem>
           <para>
-            The symetric command to <option>install</option>, but it uninstalls files provided for the considered
+            This is the symmetric command to <option>install</option>, but it uninstalls files provided for the considered
             language, textdomain and category,
           </para>
         </listitem>
@@ -153,7 +153,7 @@
         </term>
         <listitem>
           <para>
-            Merge a POT file with the provided PO file.
+            Merges a POT file with the provided PO file.
           </para>
         </listitem>
       </varlistentry>
@@ -163,8 +163,8 @@
         </term>
         <listitem>
           <para>
-            Command to extract translatable strings from an OCaml source file. This command should output
-            the same marshalled structure as <command>ocaml-xgettext</command>. The best is to use the same
+            Command to extract translatable strings from an Ocaml source file. This command should output
+            the same marshalled structure as <command>ocaml-xgettext</command>. The best to do is to use the same
             build version of <command>ocaml-gettext</command>.
           </para>
         </listitem>
@@ -249,7 +249,7 @@
         </term>
         <listitem>
           <para>
-            Base dir used when installing a MO file.
+            Base directory to use when installing a MO file.
           </para>
         </listitem>
       </varlistentry>
@@ -289,7 +289,7 @@
         </term>
         <listitem>
           <para>
-            Base dir used when uninstalling a MO file.
+            Base directory used when uninstalling a MO file.
           </para>
         </listitem>
       </varlistentry>
@@ -329,7 +329,7 @@
         </term>
         <listitem>
           <para>
-            Return only the version of ocaml-gettext. The return is made to be easily parseable by <command>configure</command>
+            Returns only the version of ocaml-gettext. The return is made to be easily parseable by <command>configure</command>
             script. The output of this command will always be the shortest version string, made of numeric characters ( 0-9 ) and 
             &quot;.&quot;. The version strings should be compared considering that a version A is greater than a version B if there is a 
             number between two &quot;.&quot; of A that is greater than B the corresponding number, beginning at the right of the string. 
@@ -346,7 +346,7 @@
         </term>
         <listitem>
           <para>
-            Display the help about the <command>ocaml-gettext</command> command.
+            Displays the help about the <command>ocaml-gettext</command> command.
           </para>
         </listitem>
       </varlistentry>
@@ -368,7 +368,7 @@
       guessed from the filename provided. You must be aware that these options can conflict with the fact that you 
       provide several files to install. For example, if you provide a textdomain, you should either install several 
       MO files which filenames only reflect the language or only one MO file if you also provide a language. For
-      example, you could execute 
+      example, you can execute 
       <command>ocaml-gettext 
         <option>--install-textdomain <parameter>mytextdomain</parameter></option>
         <parameter><filename>fr.po</filename></parameter> 
@@ -380,7 +380,7 @@
         <option>--install-language <parameter>fr</parameter></option>
         <parameter><filename>fr.po</filename></parameter> 
         <parameter><filename>de.po</filename></parameter>
-      </command>. This restriction is due to the fact that you should not overspecified file installation.
+      </command>. This restriction is due to the fact that you should not over specified file installation.
     </para>
     <para>
       Rules for guessing the language/textdomain are : language[.textdomain].mo. For a full automated install

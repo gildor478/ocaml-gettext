@@ -35,7 +35,7 @@
 
   <refnamediv>
     <refname><command>ocaml-xgettext</command></refname>
-    <refpurpose>program to extract translatable strings from OCaml source file.</refpurpose>
+    <refpurpose>program to extract translatable strings from Ocaml source file.</refpurpose>
   </refnamediv>
 
   <refsynopsisdiv>
@@ -54,9 +54,9 @@
     </para>
       
     <para>
-      <command>ocaml-xgettext</command> is a <command>camlp4</command> toplevel. This toplevel is compiled with the 
-      printer module <filename>pr_gettext.cmo</filename>. It outputs an OCaml marshalled data structure that can only
-      be understood by <command>ocaml-gettext</command>. The purpose of this program is to be a backend for OCaml source
+      <command>ocaml-xgettext</command> is a <command>camlp4</command> top level. This top level is compiled with the 
+      printer module <filename>pr_gettext.cmo</filename>. It outputs an Ocaml marshalled data structure that can only
+      be understood by <command>ocaml-gettext</command>. The purpose of this program is to be a back end for Ocaml source
       code string extraction. You should not use it directly.
     </para>
   </refsect1>
