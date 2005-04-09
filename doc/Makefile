@@ -22,6 +22,8 @@
 #  Contact: sylvain@le-gall.net                                          #
 ##########################################################################
 
+include ../ConfMakefile
+
 all:
 
 # HTML documentation
@@ -41,14 +43,38 @@ ocaml-gettext.5: ocaml-gettext-options.xml
 
 include ../TopMakefile
 
-ALL_PACKAGES=camomile gettext.base gettext.extension gettext.extract gettext-camomile gettext-stub
+ALL_PACKAGES=gettext.base gettext.extension gettext.extract 
+
+ifeq ($(BUILD_CAMOMILE),yes)
+ALL_PACKAGES+=gettext-camomile 
+endif
+
+ifeq ($(BUILD_STUB),yes)
+ALL_PACKAGES+=gettext-stub
+endif
 
 $(call ODOC_TARGET,gettext): REQUIRES=$(ALL_PACKAGES)
 $(call ODOC_TARGET,gettext):../libgettext-ocaml/gettext.mli 
 $(call ODOC_TARGET,gettext):../libgettext-ocaml/gettextTypes.ml
+
+ifeq ($(BUILD_CAMOMILE),yes)
 $(call ODOC_TARGET,gettext):../libgettext-camomile-ocaml/gettextCamomile.ml
+endif
+
+ifeq ($(BUILD_STUB),yes)
 $(call ODOC_TARGET,gettext):../libgettext-stub-ocaml/gettextStub.ml
-$(call ODOC_TARGET,gettext-ext):OCAMLDOCFLAGS+=-I ../libgettext-ocaml -I ../libgettext-camomile-ocaml -I ../libgettext-stub-ocaml
+endif
+
+$(call ODOC_TARGET,gettext-ext):OCAMLDOCFLAGS+=-I ../libgettext-ocaml 
+
+ifeq ($(BUILD_CAMOMILE),yes)
+$(call ODOC_TARGET,gettext-ext):OCAMLDOCFLAGS+=-I ../libgettext-camomile-ocaml 
+endif
+
+ifeq ($(BUILD_STUB),yes)
+$(call ODOC_TARGET,gettext-ext):OCAMLDOCFLAGS+=-I ../libgettext-stub-ocaml
+endif
+	
 $(call ODOC_TARGET,gettext-ext):REQUIRES=$(ALL_PACKAGES)
 $(call ODOC_TARGET,gettext-ext):$(wildcard ../libgettext-ocaml/*.ml)
 $(call ODOC_TARGET,gettext-ext):$(wildcard ../libgettext-ocaml/*.mli)

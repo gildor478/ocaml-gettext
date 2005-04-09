@@ -22,21 +22,25 @@
 #  Contact: sylvain@le-gall.net                                          #
 ##########################################################################
 
+
+include ../ConfMakefile
+include ../TopMakefile
+
 OCAML_GETTEXT_PACKAGE = ocaml-gettext
 LINGUAS=$(shell cat LINGUAS)
 SOURCES=POTFILES
 
-OCAML_GETTEXT=../build/bin/ocaml-gettext
+OCAML_GETTEXT=$(BUILBIN)/ocaml-gettext
 OCAML_GETTEXT_EXTRACT_OPTIONS=--extract-command ../build/bin/ocaml-xgettext
 OCAML_GETTEXT_COMPILE_OPTIONS=
 OCAML_GETTEXT_INSTALL_OPTIONS=
 OCAML_GETTEXT_MERGE_OPTIONS=
 
-BUILDPO=/mnt/nfs0/gildor/programmation/ocaml-gettext/build/share/locale/
-
 POFILES=$(addsuffix .po,$(LINGUAS))
 MOFILES=$(addsuffix .mo,$(LINGUAS))
 POTFILE=$(OCAML_GETTEXT_PACKAGE).pot
+
+ifneq ($(wildcard $(OCAML_GETTTEXT)),)
 
 all: install-buildpo
 
@@ -83,3 +87,10 @@ clean-po:
 	--uninstall-textdomain $(OCAML_GETTEXT_PACKAGE)                       \
 	--uninstall-orgdir $(BUILDPO) $(MOFILES)
 	-$(RM) $(MOFILES) 
+
+else
+
+clean::
+	-$(RM) $(MOFILES) 
+
+endif

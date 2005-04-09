@@ -55,6 +55,7 @@ clean:
 	-cd libgettext-camomile-ocaml && $(MAKE) clean
 	-cd libgettext-stub-ocaml     && $(MAKE) clean
 	-cd libgettext-ocaml          && $(MAKE) clean
+	-$(RM) -r $(BUILDDIR)
 
 distclean: clean
 	-cd doc                       && $(MAKE) distclean
@@ -65,8 +66,7 @@ distclean: clean
 	-cd libgettext-camomile-ocaml && $(MAKE) distclean
 	-cd libgettext-stub-ocaml     && $(MAKE) distclean
 	-cd libgettext-ocaml          && $(MAKE) distclean
-	-$(RM) config.* TopMakefile
-	-$(RM) -r .libs
-	-$(RM) src/.depend
-	-$(RM) test/.depend
+	-$(RM) config.* ConfMakefile
 	-$(RM) -r autom4te.cache config.log config.cache config.status
+
+-include ConfMakefile

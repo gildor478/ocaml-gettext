@@ -1,6 +1,7 @@
 ##########################################################################
 #  Ocaml-gettext : a library to translate messages                       #
 #                                                                        #
+#  Copyright (C) 2001 Jean-Christophe FILLIATRE                          #
 #  Copyright (C) 2003, 2004, 2005 Sylvain Le Gall <sylvain@le-gall.net>  #
 #                                                                        #
 #  This library is free software; you can redistribute it and/or         #
@@ -22,40 +23,52 @@
 #  Contact: sylvain@le-gall.net                                          #
 ##########################################################################
 
-include ../ConfMakefile
+# where to install the binaries
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+BINDIR =@bindir@
+LIBDIR =@libdir@
+MANDIR =@mandir@
+DOCDIR =@docdir@
 
-ifeq ($(BUILD_CAMOMILE),yes)
+# programs to build an compile
+OCAMLFIND_COMMANDS = "ocamlc=@OCAMLC@ \
+	ocamlopt=@OCAMLOPT@ \
+	ocamldep=@OCAMLDEP@"
+OCAMLC       = @OCAMLFIND@ ocamlc 
+OCAMLOPT     = @OCAMLFIND@ ocamlopt
+OCAMLDEP     = @OCAMLFIND@ ocamldep
+OCAMLBEST    = @OCAMLBEST@
+OCAMLVERSION = @OCAMLVERSION@
+OCAMLWIN32   = @OCAMLWIN32@
+OCAMLFIND    = @OCAMLFIND@
+OCAMLP4      = @OCAMLP4@
+OCAMLMKLIB   = @OCAMLMKLIB@
+CAMLIDL      = @CAMLIDL@
+OCAMLYACC    = @OCAMLYACC@
+OCAMLLEX     = @OCAMLLEX@
+EXE          = @EXE@
+MKCAMLP4     = @MKCAMLP4@
+XSLTPROC     = @XSLTPROC@
+XMLLINT      = @XMLLINT@
+OCAMLDOC     = @OCAMLDOC@
+FOP          = @FOP@
+MKDIR        = mkdir
+CP           = cp -f
+TOUCH        = touch
 
-NAME       = gettext-camomile
-CMO        =       
-LIBRARY    = true
-REQUIRES   = gettext.extension camomile
-PREDICATES =
-INSTALLIB  = META
+# stylesheets
+HTMLXSL = @DOCBOOK_STYLESHEET@/xhtml/chunk.xsl
+MANXSL  = @DOCBOOK_STYLESHEET@/manpages/docbook.xsl
+FOXSL   = @DOCBOOK_STYLESHEET@/fo/docbook.xsl
 
-all:
+# temporary build directory
+BUILDDIR  = @BUILDDIR@
 
-distclean::
-	-$(RM) META
+# build target
+BUILD_CAMOMILE=@BUILD_CAMOMILE@
+BUILD_STUB=@BUILD_STUB@
 
-##########################
-# Ocaml Gettext Camomile #
-##########################
-
-REQUIRES += camomile
-
-INSTALLIB +=          \
- gettextCamomile.cma  \
- gettextCamomile.cmxa \
- gettextCamomile.a    \
- gettextCamomile.cmi
-
-CMO_CAMOMILE=         \
- gettextCamomile.cmo
-
-gettextCamomile.cma: $(CMO_CAMOMILE)
-gettextCamomile.cmxa: $(CMO_CAMOMILE:.cmo=.cmx)
-
-endif
-
-include ../TopMakefile
+# configuration
+STUB_LDFLAGS=@STUB_LDFLAGS@
+STUB_CFLAGS=@STUB_CFLAGS@

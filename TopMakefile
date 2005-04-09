@@ -23,51 +23,12 @@
 #  Contact: sylvain@le-gall.net                                          #
 ##########################################################################
 
-# where to install the binaries
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-BINDIR =@bindir@
-LIBDIR =@libdir@
-MANDIR =@mandir@
-DOCDIR =@docdir@
+# destination dir
 DOCHTML=$(DOCDIR)/html
 DOCODOC=$(DOCHTML)
 DOCPDF =$(DOCDIR)
 
-
-
-# other variables set by ./configure
-OCAMLFIND_COMMANDS = "ocamlc=@OCAMLC@ \
-	ocamlopt=@OCAMLOPT@ \
-	ocamldep=@OCAMLDEP@"
-OCAMLC       = @OCAMLFIND@ ocamlc 
-OCAMLOPT     = @OCAMLFIND@ ocamlopt
-OCAMLDEP     = @OCAMLFIND@ ocamldep
-OCAMLBEST    = @OCAMLBEST@
-OCAMLVERSION = @OCAMLVERSION@
-OCAMLWIN32   = @OCAMLWIN32@
-OCAMLFIND    = @OCAMLFIND@
-OCAMLP4      = @OCAMLP4@
-OCAMLMKLIB   = @OCAMLMKLIB@
-CAMLIDL      = @CAMLIDL@
-OCAMLYACC    = @OCAMLYACC@
-OCAMLLEX     = @OCAMLLEX@
-EXE          = @EXE@
-MKCAMLP4     = @MKCAMLP4@
-XSLTPROC     = xsltproc
-XMLLINT      = xmllint
-OCAMLDOC     = ocamldoc
-FOP          = fop
-MKDIR        = mkdir
-CP           = cp -f
-TOUCH        = touch
-
-# Stylesheets
-HTMLXSL = /usr/share/xml/docbook/stylesheet/nwalsh/xhtml/chunk.xsl
-MANXSL  = /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
-FOXSL   = /usr/share/xml/docbook/stylesheet/nwalsh/fo/docbook.xsl
-
-# Programs flags
+# programs flags
 FOPFLAGS      = 
 XSLTPROCFLAGS = --xinclude
 XMLLINTFLAGS  = --xinclude --noent --noout --postvalid
@@ -87,7 +48,6 @@ endif
 
 CLI_OCAMLFIND = $(CLI_REQUIRES) $(CLI_PREDICATES) $(CLI_SYNTAX)
 
-BUILDDIR  = @BUILDDIR@
 BUILDLIB  = $(BUILDDIR)/lib
 BUILDBIN  = $(BUILDDIR)/bin
 BUILDDOC  = $(BUILDDIR)/share/doc
@@ -95,6 +55,7 @@ BUILDHTML = $(BUILDDOC)/html
 BUILDMAN  = $(BUILDDIR)/share/man
 BUILDODOC = $(BUILDHTML)/api
 BUILDPDF  = $(BUILDDOC)
+BUILDPO   = $(BUILDDIR)/share/locale
 
 OCAMLPATH:=$(BUILDLIB)/:$(OCAMLPATH)
 export OCAMLPATH

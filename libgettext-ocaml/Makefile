@@ -135,4 +135,5 @@ INSTALLIB +=        \
 
 pr_gettext.cmo: REQUIRES=ast-analyze
 
+include ../ConfMakefile
 include ../TopMakefile

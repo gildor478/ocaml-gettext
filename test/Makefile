@@ -41,6 +41,7 @@ clean:: clean-bench
 
 distclean::
 	
+include ../ConfMakefile
 include ../TopMakefile
 
 all-bench install-bench uninstall-bench clean-bench: NAME = bench

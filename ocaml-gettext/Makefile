@@ -22,6 +22,17 @@
 #  Contact: sylvain@le-gall.net                                          #
 ##########################################################################
 
+include ../ConfMakefile
+
+ifeq ($(BUILD_CAMOMILE),yes)
+GETTEXT_MODULES=CAMOMILE
+else
+ifeq ($(BUILD_STUB),yes)
+GETTEXT_MODULES=STUB
+endif
+endif
+
+ifdef GETTEXT_MODULES
 #################################
 # Ocaml Gettext utility program #
 #################################
@@ -65,4 +76,4 @@ clean::
 	-$(RM) $(BUILDBIN)/ocaml-xgettext
 	-$(if $(wildcard $(BUILDBIN)/*), ,$(RM) -r $(BUILDBIN))
 	-$(if $(wildcard $(BUILDDIR)/*), ,$(RM) -r $(BUILDDIR))
-
+endif

@@ -22,6 +22,10 @@
 #  Contact: sylvain@le-gall.net                                          #
 ##########################################################################
 
+include ../ConfMakefile
+
+ifeq ($(BUILD_STUB),yes)
+
 NAME       = gettext-stub
 CMO        =       
 LIBRARY    = true
@@ -56,10 +60,11 @@ gettextStubCompat.cmo: gettextStubCompat.cmi
 gettextStubCompat.cmx: gettextStubCompat.cmi
 gettextStub.cma: $(CMO_STUB)
 gettextStub.cmxa: $(CMO_STUB:.cmo=.cmx)
-gettextStub.cma gettextStub.cmxa: STUBSOBJS = -L$(OCAMLLIB) -lcamlidl
+gettextStub.cma gettextStub.cmxa: STUBSOBJS = $(STUB_LDFLAGS) -L$(OCAMLLIB) -lcamlidl
 
 clean::
 	-$(RM) gettextStubCompat.ml gettextStubCompat.mli 
 	-$(RM) gettextStubCompat.h gettextStubCompat_stubs.c 
+endif
 
 include ../TopMakefile
