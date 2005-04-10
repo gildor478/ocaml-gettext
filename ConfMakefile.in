@@ -30,6 +30,7 @@ BINDIR =@bindir@
 LIBDIR =@libdir@
 MANDIR =@mandir@
 DOCDIR =@docdir@
+OCAMLLIB=@OCAMLLIB@
 
 # programs to build an compile
 OCAMLFIND_COMMANDS = "ocamlc=@OCAMLC@ \

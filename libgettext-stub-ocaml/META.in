@@ -23,7 +23,7 @@
 ##########################################################################
 
 version = "@VERSION@"
-predicates = "gettext.extension"
+requires = "gettext.extension"
 archive(byte) = "gettextStub.cma"
 archive(native) = "gettextStub.cmxa"
 
