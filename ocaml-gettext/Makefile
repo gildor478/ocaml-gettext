@@ -41,7 +41,15 @@ NAME       = ocaml-gettext
 CMO        = ocaml-gettext.cmo      
 REQUIRES   = gettext.extension fileutils
 
+ifeq ($(GETTEXT_MODULES),CAMOMILE)
 REQUIRES  += gettext-camomile
+INCLUDES  += -pp 'camlp4o -I +camlp4 pa_macro.cmo -DCAMOMILE'
+endif
+
+ifeq ($(GETTEXT_MODULES),STUB)
+REQUIRES  += gettext-stub
+INCLUDES  += -pp 'camlp4o -I +camlp4 pa_macro.cmo -DSTUB'
+endif
 
 include ../TopMakefile
 

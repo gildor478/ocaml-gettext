@@ -38,7 +38,16 @@ module OcamlGettext = Gettext.Program(struct
   let codeset      = None
   let dir          = None
   let dependencies = Gettext.init
-  let realize      = GettextCamomile.Open.realize
+  let realize      = 
+    IFDEF CAMOMILE THEN
+      GettextCamomile.Open.realize
+    ELSE
+      IFDEF STUB THEN
+        GettextStub.Native.realize
+      ELSE
+        Gettext.Dummy.realize
+      ENDIF
+    ENDIF
 end)
 ;;
 
