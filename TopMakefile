@@ -285,7 +285,7 @@ uninstall-doc-man: clean-doc-man
 .SUFFIXES: .mli .ml .cmi .cmo .cmx .mll .mly .zog .idl .h .o
 
 %.ml %.mli %.h %_stubs.c: %.idl
-	$(CAMLIDL) -no-include $<
+	$(CAMLIDL) -nocpp -no-include $<
 
 .c.o:
 	$(OCAMLC) $(INCLUDES) -c $<	

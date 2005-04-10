@@ -29,7 +29,7 @@ exec_prefix=@exec_prefix@
 BINDIR =@bindir@
 LIBDIR =@libdir@
 MANDIR =@mandir@
-DOCDIR =@docdir@
+DOCDIR =@DOCDIR@
 OCAMLLIB=@OCAMLLIB@
 
 # programs to build an compile

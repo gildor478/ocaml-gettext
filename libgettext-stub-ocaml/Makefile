@@ -32,6 +32,7 @@ LIBRARY    = true
 REQUIRES   = gettext.extension
 PREDICATES =
 INSTALLIB  = META
+INCLUDES   = $(STUB_CFLAGS)
 
 all:
 
@@ -60,7 +61,7 @@ gettextStubCompat.cmo: gettextStubCompat.cmi
 gettextStubCompat.cmx: gettextStubCompat.cmi
 gettextStub.cma: $(CMO_STUB)
 gettextStub.cmxa: $(CMO_STUB:.cmo=.cmx)
-gettextStub.cma gettextStub.cmxa: STUBSOBJS = $(STUB_LDFLAGS) -L$(OCAMLLIB) -lcamlidl
+gettextStub.cma gettextStub.cmxa: STUBSOBJS = $(STUB_LDFLAGS)
 
 clean::
 	-$(RM) gettextStubCompat.ml gettextStubCompat.mli 
