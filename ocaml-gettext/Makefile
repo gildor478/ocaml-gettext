@@ -74,7 +74,7 @@ ocaml-xgettext: $(BUILDBIN)
 
 
 ocaml-xgettext-install:
-	$(CP) ocaml-xgettext $(BINDIR)
+	$(CP) ocaml-xgettext $(BINDIR)/
 
 ocaml-xgettext-uninstall:
 	-$(RM) $(BINDIR)/ocaml-xgettext 

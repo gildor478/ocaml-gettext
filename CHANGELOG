@@ -1,3 +1,11 @@
 v 0.2 :
-  * Building the mo reader
-  * Building the po reader
+  * Full rewrite of ocaml-gettext.
+  * Contains two version of the gettext engine : one is based on a purely OCaml approach ( gettext-camomile ),
+   one is base on the former one ( gettext-stub ).
+  * The two engines shared a common interface based on gettext.base module.
+  * Most of the encoding/settings choice are accessible through command line option.
+  * Simplify the functions to accesse to gettext : 4 functions to translate
+  * Rebuild the string extractor with as a camlp4 analyzer
+  * Write test and benchmark program for maintaing the quality 
+  * Write an example
+  * Write a manual

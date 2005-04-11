@@ -134,7 +134,7 @@ install-lib-opt: $(INSTALLIB)
 install-lib-opt: install-lib-common
 	
 install-lib-common:
-	$(OCAMLFIND) install -destdir $(LIBDIR) $(NAME) $(REAL_INSTALLIB)
+	$(OCAMLFIND) install $(if $(LDCONF),-ldconf $(LDCONF)) -destdir $(LIBDIR) $(NAME) $(REAL_INSTALLIB)
 
 uninstall-lib:
 	-$(OCAMLFIND) remove -destdir $(LIBDIR) $(NAME)
@@ -152,20 +152,20 @@ BLIBS = $(addsuffix .cma,$(LIBS))
 install-buildprog-byte: $(BUILDBIN) $(CMO)
 	$(OCAMLC) -o $(NAME) $(INCLUDES) -package "$(REQUIRES)" -linkpkg \
 	-predicates "$(PREDICATES)" $(BLIBS) $(CMO)
-	$(CP) $(NAME) $(BUILDBIN)
+	$(CP) $(NAME) $(BUILDBIN)/
 
 install-prog-byte: install-buildprog-byte
-	$(CP) $(NAME) $(BINDIR)
+	$(CP) $(NAME) $(BINDIR)/
 
 OLIBS = $(addsuffix .cmxa,$(LIBS))
 
 install-buildprog-opt: $(BUILDBIN) $(CMX)
 	$(OCAMLOPT) -o $(NAME) $(INCLUDES) -package "$(REQUIRES)" -linkpkg \
 	-predicates "$(PREDICATES)" $(OLIBS) $(CMX)
-	$(CP) $(NAME) $(BUILDBIN)
+	$(CP) $(NAME) $(BUILDBIN)/
 
 install-prog-opt: install-buildprog-opt
-	$(CP) $(NAME) $(BINDIR)
+	$(CP) $(NAME) $(BINDIR)/
 
 clean-prog:
 	-$(RM) $(NAME)
@@ -185,13 +185,13 @@ $(BUILDPDF)/%.pdf: %.fo
 install-builddoc-pdf: $(PDF_TARGETS)
 
 clean-doc-pdf:
-	-$(RM) $(PDF_TARGETS)
+	-$(if $(PDF_TARGETS),$(RM) $(PDF_TARGETS))
 
 install-doc-pdf:
-	$(CP) $(PDF_TARGETS) $(DOCPDF)
+	$(if $(PDF_TARGETS),$(CP) $(PDF_TARGETS) $(DOCPDF))
 
 uninstall-doc-pdf:
-	$(RM) $(foreach i,$(DOCPDF)/$(notdir $(i)),$(PDF_TARGETS))
+	-$(if $(PDF_TARGETS),$(RM) $(foreach i,$(DOCPDF)/$(notdir $(i)),$(PDF_TARGETS)))
 	
 
 # Build OCaml documentaiton
@@ -205,13 +205,13 @@ $(BUILDODOC)/%/index.html:
 install-builddoc-odoc: $(ODOC_TARGETS)
 
 clean-doc-odoc: 
-	-$(RM) -r $(dir $(ODOC_TARGETS))
+	-$(if $(ODOC_TARGETS),$(RM) -r $(dir $(ODOC_TARGETS)))
 
 install-doc-odoc:
-	$(CP) -r $(dir $(ODOC_TARGETS)) $(DOCODOC)
+	$(if $(ODOC_TARGETS),$(CP) -r $(dir $(ODOC_TARGETS)) $(DOCODOC))
 
 uninstall-doc-odoc: clean-doc-odoc
-	-$(RM) -r $(foreach i,$(DOCODOC)/$(notdir $(dir $(i))),$(ODOC_TARGETS))
+	-$(if $(ODOC_TARGETS),$(RM) -r $(foreach i,$(DOCODOC)/$(notdir $(dir $(i))),$(ODOC_TARGETS)))
 
 # Build HTML files
 
@@ -225,13 +225,13 @@ $(BUILDHTML)/%/index.html: %.xml
 install-builddoc-html: $(HTML_TARGETS)
 
 clean-doc-html: 
-	-$(RM) -r $(dir $(HTML_TARGETS))
+	-$(if $(HTML_TARGETS),$(RM) -r $(dir $(HTML_TARGETS)))
 	
 install-doc-html: install-builddoc-html
-	$(CP) -r $(dir $(HTML_TARGETS)) $(DOCHTML)
+	$(if $(HTML_TARGETS),$(CP) -r $(dir $(HTML_TARGETS)) $(DOCHTML))
 
 uninstall-doc-html: clean-doc-html
-	-$(RM) -r $(foreach i,$(DOCHTML)/$(notdir $(dir $(i))),$(DOC_TARGETS))
+	-$(if $(HTML_TARGETS),$(RM) -r $(foreach i,$(DOCHTML)/$(notdir $(dir $(i))),$(HTML_TARGETS)))
 
 # Build MAN files
 
@@ -268,17 +268,13 @@ endef
 install-builddoc-man: $(MAN_TARGETS)
 
 clean-doc-man:
-	-$(RM) $(MAN_TARGETS) $(foreach i,$(MAN_TARGETS),$(call MAN_BUILD_TARGETS,$(i)))
+	-$(if $(MAN_TARGETS),$(RM) $(MAN_TARGETS) $(foreach i,$(MAN_TARGETS),$(call MAN_BUILD_TARGETS,$(i))))
 
 install-doc-man: install-builddoc-man
-	$(CP) -r $(BUILDMAN) $(MANDIR)
+	$(if $(MAN_TARGETS),$(CP) -r $(BUILDMAN) $(MANDIR))
 
 uninstall-doc-man: clean-doc-man
-	-$(RM) $(foreach i,$(MAN_TARGETS),$(call MAN_INSTALL_TARGETS,$(i)))
-
-
-
-
+	-$(if $(MAN_TARGETS),$(RM) $(foreach i,$(MAN_TARGETS),$(call MAN_INSTALL_TARGETS,$(i))))
 
 # Extra files
 
