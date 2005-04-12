@@ -22,9 +22,12 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
-(** Concrete implementation based on native gettext library 
-    ( @see <http://www.gnu.org/software/gettext/gettext.html/> Gettext library ) 
+(** Concrete implementation based on native gettext library ( 
+  @see <http://www.gnu.org/software/gettext/gettext.html/> {Gettext library}
+  ) 
 *)
+
+(** {1 Concrete implementations} *)
 
 open GettextTypes;;
 open GettextUtils;;

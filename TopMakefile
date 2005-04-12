@@ -201,6 +201,7 @@ $(BUILDODOC)/%/index.html:
 	$(MKDIR) -p $(dir $@)
 	EXTRAFLAGS=`$(OCAMLFIND) query -i-format -r $(REQUIRES)`; \
 	$(OCAMLDOC) $(OCAMLDOCFLAGS) $$EXTRAFLAGS -d $(dir $@) -html $^
+	$(if $(EXTRAFILES),$(CP) $(EXTRAFILES) $(dir $@))
 
 install-builddoc-odoc: $(ODOC_TARGETS)
 
@@ -306,9 +307,6 @@ uninstall-doc-man: clean-doc-man
 
 .mly.mli:
 	$(OCAMLYACC) -v $<
-	
-.zog.ml:
-	$(OCAMLP4) pa_o.cmo pa_zog.cma  pr_o.cmo -impl $< > $@
 	
 clean:: $(if $(LIBRARY),clean-lib,clean-prog)
 	-$(RM) *.cm[ioxa] *.o *.cmxa *.a *.so

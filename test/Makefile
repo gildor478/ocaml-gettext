@@ -22,38 +22,43 @@
 #  Contact: sylvain@le-gall.net                                          #
 ##########################################################################
 
-REQUIRES   = fileutils gettext.extension gettext-camomile gettext-stub oUnit benchmark
+REQUIRES   = fileutils gettext.extension gettext-camomile gettext-stub
 TESTDIR    = tests
-CMO        = common.cmo bench.cmo test.cmo
+CMO        = common.cmo 
+ifeq ($(BUILD_BENCH),yes)
+NAME       = bench
+CMO       += bench.cmo
+REQUIRES  += benchmark
+else 
+ifeq ($(BUILD_TEST),yes)
+NAME       = test
+CMO       += test.cmo
+REQUIRES  += oUnit
+endif
+endif
 
-all: all-bench
-	$(MAKE) all-test
+include ../ConfMakefile
 
-install: install-bench
-	$(MAKE) install-test
+ifneq ($(DONT_RECURSE),yes)
+all:
+	$(MAKE) all BUILD_BENCH=$(BUILD_BENCH) DONT_RECURSE=yes
+	$(MAKE) all BUILD_TEST=$(BUILD_TEST) DONT_RECURSE=yes
 
-uninstall: uninstall-bench
-	$(MAKE) uninstall-test
+install:
+	$(MAKE) install BUILD_BENCH=$(BUILD_BENCH) DONT_RECURSE=yes
+	$(MAKE) install BUILD_TEST=$(BUILD_TEST) DONT_RECURSE=yes
 
-clean:: clean-bench
-	$(MAKE) clean-test
+uninstall: 
+	$(MAKE) uninstall BUILD_BENCH=$(BUILD_BENCH) DONT_RECURSE=yes
+	$(MAKE) uninstall BUILD_TEST=$(BUILD_TEST) DONT_RECURSE=yes
+
+clean:: 
+	-$(MAKE) clean BUILD_BENCH=$(BUILD_BENCH) DONT_RECURSE=yes
+	-$(MAKE) clean BUILD_TEST=$(BUILD_TEST) DONT_RECURSE=yes
 	-$(RM) -r $(TESTDIR)
 
 distclean::
+
+endif
 	
-include ../ConfMakefile
 include ../TopMakefile
-
-all-bench install-bench uninstall-bench clean-bench: NAME = bench
-all-bench install-bench uninstall-bench clean-bench: CMO  = common.cmo bench.cmo
-all-bench: all-$(OCAMLBEST)
-install-bench: install-$(OCAMLBEST)
-uninstall-bench: uninstall-prog
-clean-bench: clean-prog
-
-all-test install-test uninstall-test clean-test: NAME = test
-all-test install-test uninstall-test clean-test: CMO  = common.cmo test.cmo
-all-test: all-$(OCAMLBEST)
-install-test: install-$(OCAMLBEST)
-uninstall-test: uninstall-prog
-clean-test: clean-prog

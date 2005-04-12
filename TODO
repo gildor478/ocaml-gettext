@@ -4,6 +4,8 @@ v 0.2.0 :
 - Reread the code to improve general layout ( naming scheme, exception name... ie better style )
 - Intercept problem when recoding string ( charset ), errors should be wrap inside a failsafe or
   at least raise a coherent exception.
+- Create and export a gettext dummy module.
+- Use a module for Init rather than the function Realize.
 
 v 0.3.0 :
 - Better parse comments, to keep licence et al 

@@ -102,16 +102,16 @@ AC_SUBST(OCAMLVERSION)
 # AC_CHECK_OCAMLYACC([ACTION-IF-FOUND],[ACTION-IF-NOT-FOUND])
 #---------------------------------------------------------
 # Check for the existence of ocamlyacc ( or ocamlyacc.opt )
-# Subst OCAMLYACC, OCAMLVERSION variable.
+# Subst OCAMLYACC variable.
 AC_DEFUN([AC_CHECK_OCAMLYACC],
 [
-dnl Check the presence of ocamlc/ocamlc.opt and their version
+dnl Check the presence of ocamlyacc/ocamlyacc.opt and their version
 AC_CHECK_PROG(ac_ocaml_ocamlyacc,ocamlyacc,ocamlyacc)
 AC_CHECK_PROG(ac_ocaml_ocamlyacc_opt,ocamlyacc.opt,ocamlyacc.opt)
 if test "x$ac_ocaml_ocamlyacc" = "x" && test "x$ac_ocaml_ocamlyacc_opt" = "x"; then
   :
   $2
-elif test "x$ac_ocaml_ocamlyacc_opt" = "x"; then
+elif ! test "x$ac_ocaml_ocamlyacc_opt" = "x"; then
   OCAMLYACC=$ac_ocaml_ocamlyacc_opt
   $1
 else
@@ -119,8 +119,72 @@ else
   $1
 fi
 AC_SUBST(OCAMLYACC)
-AC_SUBST(OCAMLVERSION)
 ])
+
+# AC_CHECK_OCAMLFIND ([ACTION-IF-FOUND],[ACTION-IF-NOT-FOUND])
+#---------------------------------------------------------
+# Check for the existence of ocamlyacc ( or ocamlyacc.opt )
+# Subst OCAMLFIND variable.
+AC_DEFUN([AC_CHECK_OCAMLFIND],
+[
+dnl Check the presence of ocamlfind
+AC_CHECK_PROG(ac_ocaml_ocamlfind,ocamlfind,ocamlfind)
+if test "x$ac_ocaml_ocamlfind" = "x"; then
+  :
+  $2
+else
+  :
+  OCAMLFIND=$ac_ocaml_ocamlfind
+  $1
+fi
+AC_SUBST(OCAMLFIND)
+])
+
+# OCAMLFIND_CHECK_MODULE (MODULE,[ACTION-IF-FOUND],[ACTION-IF-NOT-FOUND])
+#---------------------------------------------------------
+# Check for the existence of the module using OCAMLFIND
+AC_DEFUN([OCAMLFIND_CHECK_MODULE],
+[
+AC_REQUIRE([AC_CHECK_OCAMLFIND])
+dnl Check the presence of module $1
+AC_MSG_CHECKING(for module $1)
+if ! test "x$OCAMLFIND" = "x" ; then
+  ac_ocaml_pkg_$1=`$OCAMLFIND query $1 2> /dev/null`
+  if ! test "x$ac_ocaml_pkg_$1" = "x"; then
+    AC_MSG_RESULT($ac_ocaml_pkg_$1)
+    $2
+  else
+    AC_MSG_RESULT(no)
+    $3
+  fi
+else
+  AC_MSG_RESULT(no)
+  $3
+fi
+])
+
+# AC_CHECK_[CAMLP4,CAMLIDL,OCAMLMKLIB,MKCAMLP4] ([ACTION-IF-FOUND],[ACTION-IF-NOT-FOUND])
+#---------------------------------------------------------
+# Subst the corresponding var
+AC_DEFUN([AC_CHECK_STAR],
+[
+AC_CHECK_PROG($1,$2,$2)
+if test "x$$1" = "x"; then
+  :
+  $4
+else
+  :
+  $3
+fi
+AC_SUBST($1)
+])
+AC_DEFUN([AC_CHECK_CAMLP4],     [AC_CHECK_STAR(CAMLP4,camlp4,$1,$2)])
+AC_DEFUN([AC_CHECK_CAMLIDL],    [AC_CHECK_STAR(CAMLIDL,camlidl,$1,$2)])
+AC_DEFUN([AC_CHECK_OCAMLMKLIB], [AC_CHECK_STAR(OCAMLMKLIB,ocamlmklib,$1,$2)])
+AC_DEFUN([AC_CHECK_MKCAMLP4],   [AC_CHECK_STAR(MKCAMLP4,mkcamlp4,$1,$2)])
+AC_DEFUN([AC_CHECK_OCAMLDOC],   [AC_CHECK_STAR(OCAMLDOC,ocamldoc,$1,$2)])
+AC_DEFUN([AC_CHECK_XSLTPROC],   [AC_CHECK_STAR(XSLTPROC,xsltproc,$1,$2)])
+AC_DEFUN([AC_CHECK_XMLLINT],    [AC_CHECK_STAR(XMLLINT,xmllint,$1,$2)])
 
 # AC_LIB_OCAML ()
 #---------------------------------------------------------
@@ -134,3 +198,67 @@ OCAMLLIB=`$OCAMLC -where`
 AC_MSG_RESULT($OCAMLLIB)
 AC_SUBST(OCAMLLIB)
 ])
+
+# AC_CHECK_XSL (VAR,config,DEFAULT_STYLESHEET,[ACTION-IF-OK],[ACTION-IF-NOT-OK])
+#---------------------------------------------------------
+# Check the presence and the possibility to validate
+# and apply the given stylesheet
+# Subst XSLTPROC, XMLLINT, DOCBOOK_STYLESHEET_VAR,
+AC_DEFUN([AC_CHECK_XSL],
+[
+AC_REQUIRE([AC_CHECK_XSLTPROC])
+AC_REQUIRE([AC_CHECK_XMLLINT])
+
+AC_ARG_WITH(docbook-stylesheet-$2,
+        AC_HELP_STRING([--with-docbook-stylesheet-$2=file], [Where to find the docbook stylesheet for $2 generation]),
+        $1=$withval, $1="$3")
+        
+AC_MSG_CHECKING(for $2 XSL)
+if ! test -e "$$1"; then
+  AC_MSG_RESULT(no)
+  $1=
+else
+  AC_MSG_RESULT($$1)
+fi
+
+if ! test "x$$1" = "x" && ! test "x$XSLTPROC" = "x"; then
+  :
+  $4
+else
+  :
+  $5
+fi
+
+AC_SUBST($1)
+])
+
+
+# AC_CHECK_HTMLXSL (DEFAULT_STYLESHEET,[ACTION-IF-OK],[ACTION-IF-NOT-OK])
+#---------------------------------------------------------
+# Check the possibility to generate HTML out of Docbook XML
+AC_DEFUN([AC_CHECK_HTMLXSL],
+[
+AC_CHECK_XSL(HTMLXSL,html,$1,$2,$3)
+]);
+
+# AC_CHECK_MANXSL (STYLESHEET,DEFAULT_STYLESHEET,[ACTION-IF-OK],[ACTION-IF-NOT-OK])
+#---------------------------------------------------------
+# Check the possibility to generate manpages out of Docbook XML
+AC_DEFUN([AC_CHECK_MANXSL],
+[
+AC_CHECK_XSL(MANXSL,manpages,$1,$2,$3)
+]);
+
+# AC_CHECK_PDFXSL (STYLESHEET,DEFAULT_STYLESHEET,[ACTION-IF-OK],[ACTION-IF-NOT-OK])
+#---------------------------------------------------------
+# Check the possibility to generate PDF out of Docbook XML
+AC_DEFUN([AC_CHECK_PDFXSL],
+[
+AC_CHECK_XSL(FOXSL,pdf,$1,$2,$3)
+AC_CHECK_PROG(FOP,fop,fop)
+if test "x$FOP" = "x"; then
+  AC_MSG_WARN(Cannot find fop.")
+  $4
+fi
+]);
+

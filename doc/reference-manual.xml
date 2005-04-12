@@ -288,7 +288,10 @@
                 <para>
                   If needed, you can use <command>./configure <option>--help</option></command> 
                   to have a complete help on every option you can use to tweak the 
-                  installation of ocaml-gettext.
+                  installation of ocaml-gettext. To enable documentation generation, use 
+                  <option>--enable-doc</option>. To enable benchmark executable, use 
+                  <option>--enable-bench</option>. To enable test executable, use 
+                  <option>--enable-test</option>.
                 </para>
               </footnote>
             </para>
@@ -305,17 +308,7 @@
           </listitem>
           <listitem>
             <para>
-              <command>make doc</command><footnoteref linkend="build-doc"/>
-            </para>
-          </listitem>
-          <listitem>
-            <para>
               <command>cd test</command>
-            </para>
-          </listitem>
-          <listitem>
-            <para>
-              <command>make</command>
             </para>
           </listitem>
           <listitem>

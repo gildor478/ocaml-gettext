@@ -23,25 +23,28 @@
 (**************************************************************************)
 
 (** Gettext functions *)
-(** This module defines all the function required to use gettext. The primary
-* design is to use applicative function. The "side effect" of such a choice is
-* that you must defines, before using any function, all the text domains,
-* codeset et al. When building a library, you should define a function
-* "gettext_init" that will bind all the required stuff.
-* The only function missing here is the "realize" function. This function is
-* defined in the real implementation library provided with this modules ( see
-* GettextDummy, GettextCamomile and GettextStub ).
-**)
 
-(** Exception *)
+(** This module defines all the function required to use gettext. The primary
+    design is to use applicative function. The "side effect" of such a choice is
+    that you must defines, before using any function, all the text domains,
+    codeset et al. When building a library, you should define a function
+    "gettext_init" that will bind all the required stuff.
+    The only function missing here is the "realize" function. This function is
+    defined in the real implementation library provided with this modules ( see
+    @see <GettextDummy.html> GettextDummy, 
+    {!GettextCamomile} and 
+    {!GettextStub} ).
+*)
+
+(** {1 Exception} *)
 
 val string_of_exception : exn -> string
 ;;
 
-(** High level interfaces *)
+(** {1 High level interfaces} *)
 
 (** Value of the dependencies for the initialization of the library 
-    Gettext ( for translating exception and help message 
+    Gettext ( for translating exception and help message )
 *)
 val init : GettextTypes.dependencies
 ;;
