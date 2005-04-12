@@ -96,6 +96,7 @@ CMX = $(patsubst dll%.so, lib%.a, $(CMO:.cmo=.cmx))
 
 
 # Build the lib
+ONLY_BYTE=$(filter-out %.o,$(filter-out %.a,$(filter-out %.cmx, $(filter-out %.cmxa,$(1))))) $(filter lib%.a,$(1))
 
 %.cmxa %.a %.so:
 	$(if $(STUBSOBJS),                     \
@@ -111,10 +112,9 @@ CMX = $(patsubst dll%.so, lib%.a, $(CMO:.cmo=.cmx))
 
 $(BUILDLIB):
 	mkdir -p $(BUILDLIB)
-
-# BUG : need a serious rewrite 
-install-buildlib-byte: REAL_INSTALLIB = $(filter-out %.cmx, $(filter-out %.cmxa,$(INSTALLIB)))
-install-buildlib-byte: $(filter-out %.cmx, $(filter-out %.cmxa,$(INSTALLIB)))
+	
+install-buildlib-byte: REAL_INSTALLIB = $(call ONLY_BYTE,$(INSTALLIB))
+install-buildlib-byte: $(call ONLY_BYTE,$(INSTALLIB))
 install-buildlib-byte: install-buildlib-common
 
 install-buildlib-opt: REAL_INSTALLIB =  $(INSTALLIB)
@@ -125,8 +125,8 @@ install-buildlib-common: $(BUILDLIB)
 	-$(OCAMLFIND) remove -destdir $(BUILDLIB) $(NAME) 
 	$(OCAMLFIND)  install -ldconf ignore -destdir $(BUILDLIB) $(NAME) $(REAL_INSTALLIB)
 
-install-lib-byte: REAL_INSTALLIB = $(filter-out %.o,$(filter-out %.a,$(filter-out %.cmx, $(filter-out %.cmxa,$(INSTALLIB)))))
-install-lib-byte: $(filter-out %.o,$(filter-out %.a,$(filter-out %.cmx, $(filter-out %.cmxa,$(INSTALLIB)))))
+install-lib-byte: REAL_INSTALLIB = $(call ONLY_BYTE,$(INSTALLIB))
+install-lib-byte: $(call ONLY_BYTE,$(INSTALLIB))
 install-lib-byte: install-lib-common
 
 install-lib-opt: REAL_INSTALLIB =  $(INSTALLIB)

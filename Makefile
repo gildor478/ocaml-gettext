@@ -28,7 +28,7 @@ all:
 	cd libgettext-camomile-ocaml && $(MAKE) all
 	cd ocaml-gettext             && $(MAKE) all
 	cd po                        && $(MAKE) all
-	cd doc                       && $(MAKE) all
+#	cd doc                       && $(MAKE) all
 
 install:
 	cd libgettext-ocaml          && $(MAKE) install

@@ -30,7 +30,7 @@ OCAML_GETTEXT_PACKAGE = ocaml-gettext
 LINGUAS=$(shell cat LINGUAS)
 SOURCES=POTFILES
 
-OCAML_GETTEXT=$(BUILBIN)/ocaml-gettext
+OCAML_GETTEXT=$(BUILDBIN)/ocaml-gettext
 OCAML_GETTEXT_EXTRACT_OPTIONS=--extract-command ../build/bin/ocaml-xgettext
 OCAML_GETTEXT_COMPILE_OPTIONS=
 OCAML_GETTEXT_INSTALL_OPTIONS=
@@ -39,8 +39,6 @@ OCAML_GETTEXT_MERGE_OPTIONS=
 POFILES=$(addsuffix .po,$(LINGUAS))
 MOFILES=$(addsuffix .mo,$(LINGUAS))
 POTFILE=$(OCAML_GETTEXT_PACKAGE).pot
-
-ifneq ($(wildcard $(OCAML_GETTTEXT)),)
 
 all: install-buildpo
 
@@ -67,17 +65,17 @@ $(BUILDPO):
 
 .PRECIOUS: $(POTFILE) 
 
-install-buildpo: $(MOFILES) $(BUILDPO)
+install-buildpo: $(MOFILES) $(BUILDPO) $(OCAML_GETTEXT)
 	$(OCAML_GETTEXT) --action install $(OCAML_GETTEXT_INSTALL_OPTIONS)    \
 	--install-textdomain $(OCAML_GETTEXT_PACKAGE)                         \
 	--install-destdir $(BUILDPO) $(MOFILES)
 
-install-po: $(MOFILES) 
+install-po: $(MOFILES) $(OCAML_GETTEXT)
 	$(OCAML_GETTEXT) --action install $(OCAML_GETTEXT_INSTALL_OPTIONS)    \
 	--install-textdomain $(OCAML_GETTEXT_PACKAGE)                         \
 	--install-destdir $(PODIR) $(MOFILES)
 
-uninstall-po:
+uninstall-po: $(OCAML_GETTEXT)
 	$(OCAML_GETTEXT) --action uninstall $(OCAML_GETTEXT_INSTALL_OPTIONS)  \
 	--uninstall-textdomain $(OCAML_GETTEXT_PACKAGE)                       \
 	--uninstall-orgdir $(PODIR) $(MOFILES)
@@ -87,10 +85,3 @@ clean-po:
 	--uninstall-textdomain $(OCAML_GETTEXT_PACKAGE)                       \
 	--uninstall-orgdir $(BUILDPO) $(MOFILES)
 	-$(RM) $(MOFILES) 
-
-else
-
-clean::
-	-$(RM) $(MOFILES) 
-
-endif

@@ -1,5 +1,4 @@
 v 0.2.0 : 
-- Enable compilation on non native platform ( there is a problem when installing .a file in stub ).
 - Check all exported functions ( cf GettextUtils )
 - Correct the BUG: related to bug from ocaml-fileutils
 - Reread the code to improve general layout ( naming scheme, exception name... ie better style )
