@@ -22,9 +22,8 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
-(** Concrete implementation based on camomile ( 
-  @see <http://camomile.sourceforge.net/> {Camomile library}
-  ) 
+(** Concrete implementation based on camomile. 
+  @see <http://camomile.sourceforge.net/> Camomile library
 *)
 
 open Camomile;;
@@ -35,6 +34,7 @@ open GettextTypes;;
 (** Charset module, that is derived directly from the camomile library. *)
 module Charset : GettextCharset.CHARSET_TYPE =
   struct
+    (**/**)
     type encoding = string
     type u = {
       failsafe : failsafe;
@@ -57,6 +57,7 @@ module Charset : GettextCharset.CHARSET_TYPE =
 
 (** Implementation based on a Map storage for string. *)
 module Map : GettextRealize.REALIZE_TYPE =
+ (**/**)
  GettextRealize.Generic 
  (GettextTranslate.Map)     (* Map translation *)
  (Charset)                  (* Camomile charset *)
@@ -74,6 +75,7 @@ module Hashtbl : GettextRealize.REALIZE_TYPE =
 (** Low memory and fast initializtion implementation, files are opened only when needed. 
  *)
 module Open : GettextRealize.REALIZE_TYPE =
+ (**/**)
  GettextRealize.Generic 
  (GettextTranslate.Open)    (* Open translation *)
  (Charset)                  (* Camomile charset *)

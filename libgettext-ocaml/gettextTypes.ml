@@ -56,15 +56,163 @@ type failsafe =
   | RaiseException
 ;;
 
+module MapString = Map.Make (struct
+  type t      = string
+  let compare = String.compare
+end)
+;;
+ 
+module MapTextdomain = Map.Make (struct
+  type t      = textdomain
+  let compare = String.compare
+end)
+;;
+
+(** Core types of ocaml-gettext library *)
+
+type t = {
+  failsafe    : failsafe;
+  textdomains : ((codeset option) * (dir option)) MapTextdomain.t;
+  categories  : locale MapCategory.t;
+  language    : locale option;
+  codeset     : codeset;
+  path        : dir list;
+  default     : textdomain;
+}
+;;
+  
+type t' = bool -> textdomain option -> string -> (string * int) option -> category -> string
+;;
+
+type dependencies = (textdomain * (codeset option) * (dir option)) list
+;;
+
+module type Init = 
+  sig
+    val textdomain : textdomain
+    val codeset    : codeset option
+    val dir        : dir option
+    val dependencies : dependencies
+  end
+;;
+  
+type realize = t -> t'
+;;
+
+module type InitProgram =
+  sig
+    include Init
+
+    val realize : realize
+  end
+;;
+
+
+(** {1 Exceptions} *)
+
+(** Filename wich generates the error message str 
+  *)
+exception CompileProblemReadingFile of filename * string;;
+(** While extracting filename the command str returns exit code i. 
+  *)
+exception CompileExtractionFailed of filename * string * int;;
+(** While extracting filename the command receive signal i. 
+  *)
+exception CompileExtractionInterrupted of filename * string * int;;
+(** Cannot the filename corresponding to a textdomain among the specified files. 
+  *)
+exception DomainFileDoesntExist of filename list;; 
+(** The two strings returned doesn't have the same meaning regarding [Printf]
+    syntax. 
+  *)
+exception FormatInconsistent of string * string;;
+(** A part of the code try to translate a string, but gettext is not
+    initialized. 
+  *)
+exception GettextUninitialized;;
+(** There is an invalid field in the content information of a MO file.
+  *)
+exception MoInvalidOptions of Lexing.lexbuf * string;;
+(** The plural-form field is not correct.
+  *)
+exception MoInvalidPlurals of Lexing.lexbuf * string;;
+(** The content-type field is not correct.
+  *)
+exception MoInvalidContentType of Lexing.lexbuf * string;;
+(** A plural translation of a singular string has occured.
+  *)
+exception MoInvalidTranslationSingular of string * int;;
+(** An out-of-bound plural translation has occured.
+  *)
+exception MoInvalidTranslationPlural of (string list) * int;;
+(** There is more plural translation than the number of plural forms.
+  *)
+exception MoJunk of string * string list;;
+(** 
+  *)
+exception MoEmptyEntry;;
+(** A MO corrupted file has been read.
+  *)
+exception MoInvalidFile;;
+(** The MO file specified a negative number of strings.
+  *)
+exception MoInvalidHeaderNegativeStrings;; 
+(** Offset of the string table is out of bound.
+  *)
+exception MoInvalidHeaderTableStringOutOfBound of range * range;;
+(** Offset of the translation table is out of bound.
+  *)
+exception MoInvalidHeaderTableTranslationOutOfBound of range * range;;
+(** String and translation table overlap.
+  *)
+exception MoInvalidHeaderTableTranslationStringOverlap of range * range;;
+(** The offset and length of a string entry leads to an access beyond the end
+    of the MO file.
+  *)
+exception MoInvalidStringOutOfBound of int * int;;
+(** The offset and length of a translation entry leads to an access beyond the end
+    of the MO file.
+  *)
+exception MoInvalidTranslationOutOfBound of int * int;;
+(** An error occured when trying to open a MO file.
+  *)
+exception MoCannotOpenFile of string;;
+(** A PO file cannot be parsed.
+  *)
+exception PoInvalidFile of string * Lexing.lexbuf * in_channel;;
+(** When parsing a PO file, found an out of order table indices in a plural
+    form.
+  *)
+exception PoFileInvalidIndex of string * int;;
+(** The PO file doesn't exist.
+  *)
+exception PoFileDoesntExist of string;;
+(** Cannot merge two PO files.
+  *)
+exception PoInconsistentMerge of string * string;;
+(** A string to translate cannot be found.
+  *)
+exception TranslateStringNotFound of string;;
+(** Cannot parse the POSIX representation of the locale.
+  *)
+exception LocalePosixUnparseable of string;;
+
+    
+(* We stop documentation here, for the gettext API reference, all those types
+   are internals : use at your own risk.
+ *)
+(**/**)
+
+(** {1 Extended types} *)
+
 type endianess = 
     BigEndian 
   | LittleEndian
 ;;
 
-(* Specification of .MO file *)
-(*
-   From GNU Gettext documentation 
-   ( http://www.gnu.org/software/gettext/manual/html_mono/gettext.html#SEC136 ).
+(** Specification of .MO file *)
+(**
+   @see <http://www.gnu.org/software/gettext/manual/html_mono/gettext.html#SEC136> GNU Gettext documentation.
 
    Format of MO file :
 
@@ -117,7 +265,6 @@ T + ((N-1)*8)| length & offset (N-1)th translation      |  | | | |
              +------------------------------------------+
 
 *)
-
 type mo_header = {
   endianess                : endianess;
   file_format_revision     : int32;
@@ -129,19 +276,19 @@ type mo_header = {
 }
 ;;
 
-(* Details associated with "" *)
-(* Project-Id-Version: PACKAGE VERSION\n        *)
-(* Report-Msgid-Bugs-To: \n                     *)
-(* POT-Creation-Date: 2004-05-31 16:53+0200\n   *)
-(* PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n    *)
-(* Last-Translator: FULL NAME <EMAIL@ADDRESS>\n *)
-(* Language-Team: LANGUAGE <LL@li.org>\n        *)
-(* MIME-Version: 1.0\n                          *)
-(* Content-Type: text/plain; charset=CHARSET\n  *)
-(* Content-Transfer-Encoding: 8bit\n            *)
-(* Plural-Forms: specific ( 0 is false and 1 is *)
-(* true                                         *)
-
+(** Details associated with "" 
+    Project-Id-Version: PACKAGE VERSION\n        
+    Report-Msgid-Bugs-To: \n                     
+    POT-Creation-Date: 2004-05-31 16:53+0200\n   
+    PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n    
+    Last-Translator: FULL NAME <EMAIL@ADDRESS>\n 
+    Language-Team: LANGUAGE <LL@li.org>\n        
+    MIME-Version: 1.0\n                          
+    Content-Type: text/plain; charset=CHARSET\n  
+    Content-Transfer-Encoding: 8bit\n            
+    Plural-Forms: specific ( 0 is false and 1 is 
+    true                                         
+  *)
 type mo_translation = {
   project_id_version        : string option;
   report_msgid_bugs_to      : string option;
@@ -161,39 +308,6 @@ type mo_translation = {
 }
 ;;
 
-
-module MapString = Map.Make (struct
-  type t      = string
-  let compare = String.compare
-end)
-;;
- 
-module MapTextdomain = Map.Make (struct
-  type t      = textdomain
-  let compare = String.compare
-end)
-;;
-
-module MapCategory = Map.Make (struct 
-  type t      = category
-  let compare a b = 
-    let val_category x = 
-      match x with 
-        LC_CTYPE    -> 0 
-      | LC_NUMERIC  -> 1
-      | LC_TIME     -> 2
-      | LC_COLLATE  -> 3
-      | LC_MONETARY -> 4
-      | LC_MESSAGES -> 5
-      | LC_ALL      -> 6
-    in
-    compare (val_category a) (val_category b)
-end)
-;;
-
-type location = filename * int
-;;
-
 (** Base type of MO content : translation of string. The first string members are
     the string identifier ( singular form ). 
 *)
@@ -210,9 +324,15 @@ type po_translation =
 | PoPlural of (string list) * ( string list ) * ( string list ) list
 ;;
 
+(** PO string localizator : represents in which file/lineno a string can be
+    found 
+  *)
+type po_location = filename * int
+;;
+
 (** Mapping of PO content using the string identifier as the key.
 *)
-type translations = (location list * po_translation) MapString.t
+type translations = (po_location list * po_translation) MapString.t
 ;;
 
 (** Content of a PO file. Since comments should be saved, and that we only save
@@ -225,92 +345,4 @@ type po_content = {
 }
 ;;
 
-(** Core types of ocaml-gettext library *)
-
-type t = {
-  failsafe    : failsafe;
-  textdomains : ((codeset option) * (dir option)) MapTextdomain.t;
-  categories  : locale MapCategory.t;
-  language    : locale option;
-  codeset     : codeset;
-  path        : dir list;
-  default     : textdomain;
-}
-;;
-  
-type t' = bool -> textdomain option -> string -> (string * int) option -> category -> string
-;;
-
-type dependencies = (textdomain * (codeset option) * (dir option)) list
-;;
-
-module type Init = 
-  sig
-    val textdomain : textdomain
-    val codeset    : codeset option
-    val dir        : dir option
-    val dependencies : dependencies
-  end
-;;
-  
-type realize = t -> t'
-;;
-
-module type InitProgram =
-  sig
-    include Init
-
-    val realize : realize
-  end
-;;
-
-
-(** Exceptions *)
-
-(** From GettextCompile *)
-
-(** filename wich generates the error message str *)
-exception ProblemReadingFile of filename * string;;
-(** while extracting filename the command str returns exit code i *)
-exception ExtractionFailed of filename * string * int;;
-(** while extracting filename the command receive signal i *)
-exception ExtractionInterrupted of filename * string * int;;
-
-(** From GettextDomain *)
-exception DomainFileDoesntExist of filename list;; 
-
-(** From GettextFormat *)
-exception FormatInconsistent of string * string;;
-
-(** From Gettext *)
-exception GettextUninitialized;;
-
-(** From GettextMo *)
-exception InvalidOptions of Lexing.lexbuf * string;;
-exception InvalidPlurals of Lexing.lexbuf * string;;
-exception InvalidContentType of Lexing.lexbuf * string;;
-exception InvalidTranslationSingular of string * int;;
-exception InvalidTranslationPlural of (string list) * int;;
-exception Junk of string * string list;;
-exception EmptyEntry;;
-exception InvalidMoFile;;
-exception InvalidMoHeaderNegativeStrings;; 
-exception InvalidMoHeaderTableStringOutOfBound of range * range;;
-exception InvalidMoHeaderTableTranslationOutOfBound of range * range;;
-exception InvalidMoHeaderTableTranslationStringOverlap of range * range;;
-exception InvalidMoStringOutOfBound of int * int;;
-exception InvalidMoTranslationOutOfBound of int * int;;
-exception CannotOpenMoFile of string;;
-
-(** From GettextPo *)
-exception PoFileInvalid of string * Lexing.lexbuf * in_channel;;
-exception PoFileInvalidIndex of string * int;;
-exception PoFileDoesntExist of string;;
-exception PoInconsistentMerge of string * string;;
-
-(** From GettextTranslate *)
-exception GettextTranslateStringNotFound of string;;
-
-(** From GettextLocale *)
-exception LocalePosixUnparseable of string;;
 

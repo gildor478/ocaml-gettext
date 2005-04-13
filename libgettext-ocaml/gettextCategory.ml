@@ -73,3 +73,11 @@ let compare c1 c2 =
   in
   compare (val_category c1) (val_category c2)
 ;;
+
+module MapCategory = Map.Make (struct 
+  type t      = category
+  let compare = compare
+end)
+;;
+
+

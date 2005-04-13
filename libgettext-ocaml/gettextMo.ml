@@ -72,24 +72,24 @@ let check_mo_header chn hdr =
     )
   in
   if Int32.compare hdr.number_of_strings Int32.zero < 0 then
-    raise InvalidMoHeaderNegativeStrings
+    raise MoInvalidHeaderNegativeStrings
   else if check_range_offset hdr.offset_table_strings then
     raise (
-      InvalidMoHeaderTableStringOutOfBound(
+      MoInvalidHeaderTableStringOutOfBound(
         fst (range_offset hdr.offset_table_strings),
         snd (range_offset hdr.offset_table_strings)
       )
     )
   else if check_range_offset hdr.offset_table_translation then
     raise (
-      InvalidMoHeaderTableTranslationOutOfBound(
+      MoInvalidHeaderTableTranslationOutOfBound(
         fst (range_offset hdr.offset_table_translation),
         snd (range_offset hdr.offset_table_translation)
       )
     )
   else if check_overlap hdr.offset_table_translation hdr.offset_table_strings then
     raise (
-      InvalidMoHeaderTableTranslationStringOverlap(
+      MoInvalidHeaderTableTranslationStringOverlap(
         snd (range_offset hdr.offset_table_translation),
         snd (range_offset hdr.offset_table_strings)
       )
@@ -108,7 +108,7 @@ let input_mo_header chn =
     else if magic_number = mo_sig_le then
       LittleEndian
     else
-      raise InvalidMoFile
+      raise MoInvalidFile
   in
   let seek_and_input x = seek_in chn x; input_int32 chn endianess
   in
@@ -161,11 +161,11 @@ let input_mo_untranslated failsafe chn mo_header number =
         seek_in chn offset_pair;
         input_int32_pair_string chn mo_header.endianess
       with End_of_file ->
-        raise (InvalidMoStringOutOfBound(in_channel_length chn,offset_pair))
+        raise (MoInvalidStringOutOfBound(in_channel_length chn,offset_pair))
     in
     split_plural str
   else
-    raise (InvalidMoStringOutOfBound(Int32.to_int mo_header.number_of_strings, number))
+    raise (MoInvalidStringOutOfBound(Int32.to_int mo_header.number_of_strings, number))
 ;;
 
 let input_mo_translated failsafe chn mo_header number = 
@@ -178,11 +178,11 @@ let input_mo_translated failsafe chn mo_header number =
         seek_in chn offset_pair;
         input_int32_pair_string chn mo_header.endianess
       with End_of_file ->
-        raise (InvalidMoTranslationOutOfBound(in_channel_length chn,offset_pair))
+        raise (MoInvalidTranslationOutOfBound(in_channel_length chn,offset_pair))
     in
     split_plural str 
   else
-    raise (InvalidMoStringOutOfBound(Int32.to_int mo_header.number_of_strings, number))
+    raise (MoInvalidStringOutOfBound(Int32.to_int mo_header.number_of_strings, number))
 ;;
 
 let input_mo_translation failsafe chn mo_header number =
@@ -197,11 +197,11 @@ let input_mo_translation failsafe chn mo_header number =
   | id :: id_plural :: [] -> Plural ( id, id_plural, translated )
   | id :: id_plural :: tl ->
       fail_or_continue failsafe 
-      (Junk (id, tl)) 
+      (MoJunk (id, tl)) 
       (Plural (id, id_plural, translated))
   | [] ->
       fail_or_continue failsafe
-      EmptyEntry
+      MoEmptyEntry
       (Singular ( "", ""))
 ;;
 
@@ -211,7 +211,7 @@ let get_translated_value failsafe translation plural_number =
       str
   | ((Singular (_,str)), x) ->
       fail_or_continue failsafe
-      (InvalidTranslationSingular(str,x))
+      (MoInvalidTranslationSingular(str,x))
       str
   | ((Plural (str,str_plural,[])),x) ->
       if x = 0 then
@@ -222,7 +222,7 @@ let get_translated_value failsafe translation plural_number =
       List.nth lst x 
   | ((Plural (_,_,lst)), x) ->
       fail_or_continue failsafe
-      (InvalidTranslationPlural(lst,x))
+      (MoInvalidTranslationPlural(lst,x))
       List.nth lst 0
 ;;
 
@@ -247,7 +247,7 @@ let input_mo_informations failsafe chn mo_header =
       Parsing.Parse_error 
     | Failure("lexing: empty token") ->
         fail_or_continue failsafe 
-        (InvalidOptions (lexbuf,empty_translation)) 
+        (MoInvalidOptions (lexbuf,empty_translation)) 
         []
   in
   let (nplurals,fun_plural_forms) = 
@@ -263,13 +263,13 @@ let input_mo_informations failsafe chn mo_header =
         Parsing.Parse_error 
       | Failure("lexing: empty token") ->
           fail_or_continue failsafe 
-          (InvalidPlurals(lexbuf,field_plural_forms))
+          (MoInvalidPlurals(lexbuf,field_plural_forms))
           (2,germanic_plural)
     with Not_found ->
       (2,germanic_plural)
   in
   let (content_type, content_type_charset) = 
-    let gettext_content = ("text/plain", "UTF-8")
+    let gettext_content = ("text/plain", GettextConfig.default_codeset)
     in
     try 
       let field_content_type = List.assoc "Content-Type" field_value
@@ -283,7 +283,7 @@ let input_mo_informations failsafe chn mo_header =
         Parsing.Parse_error 
       | Failure("lexing: empty token") ->
           fail_or_continue failsafe
-          (InvalidContentType(lexbuf,field_content_type))
+          (MoInvalidContentType(lexbuf,field_content_type))
           gettext_content
     with Not_found ->
       gettext_content 
@@ -462,7 +462,7 @@ let fold_mo failsafe f init fl_mo =
       (translations,fun_plural_forms)
     with (Sys_error _) ->
       fail_or_continue failsafe
-      (CannotOpenMoFile fl_mo)
+      (MoCannotOpenFile fl_mo)
       (init,germanic_plural)
   in
   close_in chn;

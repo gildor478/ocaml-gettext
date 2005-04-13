@@ -171,9 +171,9 @@ let input_po chn =
     GettextPo_parser.msgfmt GettextPo_lexer.token lexbuf
   with 
     Parsing.Parse_error ->
-      raise (PoFileInvalid ("parse error",lexbuf,chn))
+      raise (PoInvalidFile ("parse error",lexbuf,chn))
   | Failure(s) ->
-      raise (PoFileInvalid (s,lexbuf,chn))
+      raise (PoInvalidFile (s,lexbuf,chn))
   | PoInconsistentMerge(str1,str2) ->
       raise (PoInconsistentMerge(str1,str2))
 ;;

@@ -129,7 +129,7 @@ module Map : TRANSLATE_TYPE =
         get_translated_value u.failsafe (check (MapString.find str u.map)) plural_number
       with Not_found ->
         fail_or_continue u.failsafe
-        (GettextTranslateStringNotFound str)
+        (TranslateStringNotFound str)
         (Dummy.translate u.dummy printf_format str plural_form)
   end
 ;;
@@ -193,7 +193,7 @@ module Hashtbl : TRANSLATE_TYPE =
         get_translated_value u.failsafe (check (Hashtbl.find u.hashtbl str)) plural_number
       with Not_found ->
         fail_or_continue u.failsafe
-        (GettextTranslateStringNotFound str)
+        (TranslateStringNotFound str)
         (Dummy.translate u.dummy printf_format str plural_form)
   end
 ;;
@@ -295,7 +295,7 @@ module Open : TRANSLATE_TYPE =
           get_translated_value u.failsafe translation plural_number
         with Not_found ->
           fail_or_continue u.failsafe
-          (GettextTranslateStringNotFound str)
+          (TranslateStringNotFound str)
           (Dummy.translate u.dummy printf_format str plural_form)
       in
       close_in chn;

@@ -22,9 +22,8 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
-(** Concrete implementation based on native gettext library ( 
-  @see <http://www.gnu.org/software/gettext/gettext.html/> {Gettext library}
-  ) 
+(** Concrete implementation based on native gettext library.
+  @see <http://www.gnu.org/software/gettext/gettext.html/> Gettext library
 *)
 
 (** {1 Concrete implementations} *)
@@ -37,6 +36,7 @@ open GettextUtils;;
   *)
 module Native : GettextRealize.REALIZE_TYPE =
   struct
+  (**/**)
 
     let realize t =
       (* Here we do the binding between C library call and the information we
@@ -167,6 +167,7 @@ module Native : GettextRealize.REALIZE_TYPE =
   *)
 module Preload : GettextRealize.REALIZE_TYPE =
   struct
+  (**/**)
 
     let realize t = 
       let t' = Native.realize t

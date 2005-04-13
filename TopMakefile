@@ -88,7 +88,6 @@ clean:: clean-doc-odoc
 clean:: clean-doc-pdf
 clean:: clean-doc-html 
 clean:: clean-doc-man
-	$(RM) -r $(BUILDHTML) $(BUILDMAN) $(BUILDPDF) $(BUILDODOC)
 
 distclean::
 

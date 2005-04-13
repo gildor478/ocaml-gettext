@@ -48,9 +48,9 @@ let default_realize =
 ;;
 
 (* Referenced function used to manage access to global variable, 
-*  in other word to be fullfiled with mutex locking/unlocking if 
-*  needed
-*)
+   in other word to be fullfiled with mutex locking/unlocking if 
+   needed
+ *)
 
 let global_lock = ref ( fun () -> () )
 ;;
@@ -179,12 +179,12 @@ let string_of_exception exc =
     line_pos char_pos
   in
   match exc with
-    ProblemReadingFile(fln,error) ->
+    CompileProblemReadingFile(fln,error) ->
       spf (f_ "Problem reading file %s: %s.") fln error
-  | ExtractionFailed(fln,cmd,status) ->
+  | CompileExtractionFailed(fln,cmd,status) ->
       spf (f_ "Problem while extracting %s: command %S exits with code %d.")
       fln cmd status
-  | ExtractionInterrupted(fln,cmd,signal) ->
+  | CompileExtractionInterrupted(fln,cmd,signal) ->
       spf (f_ "Problem while extracting %s: command %S killed by signal %d.")
       fln cmd signal
   | DomainFileDoesntExist(lst) ->
@@ -192,52 +192,52 @@ let string_of_exception exc =
       (string_of_list lst)
   | GettextUninitialized -> 
       (s_ "Ocaml-gettext library is not initialized")
-  | InvalidOptions (lexbuf,text) ->
+  | MoInvalidOptions (lexbuf,text) ->
       spf (f_ "Error while processing parsing of options at %s: %S.")
       (string_of_pos lexbuf)
       text
-  | InvalidPlurals (lexbuf,text) ->
+  | MoInvalidPlurals (lexbuf,text) ->
       spf (f_ "Error while processing parsing of plural at %s: %S.")
       (string_of_pos lexbuf)
       text
-  | InvalidContentType (lexbuf,text) ->
+  | MoInvalidContentType (lexbuf,text) ->
       spf (f_ "Error while processing parsing of content-type at %s: %S.")
       (string_of_pos lexbuf)
       text
-  | InvalidMoFile ->
+  | MoInvalidFile ->
       (s_ "MO file provided is not encoded following ocaml-gettext convention.")
-  | InvalidTranslationSingular (str,x) ->
+  | MoInvalidTranslationSingular (str,x) ->
       spf (f_ "Trying to fetch the plural form %d of a singular form %S.")
       x str
-  | InvalidTranslationPlural (lst,x) ->
+  | MoInvalidTranslationPlural (lst,x) ->
       spf (f_ "Trying to fetch the plural form %d of plural form %s.")
       x (string_of_list lst)
-  | Junk (id,lst) ->
+  | MoJunk (id,lst) ->
       spf (f_ "Junk at the end of the plural form id %S: %s.")
       id (string_of_list lst)
-  | EmptyEntry ->
+  | MoEmptyEntry ->
       (s_ "An empty entry has been encounter.")
-  | InvalidMoHeaderNegativeStrings ->
+  | MoInvalidHeaderNegativeStrings ->
       (s_ "Number of strings is negative.")
-  | InvalidMoHeaderTableStringOutOfBound((b1,e1),(b2,e2)) ->
+  | MoInvalidHeaderTableStringOutOfBound((b1,e1),(b2,e2)) ->
       spf (f_ "Offset of string table is out of bound ([%ld,%ld] should be in [%ld,%ld]).")
       b1 e1 b2 e2
-  | InvalidMoHeaderTableTranslationOutOfBound((b1,e1),(b2,e2)) ->
+  | MoInvalidHeaderTableTranslationOutOfBound((b1,e1),(b2,e2)) ->
       spf (f_ "Offset of translation table is out of bound ([%ld,%ld] should be in [%ld,%dl]).")
       b1 e1 b2 e2
-  | InvalidMoHeaderTableTranslationStringOverlap((b1,e1),(b2,e2)) ->
+  | MoInvalidHeaderTableTranslationStringOverlap((b1,e1),(b2,e2)) ->
       spf (f_ "Translation table and string table overlap ([%ld,%ld] and [%ld,%ld] have a non empty intersection).")
       b1 e1 b2 e2
-  | InvalidMoStringOutOfBound(max,cur) ->
+  | MoInvalidStringOutOfBound(max,cur) ->
       spf (f_ "Out of bound access when trying to find a string (%d < %d).")
       max cur
-  | InvalidMoTranslationOutOfBound(max,cur) ->
+  | MoInvalidTranslationOutOfBound(max,cur) ->
       spf (f_ "Out of bound access when trying to find a translation (%d < %d).")
       max cur
-  | CannotOpenMoFile fln ->
+  | MoCannotOpenFile fln ->
       spf (f_ "Could not open file %s.")
       fln
-  | PoFileInvalid (s,lexbuf,chn) ->
+  | PoInvalidFile (s,lexbuf,chn) ->
       spf (f_ "Error while processing parsing of PO file: %S at %s.")
       s (string_of_pos lexbuf)
   | PoFileInvalidIndex (id,i) ->
@@ -249,7 +249,7 @@ let string_of_exception exc =
   | PoInconsistentMerge (str1,str2) ->
       spf (f_ "Error while merging two PO files: %S and %S cannot be merged.")
       str1 str2
-  | GettextTranslateStringNotFound str ->
+  | TranslateStringNotFound str ->
       spf (f_ "Cannot find string %S.")
       str
   | LocalePosixUnparseable str ->

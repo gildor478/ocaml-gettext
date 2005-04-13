@@ -32,7 +32,7 @@ let po_of_filename filename =
     try
       open_in filename
     with Sys_error(str) ->
-      raise (ProblemReadingFile(filename,str))
+      raise (CompileProblemReadingFile(filename,str))
   in
   let po = 
     GettextPo.input_po chn
@@ -75,10 +75,10 @@ let extract command default_options filename_options filename_lst filename_pot =
     | Unix.WEXITED 0 ->
         GettextPo.merge_po po value
     | Unix.WEXITED exit_code -> 
-        raise (ExtractionFailed(filename,real_command,exit_code))
+        raise (CompileExtractionFailed(filename,real_command,exit_code))
     | Unix.WSIGNALED signal
     | Unix.WSTOPPED signal -> 
-        raise (ExtractionInterrupted(filename,real_command,signal))
+        raise (CompileExtractionInterrupted(filename,real_command,signal))
   in
   let extraction = 
     List.fold_left extract_one GettextPo.empty_po filename_lst

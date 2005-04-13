@@ -22,22 +22,31 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
-(** Gettext functions *)
+(**
+    Modules to use in libraries and programs.
+    @author Sylvain Le Gall
+*)
 
-(** This module defines all the function required to use gettext. The primary
+(**
+    This module defines all the function required to use gettext. The primary
     design is to use applicative function. The "side effect" of such a choice is
     that you must defines, before using any function, all the text domains,
-    codeset et al. When building a library, you should define a function
-    "gettext_init" that will bind all the required stuff.
-    The only function missing here is the "realize" function. This function is
-    defined in the real implementation library provided with this modules ( see
-    @see <GettextDummy.html> GettextDummy, 
-    {!GettextCamomile} and 
-    {!GettextStub} ).
-*)
+    codeset et al. When building a library, you should give access to 
+    [Library.init] ( by defining a [gettext_init = YouLibrary.init] ). This is
+    required to enable string translation in the library and programs that uses
+    the library. The only function missing here is the [realize] function. This 
+    function is defined in a real implementation library :
+    {ul
+      {- {!GettextDummy}}
+      {- {!GettextCamomile}}
+      {- {!GettextStub}}
+    }
+  *)
 
 (** {1 Exception} *)
 
+(** Return the string representation of a ocaml-gettext exception.
+  *)
 val string_of_exception : exn -> string
 ;;
 
@@ -53,10 +62,27 @@ val init : GettextTypes.dependencies
 module Library :
   functor ( Init : GettextTypes.Init ) ->
   sig
+    
+    (** Definition of all variables required by ocaml-gettext to use this module 
+        ( includes all the dependencies of the library, as defined in
+        {!GettextTypes.Init} ).
+     *)
     val init  : GettextTypes.dependencies
+    
+    (** Translate a singular string.
+     *)
     val s_    : string -> string 
+    
+    (** Translate a [Printf] singular argument.
+     *)
     val f_    : string -> ('a, 'b, 'c, 'd) format4
+    
+    (** Translate a plural string.
+     *)
     val sn_   : string -> string -> int -> string
+    
+    (** Translate a [Printf] plural argument.
+     *)
     val fn_   : string -> string -> int -> ('a, 'b, 'c, 'd) format4
   end
 ;;    
@@ -65,10 +91,26 @@ module Library :
 module Program :
   functor ( Init : GettextTypes.InitProgram ) ->
   sig
+    (** The first element is a [Arg] argument list. The second element
+        contains some information about the gettext library ( version,
+        build date, author ).
+      *)
     val init  : (Arg.key * Arg.spec * Arg.doc ) list * string 
+
+    (** Translate a singular string.
+     *)
     val s_    : string -> string 
+    
+    (** Translate a [Printf] singular argument.
+     *)
     val f_    : string -> ('a, 'b, 'c, 'd) format4
+    
+    (** Translate a plural string.
+     *)
     val sn_   : string -> string -> int -> string
+    
+    (** Translate a [Printf] plural argument.
+     *)
     val fn_   : string -> string -> int -> ('a, 'b, 'c, 'd) format4
   end
 ;;
