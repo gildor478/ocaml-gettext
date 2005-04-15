@@ -22,6 +22,14 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
+(** Types and exception of ocaml-gettext.
+    @author Sylvain Le Gall
+  *)
+
+open GettextCategory;;
+
+(** {1 Core types of ocaml-gettext library} *)
+
 type range = Int32.t * Int32.t 
 ;;
 
@@ -39,74 +47,6 @@ type filename = string
 
 type codeset = string
 ;;
-
-type category =
-    LC_CTYPE
-  | LC_NUMERIC
-  | LC_TIME
-  | LC_COLLATE
-  | LC_MONETARY
-  | LC_MESSAGES
-  | LC_ALL
-;;
-  
-type failsafe = 
-    Ignore 
-  | InformStderr of (exn -> string)
-  | RaiseException
-;;
-
-module MapString = Map.Make (struct
-  type t      = string
-  let compare = String.compare
-end)
-;;
- 
-module MapTextdomain = Map.Make (struct
-  type t      = textdomain
-  let compare = String.compare
-end)
-;;
-
-(** Core types of ocaml-gettext library *)
-
-type t = {
-  failsafe    : failsafe;
-  textdomains : ((codeset option) * (dir option)) MapTextdomain.t;
-  categories  : locale MapCategory.t;
-  language    : locale option;
-  codeset     : codeset;
-  path        : dir list;
-  default     : textdomain;
-}
-;;
-  
-type t' = bool -> textdomain option -> string -> (string * int) option -> category -> string
-;;
-
-type dependencies = (textdomain * (codeset option) * (dir option)) list
-;;
-
-module type Init = 
-  sig
-    val textdomain : textdomain
-    val codeset    : codeset option
-    val dir        : dir option
-    val dependencies : dependencies
-  end
-;;
-  
-type realize = t -> t'
-;;
-
-module type InitProgram =
-  sig
-    include Init
-
-    val realize : realize
-  end
-;;
-
 
 (** {1 Exceptions} *)
 
@@ -197,14 +137,69 @@ exception TranslateStringNotFound of string;;
   *)
 exception LocalePosixUnparseable of string;;
 
-    
+(** {1 Modules signatures} *)
+
+type dependencies = (textdomain * (codeset option) * (dir option)) list
+;;
+
+module type INIT_TYPE = 
+  sig
+    val textdomain : textdomain
+    val codeset    : codeset option
+    val dir        : dir option
+    val dependencies : dependencies
+  end
+;;
+
 (* We stop documentation here, for the gettext API reference, all those types
    are internals : use at your own risk.
  *)
 (**/**)
 
-(** {1 Extended types} *)
+(** {1 Extended core types} *)
 
+module MapString = Map.Make (struct
+  type t      = string
+  let compare = String.compare
+end)
+;;
+ 
+module MapTextdomain = Map.Make (struct
+  type t      = textdomain
+  let compare = String.compare
+end)
+;;
+
+(** Defines behavior regarding exception in the ocaml-gettext library 
+  *)
+type failsafe = 
+    Ignore 
+  | InformStderr of (exn -> string)
+  | RaiseException
+;;
+
+(** Data structure handling initialization variable of ocaml-gettext 
+  *)
+type t = {
+  failsafe    : failsafe;
+  textdomains : ((codeset option) * (dir option)) MapTextdomain.t;
+  categories  : locale MapCategory.t;
+  language    : locale option;
+  codeset     : codeset;
+  path        : dir list;
+  default     : textdomain;
+}
+;;
+
+(** Function to translate effectively a string 
+  *)
+type t' = bool -> textdomain option -> string -> (string * int) option -> category -> string
+;;
+
+(** {1 Types for MO file processing} *)
+
+(** Endianess of a MO file 
+  *)
 type endianess = 
     BigEndian 
   | LittleEndian
@@ -332,7 +327,7 @@ type po_location = filename * int
 
 (** Mapping of PO content using the string identifier as the key.
 *)
-type translations = (po_location list * po_translation) MapString.t
+type po_translations = (po_location list * po_translation) MapString.t
 ;;
 
 (** Content of a PO file. Since comments should be saved, and that we only save
@@ -340,9 +335,20 @@ type translations = (po_location list * po_translation) MapString.t
     last comments, which is not attached to any translation 
 *)
 type po_content = {
-  no_domain    : translations;
-  domain       : translations MapTextdomain.t;
+  no_domain    : po_translations;
+  domain       : po_translations MapTextdomain.t;
 }
 ;;
 
+
+(** {1 Modules signatures} *)
+
+(** Signature for module handling transformation of initialization parameters
+    to concrete translation function.
+  *)
+module type REALIZE_TYPE =
+  sig
+    val realize : t -> t'
+  end
+;;
 

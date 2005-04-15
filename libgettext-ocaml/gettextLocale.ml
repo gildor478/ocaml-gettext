@@ -22,7 +22,9 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
-(** Implements different operation over locale/category *)
+(** Implements different operation over locale/category.
+    @author Sylvain Le Gall
+  *)
 
 open GettextTypes;;
 open GettextCategory;;

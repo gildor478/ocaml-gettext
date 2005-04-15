@@ -112,10 +112,6 @@ AC_LIB_OCAML()
 
 # check if we build at least one of stub | camomile for building ocaml-gettext
 
-if test "$BUILD_STUB" = "no" && test "$BUILD_CAMOMILE" = "no"; then
-  AC_MSG_WARN(Stub and camomile extension build, cannot build ocaml-gettext executable.)
-fi
-
 if test "$BUILD_STUB" = "no" || test "$BUILD_CAMOMILE" = "no"; then
   if test "$BUILD_TEST" = "yes"; then
     AC_MSG_ERROR(Cannot build test since it depends on both gettext-stub and gettext-camomile)

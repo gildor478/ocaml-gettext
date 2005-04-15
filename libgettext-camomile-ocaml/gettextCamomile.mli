@@ -22,70 +22,22 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
-(** Functions to manipulate category.
+(** Concrete implementation based on camomile. 
+    @see <http://camomile.sourceforge.net/> Camomile library
     @author Sylvain Le Gall
-  *) 
+*)
 
-type category =
-    LC_CTYPE
-  | LC_NUMERIC
-  | LC_TIME
-  | LC_COLLATE
-  | LC_MONETARY
-  | LC_MESSAGES
-  | LC_ALL
-;;
+(** {1 Concrete implementations} *)
+
+(** Implementation based on a Map storage for string. 
+  *)
+module Map : GettextTypes.REALIZE_TYPE 
  
-let string_of_category cat =
-  match cat with
-    LC_CTYPE    -> "LC_CTYPE"
-  | LC_NUMERIC  -> "LC_NUMERIC"
-  | LC_TIME     -> "LC_TIME"
-  | LC_COLLATE  -> "LC_COLLATE"
-  | LC_MONETARY -> "LC_MONETARY"
-  | LC_MESSAGES -> "LC_MESSAGES"
-  | LC_ALL      -> "LC_ALL"
-;;
-
-let category_of_string str =
-   match str with
-     "LC_CTYPE"    -> LC_CTYPE   
-  |  "LC_NUMERIC"  -> LC_NUMERIC 
-  |  "LC_TIME"     -> LC_TIME    
-  |  "LC_COLLATE"  -> LC_COLLATE 
-  |  "LC_MONETARY" -> LC_MONETARY
-  |  "LC_MESSAGES" -> LC_MESSAGES
-  |  "LC_ALL"      -> LC_ALL     
-  |  _             -> raise (Invalid_argument "category_of_string")
-;;
-
-let categories = [
-  LC_CTYPE ;
-  LC_NUMERIC ;
-  LC_TIME ;
-  LC_COLLATE ;
-  LC_MONETARY ;
-  LC_MESSAGES ;
-  LC_ALL 
-]
-;;
-
-let compare c1 c2 = 
-  let val_category x = 
-    match x with 
-      LC_CTYPE    -> 0 
-    | LC_NUMERIC  -> 1
-    | LC_TIME     -> 2
-    | LC_COLLATE  -> 3
-    | LC_MONETARY -> 4
-    | LC_MESSAGES -> 5
-    | LC_ALL      -> 6
-  in
-  compare (val_category c1) (val_category c2)
-;;
-
-module MapCategory = Map.Make (struct 
-  type t      = category
-  let compare = compare
-end)
-;;
+(** Implementation based on a Hashtbl storage for string. 
+  *)
+module Hashtbl : GettextTypes.REALIZE_TYPE 
+ 
+(** Low memory and fast initialization implementation, files are opened only when needed. 
+  *)
+module Open : GettextTypes.REALIZE_TYPE 
+  

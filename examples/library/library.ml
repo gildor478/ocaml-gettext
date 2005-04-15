@@ -9,7 +9,7 @@
 (*  Contact: sylvain@le-gall.net                                           *)
 (**************************************************************************)
 
-open LibraryGettext;;
+open LibraryGettext.Gettext;;
 
 (* Give access to the init of LibraryGettext *)
 let init =

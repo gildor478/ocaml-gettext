@@ -22,7 +22,9 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
-(** Signature of module for translation storage / access *)
+(** Signature of module for translation storage / access.
+    @author Sylvain Le Gall
+  *)
 
 open GettextTypes;;
 open GettextUtils;;

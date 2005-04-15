@@ -29,6 +29,7 @@ open FileUtil.StrUtil;;
 open FilePath;;
 open FilePath.DefaultPath;;
 open GettextTypes;;
+open GettextCategory;;
 open Common;;
 
 type tests = {
@@ -334,15 +335,15 @@ let install_test tests =
       let i32 = Int32.of_int
       in
       List.map install_fail_test_one [
-        "test5.mo",InvalidMoFile,
+        "test5.mo",MoInvalidFile,
           "MO file invalid ( magic number )";
-        "test6.mo",InvalidMoHeaderTableStringOutOfBound((i32 28, i32 2626),(i32 (-1), i32 159)),
+        "test6.mo",MoInvalidHeaderTableStringOutOfBound((i32 28, i32 2626),(i32 (-1), i32 159)),
           "Offset of table with original strings is out of bound";
-        "test7.mo",InvalidMoHeaderTableTranslationOutOfBound((i32 28, i32 2626),(i32 (-49), i32 111)),
+        "test7.mo",MoInvalidHeaderTableTranslationOutOfBound((i32 28, i32 2626),(i32 (-49), i32 111)),
           "Offset of table with translation strings is out of bound";
-        "test8.mo",InvalidMoStringOutOfBound(2626, 36),
+        "test8.mo",MoInvalidStringOutOfBound(2626, 36),
           "Offset of first string is out of bound";
-        "test9.mo",InvalidMoTranslationOutOfBound(2626, 196),
+        "test9.mo",MoInvalidTranslationOutOfBound(2626, 196),
           "Offset of first translation is out of bound";
       ]
     )

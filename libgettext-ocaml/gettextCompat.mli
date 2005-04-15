@@ -22,8 +22,12 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
-(** Gettext compatibility functions ( use this one to have the closest API to gettext *)
+(** Gettext compatibility with the native gettext API
+    @author Sylvain Le Gall
+  *)
+
 open GettextTypes
+open GettextCategory
 
 (** textdomain domain t : Set the current text domain.
 *)

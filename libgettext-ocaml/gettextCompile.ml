@@ -22,6 +22,10 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
+(** Functions for extraction/compilation/installation of PO/MO file.
+    @author Sylvain Le Gall
+  *)
+    
 open GettextTypes;;
 open FileUtil;;
 open FileUtil.StrUtil;;

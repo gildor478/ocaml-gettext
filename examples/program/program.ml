@@ -9,7 +9,7 @@
 (*  Contact: sylvain@le-gall.net                                           *)
 (**************************************************************************)
 
-open ProgramGettext;;
+open ProgramGettext.Gettext;;
 
 let () = 
   let my_name = ref ""
@@ -17,7 +17,7 @@ let () =
   let spf x = Printf.sprintf x
   in
   let (gettext_args,gettext_copyright) =
-    Gettext.init
+    ProgramGettext.Gettext.init
   in
   let args =
     Arg.align (

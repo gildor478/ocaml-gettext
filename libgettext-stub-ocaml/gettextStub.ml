@@ -23,18 +23,20 @@
 (**************************************************************************)
 
 (** Concrete implementation based on native gettext library.
-  @see <http://www.gnu.org/software/gettext/gettext.html/> Gettext library
+    @see <http://www.gnu.org/software/gettext/gettext.html/> Gettext library
+    @author Sylvain Le Gall
 *)
 
 (** {1 Concrete implementations} *)
 
 open GettextTypes;;
 open GettextUtils;;
+open GettextCategory;;
 
 (** Native implementation of gettext. All translation are bound to C library
     call. Still use check_format, to ensure that strings follow printf format.
   *)
-module Native : GettextRealize.REALIZE_TYPE =
+module Native : GettextTypes.REALIZE_TYPE =
   struct
   (**/**)
 
@@ -43,13 +45,13 @@ module Native : GettextRealize.REALIZE_TYPE =
          have in parameter t. *)
       let native_category_of_category cat =
         match cat with
-          GettextTypes.LC_CTYPE    ->  GettextStubCompat.LC_CTYPE    
-        | GettextTypes.LC_NUMERIC  ->  GettextStubCompat.LC_NUMERIC  
-        | GettextTypes.LC_TIME     ->  GettextStubCompat.LC_TIME     
-        | GettextTypes.LC_COLLATE  ->  GettextStubCompat.LC_COLLATE  
-        | GettextTypes.LC_MONETARY ->  GettextStubCompat.LC_MONETARY 
-        | GettextTypes.LC_MESSAGES ->  GettextStubCompat.LC_MESSAGES 
-        | GettextTypes.LC_ALL      ->  GettextStubCompat.LC_ALL      
+          GettextCategory.LC_CTYPE    ->  GettextStubCompat.LC_CTYPE    
+        | GettextCategory.LC_NUMERIC  ->  GettextStubCompat.LC_NUMERIC  
+        | GettextCategory.LC_TIME     ->  GettextStubCompat.LC_TIME     
+        | GettextCategory.LC_COLLATE  ->  GettextStubCompat.LC_COLLATE  
+        | GettextCategory.LC_MONETARY ->  GettextStubCompat.LC_MONETARY 
+        | GettextCategory.LC_MESSAGES ->  GettextStubCompat.LC_MESSAGES 
+        | GettextCategory.LC_ALL      ->  GettextStubCompat.LC_ALL      
       in
       let default_dir = 
         match t.path with
@@ -165,7 +167,7 @@ module Native : GettextRealize.REALIZE_TYPE =
     that it is better to preload all string. Don't use this module if you think
     you will only have a few strings to translate.
   *)
-module Preload : GettextRealize.REALIZE_TYPE =
+module Preload : GettextTypes.REALIZE_TYPE =
   struct
   (**/**)
 

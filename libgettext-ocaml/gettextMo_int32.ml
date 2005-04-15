@@ -22,6 +22,10 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
+(**
+    @author Sylvain Le Gall
+  *)
+
 open GettextTypes;;
 
 let int32_of_byte (a0,a1,a2,a3) = 

@@ -23,6 +23,7 @@
 (**************************************************************************)
 
 open GettextTypes;;
+open GettextCategory;;
 open FilePath.DefaultPath;;
 
 (* Version data *)

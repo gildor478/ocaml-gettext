@@ -22,6 +22,9 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
+(**
+    @author Sylvain Le Gall
+  *)
 open GettextUtils;;
 open GettextTypes;;
 open GettextMo_int32;;

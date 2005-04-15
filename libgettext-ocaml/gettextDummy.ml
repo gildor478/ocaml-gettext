@@ -22,70 +22,24 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
-(** Functions to manipulate category.
+(** Concrete implementation based on nothing.
     @author Sylvain Le Gall
-  *) 
+ *)
 
-type category =
-    LC_CTYPE
-  | LC_NUMERIC
-  | LC_TIME
-  | LC_COLLATE
-  | LC_MONETARY
-  | LC_MESSAGES
-  | LC_ALL
-;;
- 
-let string_of_category cat =
-  match cat with
-    LC_CTYPE    -> "LC_CTYPE"
-  | LC_NUMERIC  -> "LC_NUMERIC"
-  | LC_TIME     -> "LC_TIME"
-  | LC_COLLATE  -> "LC_COLLATE"
-  | LC_MONETARY -> "LC_MONETARY"
-  | LC_MESSAGES -> "LC_MESSAGES"
-  | LC_ALL      -> "LC_ALL"
-;;
+open GettextTypes;;
 
-let category_of_string str =
-   match str with
-     "LC_CTYPE"    -> LC_CTYPE   
-  |  "LC_NUMERIC"  -> LC_NUMERIC 
-  |  "LC_TIME"     -> LC_TIME    
-  |  "LC_COLLATE"  -> LC_COLLATE 
-  |  "LC_MONETARY" -> LC_MONETARY
-  |  "LC_MESSAGES" -> LC_MESSAGES
-  |  "LC_ALL"      -> LC_ALL     
-  |  _             -> raise (Invalid_argument "category_of_string")
+module Generic : REALIZE_TYPE =
+  struct
+    let realize t = 
+      fun printf_format opt str plural_form category ->
+        match plural_form with
+          Some(str_plural,n) ->
+            if GettextMo.germanic_plural n = 0 then
+              str
+            else
+              str_plural
+        | None ->
+            str
+  end 
 ;;
-
-let categories = [
-  LC_CTYPE ;
-  LC_NUMERIC ;
-  LC_TIME ;
-  LC_COLLATE ;
-  LC_MONETARY ;
-  LC_MESSAGES ;
-  LC_ALL 
-]
-;;
-
-let compare c1 c2 = 
-  let val_category x = 
-    match x with 
-      LC_CTYPE    -> 0 
-    | LC_NUMERIC  -> 1
-    | LC_TIME     -> 2
-    | LC_COLLATE  -> 3
-    | LC_MONETARY -> 4
-    | LC_MESSAGES -> 5
-    | LC_ALL      -> 6
-  in
-  compare (val_category c1) (val_category c2)
-;;
-
-module MapCategory = Map.Make (struct 
-  type t      = category
-  let compare = compare
-end)
-;;
+      

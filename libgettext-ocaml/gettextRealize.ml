@@ -22,16 +22,13 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
-(** Module type for the function realize *)
+(** Module type for the function realize.
+    @author Sylvain Le Gall
+  *)
 
 open GettextTypes;;
 open GettextUtils;;
-
-module type REALIZE_TYPE =
-  sig
-    val realize : realize
-  end
-;;
+open GettextCategory;;
 
 module Generic : (
     functor ( Translate : GettextTranslate.TRANSLATE_TYPE ) ->

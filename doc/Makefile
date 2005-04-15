@@ -57,14 +57,13 @@ ALL_PACKAGES+=gettext-stub
 endif
 
 $(call ODOC_TARGET,gettext):REQUIRES=$(ALL_PACKAGES)
-$(call ODOC_TARGET,gettext):OCAMLDOCFLAGS+=-css-style style.css
-$(call ODOC_TARGET,gettext):EXTRAFILES+=style.css
 $(call ODOC_TARGET,gettext):OCAMLDOCFLAGS+=-I ../libgettext-ocaml/
 $(call ODOC_TARGET,gettext):../libgettext-ocaml/gettext.mli 
 $(call ODOC_TARGET,gettext):../libgettext-ocaml/gettextTypes.ml
+$(call ODOC_TARGET,gettext):../libgettext-ocaml/gettextDummy.ml
 
 ifeq ($(BUILD_CAMOMILE),yes)
-$(call ODOC_TARGET,gettext):../libgettext-camomile-ocaml/gettextCamomile.ml
+$(call ODOC_TARGET,gettext):../libgettext-camomile-ocaml/gettextCamomile.mli
 $(call ODOC_TARGET,gettext):OCAMLDOCFLAGS+=-I ../libgettext-camomile-ocaml/
 endif
 
@@ -75,8 +74,6 @@ endif
 
 $(call ODOC_TARGET,gettext-ext):OCAMLDOCFLAGS+=-I ../libgettext-ocaml 
 $(call ODOC_TARGET,gettext-ext):REQUIRES=$(ALL_PACKAGES)
-$(call ODOC_TARGET,gettext-ext):OCAMLDOCFLAGS+=-css-style style.css
-$(call ODOC_TARGET,gettext-ext):EXTRAFILES+=style.css
 $(call ODOC_TARGET,gettext-ext):$(wildcard ../libgettext-ocaml/*.ml)
 $(call ODOC_TARGET,gettext-ext):$(wildcard ../libgettext-ocaml/*.mli)
 endif

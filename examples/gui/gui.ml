@@ -9,7 +9,7 @@
 (*  Contact: sylvain@le-gall.net                                           *)
 (**************************************************************************)
 
-open GuiGettext;;
+open GuiGettext.Gettext;;
 
 (* Give access to the init of GuiGettext *)
 let init = 

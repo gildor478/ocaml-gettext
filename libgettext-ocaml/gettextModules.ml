@@ -22,9 +22,14 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
+(**
+    @author Sylvain Le Gall
+  *)
+
 open FileUtil;;
 open FileUtil.StrUtil;;
 open GettextTypes;;
+open GettextCategory;;
 
 (** Function for manipulation the type t *)
 

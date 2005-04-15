@@ -44,11 +44,12 @@ INSTALLIB +=              \
  gettextBase.cmxa         \
  gettextBase.a            \
  gettextTypes.cmi         \
- gettextCompat.cmi        \
+ gettextDummy.cmi         \
  gettext.cmi         
 
 CMO_BASE  =               \
  gettextConfig.cmo        \
+ gettextCategory.cmo      \
  gettextTypes.cmo         \
  gettextUtils.cmo         \
  gettextModules.cmo       \
@@ -60,7 +61,8 @@ CMO_BASE  =               \
  gettextMo_int32.cmo      \
  gettextMo_parser.cmo     \
  gettextMo_lexer.cmo      \
- gettextMo.cmo            
+ gettextMo.cmo            \
+ gettextDummy.cmo
 
 gettextCompat.cmo: gettextCompat.cmi 
 gettextCompat.cmx: gettextCompat.cmi 
@@ -97,10 +99,10 @@ INSTALLIB +=           \
  gettextRealize.cmi    \
  gettextPo.cmi         \
  gettextUtils.cmi      \
+ gettextCompat.cmi     \
  gettextCompile.cmi         
 
 CMO_EXTENSION=            \
- gettextCategory.cmo      \
  gettextLocale_types.cmo  \
  gettextLocale_parser.cmo \
  gettextLocale_lexer.cmo  \
@@ -123,8 +125,10 @@ gettextExtension.cma: $(CMO_EXTENSION)
 gettextExtension.cmxa: $(CMO_EXTENSION:.cmo=.cmx)
 
 clean::
-	-$(RM) gettextPo_parser.output \
-	 gettextPo_parser.ml gettextPo_parser.mli
+	-$(RM) \
+	 gettextPo_parser.output gettextPo_parser.ml gettextPo_parser.mli \
+	 gettextFormat_parser.output gettextFormat_parser.ml gettextFormat_parser.mli \
+	 gettextLocale_parser.output gettextLocale_parser.ml gettextLocale_parser.mli
 
 ########################
 # Pa_gettext extension #

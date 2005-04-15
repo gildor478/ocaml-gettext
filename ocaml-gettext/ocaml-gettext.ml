@@ -22,6 +22,10 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
+(** Ocaml-gettext tools.
+    @author Sylvain Le Gall
+  *)
+
 (** Helper program to : 
   - extract translatable strings from OCaml source,
   - compile PO file,
@@ -30,25 +34,30 @@
 *)
 
 open GettextTypes;;
+open GettextCategory;;
 open GettextUtils;;
 open FilePath.DefaultPath;;
 
-module OcamlGettext = Gettext.Program(struct
-  let textdomain   = "ocaml-gettext"
-  let codeset      = None
-  let dir          = None
-  let dependencies = Gettext.init
-  let realize      = 
-    IFDEF CAMOMILE THEN
-      GettextCamomile.Open.realize
-    ELSE
-      IFDEF STUB THEN
-        GettextStub.Native.realize
-      ELSE
-        Gettext.Dummy.realize
-      ENDIF
-    ENDIF
-end)
+IFDEF CAMOMILE THEN
+module OcamlGettextRealize = GettextCamomile.Open
+ELSE IFDEF STUB THEN
+module OcamlGettextRealize =  GettextStub.Native
+ELSE
+module OcamlGettextRealize =  GettextDummy.Dummy
+ENDIF
+ENDIF
+;;
+
+module OcamlGettext = Gettext.Program
+(
+  struct
+    let textdomain   = "ocaml-gettext"
+    let codeset      = None
+    let dir          = None
+    let dependencies = Gettext.init
+  end
+)
+( OcamlGettextRealize )
 ;;
 
 type action = 
@@ -70,11 +79,11 @@ type t =
     extract_pot                 : string;
     compile_output_file_option  : string option;
     install_language_option     : string option;
-    install_category            : GettextTypes.category;
+    install_category            : GettextCategory.category;
     install_textdomain_option   : string option;
     install_destdir             : string;
     uninstall_language_option   : string option;
-    uninstall_category          : GettextTypes.category;
+    uninstall_category          : GettextCategory.category;
     uninstall_textdomain_option : string option;
     uninstall_orgdir            : string;
     merge_filename_pot          : string;

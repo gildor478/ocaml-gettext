@@ -22,6 +22,10 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
+(**
+    @author Sylvain Le Gall
+  *)
+
 type locale = {
   language  : string;
   territory : string option;

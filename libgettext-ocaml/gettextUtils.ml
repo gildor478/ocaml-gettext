@@ -22,6 +22,10 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
+(** Misc. utilities.
+    @author Sylvain Le Gall
+  *)
+
 open GettextTypes;;
 
 let string_of_list lst = 

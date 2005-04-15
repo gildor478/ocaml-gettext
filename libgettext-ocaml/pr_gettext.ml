@@ -22,6 +22,10 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
+(** Camlp4 dumper to extract strings.
+    @author Sylvain Le Gall
+  *)
+
 (* Extract the string which should be used for a gettext translation. Output a
    po_content list through the function Marshal.to_channel
    Functions that are looked for :

@@ -22,6 +22,10 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
+(**
+    @author Sylvain Le Gall
+  *)
+
 open GettextTypes;;
 
 let empty_po = 

@@ -22,7 +22,9 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
-(** Signature of module for charset conversion *)
+(** Signature of module for charset conversion 
+    @author Sylvain Le Gall
+  *)
 
 open GettextTypes;;
 

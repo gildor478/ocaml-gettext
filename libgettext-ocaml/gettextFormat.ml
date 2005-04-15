@@ -22,7 +22,9 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
-(** Implements functions helping check that two strings are equivalent, regarding printf use *)
+(** Check string equivalence regarding printf use. 
+    @author Sylvain Le Gall
+  *)
 
 open GettextTypes;;
 open GettextUtils;;

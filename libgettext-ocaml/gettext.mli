@@ -60,7 +60,7 @@ val init : GettextTypes.dependencies
 
 (** Module to handle typical library requirement *)
 module Library :
-  functor ( Init : GettextTypes.Init ) ->
+  functor ( Init : GettextTypes.INIT_TYPE ) ->
   sig
     
     (** Definition of all variables required by ocaml-gettext to use this module 
@@ -89,7 +89,8 @@ module Library :
 
 (** Module to handle typical program requirement *)
 module Program :
-  functor ( Init : GettextTypes.InitProgram ) ->
+  functor ( Init : GettextTypes.INIT_TYPE ) ->
+  functor ( Realize : GettextTypes.REALIZE_TYPE ) ->
   sig
     (** The first element is a [Arg] argument list. The second element
         contains some information about the gettext library ( version,

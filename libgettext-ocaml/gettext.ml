@@ -32,7 +32,7 @@ open Lexing;;
 
 type global_type = {
   t          : t option;
-  realize    : realize; 
+  realize    : t -> t'; 
   t'         : t' option;
 }
 ;;
@@ -129,7 +129,7 @@ let get_global_t' () =
 (* High level functions *)
 
 module Library =
-  functor ( Init : Init ) ->
+  functor ( Init : INIT_TYPE ) ->
   struct
     let init = (Init.textdomain, Init.codeset, Init.dir) :: Init.dependencies
 
@@ -261,7 +261,8 @@ let string_of_exception exc =
 
 
 module Program = 
-  functor ( Init : InitProgram ) ->
+  functor ( Init : INIT_TYPE ) ->
+  functor ( Realize : REALIZE_TYPE ) ->
   struct
     let textdomain = Init.textdomain
 
@@ -293,7 +294,7 @@ module Program =
         )
       in
       let () = 
-        set_global_realize (Init.realize) 
+        set_global_realize (Realize.realize) 
       in      
       [  
           (

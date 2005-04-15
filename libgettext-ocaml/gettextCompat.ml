@@ -23,6 +23,7 @@
 (**************************************************************************)
 
 open GettextTypes;;
+open GettextCategory;;
 open GettextModules;;
 
 let format_of_string x = 

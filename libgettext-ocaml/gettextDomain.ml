@@ -22,7 +22,9 @@
 (*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
-(** Signature of module for domain management *)
+(** Signature of module for domain management.
+    @author Sylvain Le Gall
+  *)
 
 open FilePath;;
 open FilePath.DefaultPath;;

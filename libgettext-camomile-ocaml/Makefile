@@ -53,6 +53,8 @@ INSTALLIB +=          \
 CMO_CAMOMILE=         \
  gettextCamomile.cmo
 
+gettextCamomile.cmo: gettextCamomile.cmi
+gettextCamomile.cmx: gettextCamomile.cmi
 gettextCamomile.cma: $(CMO_CAMOMILE)
 gettextCamomile.cmxa: $(CMO_CAMOMILE:.cmo=.cmx)
 
