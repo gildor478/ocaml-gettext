@@ -5,7 +5,16 @@
 <webpage id="ocaml-gettext-documentation">
 <config param="rcsdate" value="svn:date"/>
 <head>
-	<title>Documentation</title>
+  <title>Documentation of ocaml-gettext</title>
+  <titleabbrev>Documentation</titleabbrev>
+  <summary>Documentation of ocaml-gettext library</summary>
 </head>
+
 <webtoc/>
+
+<section>
+  <title>Documentation</title>
+
+  <para>Here you can find all the documentation of the ocaml-gettext project.</para>
+</section>
 </webpage>
