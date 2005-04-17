@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<tocentry page="ocaml-gettext.xml" filename="ocaml-gettext.html">
+  <tocentry page="ocaml-gettext-documentation.xml" 
+    filename="ocaml-gettext-documentation.html" tocskip="1">
+    <title>Documentation</title>
+    <tocentry id="ocaml-gettext-reference-manual-html" 
+      href="ocaml-gettext/reference-manual/index.html">
+      <title>Reference manual (HTML)</title>
+    </tocentry>
+    <tocentry id="ocaml-gettext-reference-manual-pdf" 
+      href="ocaml-gettext/reference-manual.pdf">
+      <title>Reference manual (PDF)</title>
+    </tocentry>
+    <tocentry id="ocaml-gettext-api" 
+      href="ocaml-gettext/gettext/index.html">
+      <title>API</title>
+    </tocentry>
+    <tocentry id="ocaml-gettext-ext-api" 
+      href="ocaml-gettext/gettext-ext/index.html">
+      <title>Extended API</title>
+  </tocentry>
+</tocentry>
+<tocentry id="ocaml-gettext-download"
+  href="download/ocaml-gettext-latest.tar.gz">
+  <title>Download</title>
+  </tocentry>
+  <tocentry id="ocaml-gettext-bugs" 
+    href="http://www.gallu.homelinux.org/bugs/cgi/pkgreport.cgi?pkg=ocaml-gettext">
+    <title>Bugs</title>
+  </tocentry>
+</tocentry>

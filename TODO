@@ -1,7 +1,3 @@
-v 0.2.0 : 
-- Write a patch for xgettext et al
-- Create website pages
-
 v 0.3.0 :
 - Better parse comments, to keep licence et al 
 - Try to be faster than gettext C library
@@ -12,3 +8,4 @@ v 0.3.0 :
 - Intercept problem when recoding string ( charset ), errors should be wrap inside a failsafe or
   at least raise a coherent exception.
 - Create what is necessary for running into Threaded env
+- Write a patch for xgettext et al

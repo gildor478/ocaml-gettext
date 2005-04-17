@@ -1,4 +1,4 @@
-v 0.2 :
+v 0.2.0 :
   * Full rewrite of ocaml-gettext.
   * Contains two version of the gettext engine : one is based on a purely OCaml approach ( gettext-camomile ),
    one is base on the former one ( gettext-stub ).

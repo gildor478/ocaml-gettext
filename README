@@ -1,9 +1,10 @@
 --------------
-libgettext-ocaml.
+ocaml-gettext
 --------------
 
 This library is a wrapper around gettext 
-( http://www.gnu.org/software/gettext/gettext.html ).
+( http://www.gnu.org/software/gettext/gettext.html ), it also provides a pure
+Ocaml implementation based on camomile.
 
 The primary target of this work is to bring internationalization to 
 cameleon ( http://savannah.nongnu.org/projects/cameleon/ ). Before i 
@@ -12,13 +13,6 @@ and try to use it with some program of my creation... ).
 
 Feel free to use it in your application. There is no real doc coming
 with it, but i will prepare some in the next future. 
-
-There is a patch to apply against gettext, in order to have xgettext
-work with ocaml source ( i try it, and it seems to work ).
-
-Warning : if you use xgettext patched YOU NEED CLEAN SOURCE, in other
-word, don't forget to pass camlp4 on your source to remove any special
-syntax...
 
 Please report me any problem : send an email to submit@bugs.gallu.homelinux.org
 beginning with 

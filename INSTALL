@@ -1,5 +1,5 @@
 --------------
-libgettext-ocaml.
+ocaml-gettext
 --------------
 
 Prerequisite :
@@ -12,6 +12,11 @@ In order to install you will need :
 - ocamlfind ( >= 0.8 ) 
 	http://www.ocaml-programming.de/packages/
 - make, a C compiler, libintl.h ( which is bundle in libc6 )
+- camomile
+- ounit
+- benchmark
+- docbook DTD and XSL
+- xsltproc
 
 Installing :
 1) Go in the untared source directory
