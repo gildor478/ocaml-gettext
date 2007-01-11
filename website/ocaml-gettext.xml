@@ -1,80 +1,78 @@
-<?xml version="1.0" encoding="ISO-8859-15"?>
-<!DOCTYPE webpage
-       PUBLIC "-//Norman Walsh//DTD Website V2.5.0//EN"
-       "http://docbook.sourceforge.net/release/website/2.5.0/schema/dtd/website.dtd">
-
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE webpage PUBLIC "-//Norman Walsh//DTD Website V2.5.0//EN"
+  "/usr/share/xml/docbook/custom/website/2.5.0/schema/dtd/website.dtd"> 
 <webpage id="ocaml-gettext-project">
-<config param="rcsdate" value="svn:date"/>
-<head>
-  <title>Project ocaml-gettext</title>
-  <titleabbrev>ocaml-gettext</titleabbrev>
-  <summary>OCaml library for string translation.</summary>
-</head>
+  
+  <head>
+    <title>Project ocaml-gettext</title>
+    <titleabbrev>ocaml-gettext</titleabbrev>
+    <summary>OCaml library for string translation.</summary>
+  </head>
 
-<webtoc/>
-
-<section>
-  <title>Goals</title>
-  <para>Ocaml-gettext should provide a support for internationalization of Ocaml program.</para>
-  <para>Constraints :</para>
-  <itemizedlist>
-    <listitem>
-      <para>provides a pure Ocaml implementation,</para>
-    </listitem>
-    <listitem>
-      <para>the API should be as close as possible to GNU gettext,</para>
-    </listitem>
-    <listitem>
-      <para>provides a way to automatically extract translatable strings from Ocaml source
-      code.</para>
-    </listitem>
-  </itemizedlist>
-</section>
-
-<section>
-  <title>Description</title>
-
-  <para>
-    Internationalization of a program means that the program have the possibility to handle
-    different language. Handling different language means that it can output string which 
-    depends on the language of the user, who will read it. Typically, if a program output 
-    &quot;bonjour&quot; for a french user, and &quot;hello&quot; for an english user, this 
-    program is internationalized. 
-  </para>
-
-  <para>
-    It is possible to make things very simple ( at least i think so ), for internationalizing
-    a program. GNU gettext seems a very good solution. You just need to use a special function
-    to translate strings, that need to be translated and they are treated automatically. After 
-    having include this function ( in the case of ocaml-gettext, functions are &quot;s_&quot;,
-    &quot;f_&quot;,&quot;sn_&quot; and &quot;fn_&quot;.
-  </para>
-
-  <para>For now, ocaml-gettext provides enough service to build a basic internationalized 
-    program. It comes with :</para>
-  <itemizedlist>
-    <listitem>
-      <para>a pure Ocaml implementation, based on Camomile,</para>
-    </listitem>
-    <listitem>
-      <para>a binding to GNU gettext library,</para>
-    </listitem>
-    <listitem>
-      <para><command>ocaml-gettext</command> a tool to extract strings from Ocaml source.</para>
-    </listitem>
-  </itemizedlist>
-</section>
-
-<section>
-  <title>News</title>
+  <webtoc/>
 
   <section>
-    <sectioninfo><date>April, 16th 2005</date></sectioninfo>
-    <title>Version 0.2.0</title>
+    <title>Goals</title>
+    <para>Ocaml-gettext should provide a support for internationalization of Ocaml program.</para>
+    <para>Constraints :</para>
+    <itemizedlist>
+      <listitem>
+        <para>provides a pure Ocaml implementation,</para>
+      </listitem>
+      <listitem>
+        <para>the API should be as close as possible to GNU gettext,</para>
+      </listitem>
+      <listitem>
+        <para>provides a way to automatically extract translatable strings from Ocaml source
+        code.</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section>
+    <title>Description</title>
 
     <para>
-      This is the first official public release. 
+      Internationalization of a program means that the program have the possibility to handle
+      different language. Handling different language means that it can output string which 
+      depends on the language of the user, who will read it. Typically, if a program output 
+      &quot;bonjour&quot; for a french user, and &quot;hello&quot; for an english user, this 
+      program is internationalized. 
     </para>
+
+    <para>
+      It is possible to make things very simple ( at least i think so ), for internationalizing
+      a program. GNU gettext seems a very good solution. You just need to use a special function
+      to translate strings, that need to be translated and they are treated automatically. After 
+      having include this function ( in the case of ocaml-gettext, functions are &quot;s_&quot;,
+      &quot;f_&quot;,&quot;sn_&quot; and &quot;fn_&quot;.
+    </para>
+
+    <para>For now, ocaml-gettext provides enough service to build a basic internationalized 
+      program. It comes with :</para>
+    <itemizedlist>
+      <listitem>
+        <para>a pure Ocaml implementation, based on Camomile,</para>
+      </listitem>
+      <listitem>
+        <para>a binding to GNU gettext library,</para>
+      </listitem>
+      <listitem>
+        <para><command>ocaml-gettext</command> a tool to extract strings from Ocaml source.</para>
+      </listitem>
+    </itemizedlist>
   </section>
-</section>
+
+  <section>
+    <title>News</title>
+
+    <section>
+      <sectioninfo><date>April, 16th 2005</date></sectioninfo>
+      <title>Version 0.2.0</title>
+
+      <para>
+        This is the first official public release. 
+      </para>
+    </section>
+  </section>
 </webpage>

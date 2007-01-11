@@ -1,20 +1,22 @@
-<?xml version="1.0" encoding="ISO-8859-15"?>
-<!DOCTYPE webpage
-       PUBLIC "-//Norman Walsh//DTD Website V2.5.0//EN"
-       "http://docbook.sourceforge.net/release/website/2.5.0/schema/dtd/website.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE webpage PUBLIC "-//Norman Walsh//DTD Website V2.5.0//EN"
+  "/usr/share/xml/docbook/custom/website/2.5.0/schema/dtd/website.dtd"> 
 <webpage id="ocaml-gettext-documentation">
-<config param="rcsdate" value="svn:date"/>
-<head>
-  <title>Documentation of ocaml-gettext</title>
-  <titleabbrev>Documentation</titleabbrev>
-  <summary>Documentation of ocaml-gettext library</summary>
-</head>
+  
+  <config param="rcsdate" value="svn:date"/>
+  
+  <head>
+    <title>Documentation of ocaml-gettext</title>
+    <titleabbrev>Documentation</titleabbrev>
+    <summary>Documentation of ocaml-gettext library</summary>
+  </head>
+  
+  <webtoc/>
+  
+  <section>
+    <title>Documentation</title>
+  
+    <para>Here you can find all the documentation of the ocaml-gettext project.</para>
+  </section>
 
-<webtoc/>
-
-<section>
-  <title>Documentation</title>
-
-  <para>Here you can find all the documentation of the ocaml-gettext project.</para>
-</section>
 </webpage>

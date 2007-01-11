@@ -1,19 +1,34 @@
-<?xml version="1.0" encoding="ISO-8859-15"?>
-<!DOCTYPE autolayout PUBLIC "-//Norman Walsh//DTD Website Autolayout V2.5.0//EN"
-               "http://docbook.sourceforge.net/release/website/2.5.0/autolayout.dtd" [
-   <!ENTITY exported-toc SYSTEM "ocaml-gettext-toc.xml">
-]>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE layout PUBLIC "-//Norman Walsh//DTD Website Autolayout V2.5.0//EN"
+  "/usr/share/xml/docbook/custom/website/2.5.0/schema/dtd/layout.dtd"> 
 <layout>
 
-<copyright>
-  <year>2003</year>
-  <year>2004</year>
-  <year>2005</year>
-	<holder>Sylvain Le Gall</holder>
-</copyright>
+  <copyright>
+    <year>2003-2005</year>
+    <holder>Sylvain Le Gall</holder>
+  </copyright>
 
-<toc page="website.xml" filename="index.html">
-	&exported-toc;
-</toc>
-
+  <toc page="website.xml" filename="index.html">
+    <tocentry page="ocaml-gettext.xml" filename="ocaml-gettext.html">
+      <tocentry page="ocaml-gettext-documentation.xml" 
+        filename="ocaml-gettext-documentation.html">
+        <title>Documentation</title>
+        <tocentry id="ocaml-gettext-reference-manual-html" 
+          href="ocaml-gettext/reference-manual/index.html">
+          <title>Reference manual</title></tocentry>
+        <tocentry id="ocaml-gettext-reference-manual-pdf" 
+          href="ocaml-gettext/reference-manual.pdf">
+          <title>Reference manual (PDF)</title></tocentry>
+        <tocentry id="ocaml-gettext-api" 
+          href="ocaml-gettext/gettext/index.html">
+          <title>API</title></tocentry>
+        <tocentry id="ocaml-gettext-ext-api" 
+          href="ocaml-gettext/gettext-ext/index.html">
+          <title>Extended API</title></tocentry></tocentry>
+      <tocentry id="ocaml-gettext-download"
+        href="download/ocaml-gettext-latest.tar.gz">
+        <title>Download</title></tocentry>
+      <tocentry id="ocaml-gettext-bugs" 
+          href="http://www.gallu.homelinux.org/bugs/cgi/pkgreport.cgi?pkg=ocaml-gettext">
+          <title>Bugs</title></tocentry></tocentry></toc>
 </layout>
