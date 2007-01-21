@@ -29,6 +29,13 @@
         href="download/ocaml-gettext-latest.tar.gz">
         <title>Download</title></tocentry>
       <tocentry id="ocaml-gettext-bugs" 
-          href="http://www.gallu.homelinux.org/bugs/cgi/pkgreport.cgi?pkg=ocaml-gettext">
-          <title>Bugs</title></tocentry></tocentry></toc>
+        href="bts/index.php?tasks=all&amp;project=1">
+        <title>Bugs</title></tocentry>
+      <!--
+      <tocentry id="ocaml-gettext-blog" 
+        href="blog/index.php?Ocaml-gettext">
+        <title>News</title></tocentry>
+      --> 
+    </tocentry>
+  </toc>
 </layout>
