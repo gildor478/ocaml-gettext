@@ -66,7 +66,7 @@ exception DomainFileDoesntExist of filename list;;
     syntax. 
   *)
 exception FormatInconsistent of string * string;;
-(** A part of the code try to translate a string, but gettext is not
+(** A part of the code try to translate a string, but ocaml-gettext is not
     initialized. 
   *)
 exception GettextUninitialized;;

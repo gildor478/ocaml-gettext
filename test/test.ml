@@ -78,7 +78,7 @@ let parse_arg () =
       ,"dir Specify the temporary dir for testing files."
     );
   ])
-  (fun str -> () )
+  (fun str -> ())
   ("Test utility for ocaml-gettext v"^(GettextConfig.version)^" by Sylvain Le Gall\n"^
   "Copyright 2004,2005. Licensed under LGPL v2.1 with Ocaml exception.");
   !tests
