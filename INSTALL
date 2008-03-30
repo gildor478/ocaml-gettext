@@ -13,6 +13,7 @@ In order to install you will need :
 	http://www.ocaml-programming.de/packages/
 - make, a C compiler, libintl.h ( which is bundle in libc6 )
 - camomile
+- ocaml-fileutils
 - ounit
 - benchmark
 - docbook DTD and XSL
