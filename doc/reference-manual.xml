@@ -69,7 +69,6 @@
 <!ENTITY site-gtranslator           'http://gtranslator.sourceforge.net/'>
 <!ENTITY site-kbabel                'http://i18n.kde.org/tools/kbabel/'>
 <!ENTITY download-fop               'http://www.apache.org/dyn/closer.cgi/xml/fop'>
-<!ENTITY download-ocaml-ast-analyze 'http://www.gallu.homelinux.org/download/'>
   ]>
 <book>
   <title>Ocaml-gettext reference manual</title>
@@ -213,7 +212,7 @@
         <itemizedlist>
           <listitem>
             <para>
-              <ulink url="&download-ocaml;">OCaml</ulink> v3.08.3 or later,
+              <ulink url="&download-ocaml;">OCaml</ulink> v3.10.1 or later,
             </para>
           </listitem>
           <listitem>
@@ -228,12 +227,7 @@
           </listitem>
           <listitem>
             <para>
-              <ulink url="&download-ocaml-ast-analyze;">ocaml-ast-analyze</ulink> v0.1.0 or later,
-            </para>
-          </listitem>
-          <listitem>
-            <para>
-              <ulink url="&download-camomile;">camomile</ulink> v0.6.0 or later,
+              <ulink url="&download-camomile;">camomile</ulink> v0.7.1 or later,
             </para>
           </listitem>
           <listitem>

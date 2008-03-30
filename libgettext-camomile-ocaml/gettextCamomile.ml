@@ -23,7 +23,8 @@
 (**************************************************************************)
 
 
-open Camomile;;
+open CamomileLibrary;;
+open Default.Camomile;;
 open GettextTypes;;
 
 (** Charset module, that is derived directly from the camomile library. *)

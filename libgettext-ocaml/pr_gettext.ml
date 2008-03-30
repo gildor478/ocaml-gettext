@@ -24,6 +24,7 @@
 
 (** Camlp4 dumper to extract strings.
     @author Sylvain Le Gall
+    @author Richard W.M. Jones (translation to OCaml 3.10.X new camlp4)
   *)
 
 (* Extract the string which should be used for a gettext translation. Output a
@@ -48,163 +49,129 @@ dcngettext    _          domain     singular   plural     _          _
 fdcngettext   _          domain     singular   plural     _          _
 *)
 
-open MLast;;
-open Format;;
-open GettextTypes;;
-open GettextPo;;
+open Format
+open GettextTypes
+open GettextPo
 
 let default_textdomain = ref None
-;;
 
-let add_translation t loc singular plural domain =
-  let location =
-    let (pos1,_) = loc
+module Id = struct
+  (* name is printed with the -loaded-modules switch *) 
+  let name = "pr_gettext" 
+  (* cvs id's seem to be the preferred version string *) 
+  let version = "$Id$" 
+end 
+
+module Make (Syntax : Camlp4.Sig.Camlp4Syntax)
+  : Camlp4.Sig.Printer(Syntax.Ast).S =
+struct
+  module Loc = Syntax.Loc
+  module Ast = Syntax.Ast
+
+  type t = po_content
+
+  let add_translation t loc singular plural domain =
+    let location = Loc.file_name loc, Loc.start_line loc in
+    let translation =
+      match plural with 
+	Some plural -> ([location],PoPlural([singular],[plural],[[""];[""]]))
+      | None -> ([location],PoSingular([singular],[""]))
     in
-    (!Pcaml.input_file,pos1.Lexing.pos_lnum)
-  in
-  let translation =
-    match plural with 
-      Some plural -> ([location],PoPlural([singular],[plural],[[""];[""]]))
-    | None -> ([location],PoSingular([singular],[""]))
-  in
-  match domain with 
-    Some domain -> 
-      add_po_translation_domain domain t translation
-  | None -> 
-      (
-        match !default_textdomain with
-          Some domain ->
-            add_po_translation_domain domain t translation
-        | None ->
-            add_po_translation_no_domain t translation
-      )
-;;
+    match domain with 
+      Some domain -> 
+	add_po_translation_domain domain t translation
+    | None ->
+	(
+          match !default_textdomain with
+            Some domain ->
+              add_po_translation_domain domain t translation
+          | None ->
+              add_po_translation_no_domain t translation
+	)
 
-module AstGettextMatch =
-  struct
-    type t = po_content
-    
-    let s_functions = ref [ "s_"; "f_" ]
+  let output_translations ?output_file m = 
+    let (fd,close_on_exit) = 
+      match output_file with
+	Some f -> (open_out f,true)
+      | None -> (stdout,false)
+    in
+    Marshal.to_channel fd m [];
+    flush fd;
+    if close_on_exit then
+      close_out fd
+    else
+      ()
 
-    let sn_functions = ref [ "sn_"; "fn_" ]
+  class visitor = object
+    inherit Ast.fold as super
 
-    let gettext_functions = ref [ "gettext"; "fgettext" ]
+    val t = empty_po
+    method t = t
 
-    let dgettext_functions = ref [ "dgettext"; "fdgettext"; "dcgettext"; "fdcgettext" ]
+    method expr = function
+    | <:expr@loc< s_ $str:singular$ >>
+    | <:expr@loc< f_ $str:singular$ >> ->
+      (* Add a singular / default domain string *)
+      let t = add_translation t loc singular None None in
+      {< t = t >}
 
-    let ngettext_functions = ref [ "ngettext"; "fngettext" ]
+    | <:expr@loc< sn_ $str:singular$ $str:plural$ >>
+    | <:expr@loc< fn_ $str:singular$ $str:plural$ >> ->
+      (* Add a plural / default domain string *)
+      let t = add_translation t loc singular (Some plural) None in
+      {< t = t >}
 
-    let dngettext_functions = ref [ "dngettext"; "fdngettext"; "dcngettext"; "fdcngettext" ]
+    | <:expr@loc< gettext $expr$ $str:singular$ >>
+    | <:expr@loc< fgettext $expr$ $str:singular$ >> ->
+      (* Add a singular / default domain string *)
+      let t = add_translation t loc singular None None in
+      {< t = t >}
 
-    (* Check if the given node belong to the given functions *)
-    let is_like e functions = 
-      let function_name e =
-        let rec check_module e =
-          match e with
-            ExAcc(_, ExUid(_, _), e) -> check_module e
-          | ExUid(_, _) -> true
-          | _ -> false
-        in
-        match e with
-          ExLid(_, s) -> s
-        | ExAcc(_, e, ExLid(_, s)) when check_module e -> s
-        | _ -> raise Not_found
-      in
-      try
-        List.mem (function_name e) !functions
-      with Not_found ->
-        false
-    
-    let id t x = t
-    let ctyp = id 
-    let row_field = id 
-    let class_infos = id 
-    let patt = id 
-    let expr t e = 
-      match e with
-        ExApp(_, 
-          e, ExStr(loc, singular)
-          ) when is_like e s_functions ->
-          (* Add a singular / default domain string *)
-          add_translation t loc singular None None
-      | ExApp(_, 
-          ExApp(_, e, _), ExStr(loc, singular)
-          ) when is_like e gettext_functions ->
-          (* Add a singular / default domain string *)
-          add_translation t loc singular None None
-      | ExApp(_, 
-          ExApp(_, e, ExStr(loc, singular)), ExStr(_, plural)
-          ) when is_like e sn_functions ->
-          (* Add a plural / default domain string *)
-          add_translation t loc singular (Some plural) None
-      | ExApp(_, 
-          ExApp(_, ExApp(_, e, _), ExStr(loc, singular)), ExStr(_, plural)
-          ) when is_like e ngettext_functions ->
-          (* Add a plural / default domain string *)
-          add_translation t loc singular (Some plural) None
-      | ExApp(_, 
-          ExApp(_, ExApp(_, e, _), ExStr(_, domain)), ExStr(loc, singular)
-          ) when is_like e dgettext_functions ->
-          (* Add a singular / defined domain string *)
-          add_translation t loc singular None (Some domain)
-      | ExApp(_, 
-          ExApp(_, ExApp(_, ExApp(_, e, _), ExStr(_, domain)), ExStr(loc, singular)), ExStr(_, plural)
-          ) when is_like e dngettext_functions ->
-          (* Add a plural / defined domain string *)
-          add_translation t loc singular (Some plural) (Some domain)
-      | _ ->
-          t
+    | <:expr@loc< dgettext $expr$ $str:domain$ $str:singular$ >>
+    | <:expr@loc< fdgettext $expr$ $str:domain$ $str:singular$ >>
+    | <:expr@loc< dcgettext $expr$ $str:domain$ $str:singular$ >>
+    | <:expr@loc< fdcgettext $expr$ $str:domain$ $str:singular$ >> ->
+      (* Add a singular / defined domain string *)
+      let t = add_translation t loc singular (Some domain) None in
+      {< t = t >}
 
-    let module_type = id 
-    let sig_item = id 
-    let with_constr = id 
-    let module_expr = id 
-    let str_item = id 
-    let type_decl = id 
-    let class_type = id 
-    let class_sig_item = id 
-    let class_expr = id 
-    let class_str_item = id 
-    let interf = id 
-    let implem = id 
+    | <:expr@loc< nettext $expr$ $str:singular$ $str:plural$ >>
+    | <:expr@loc< fngettext $expr$ $str:singular$ $str:plural$ >> ->
+      (* Add a plural / default domain string *)
+      let t = add_translation t loc singular (Some plural) None in
+      {< t = t >}
+
+    | <:expr@loc< dgettext $expr$ $str:domain$ $str:singular$ $str:plural$ >>
+    | <:expr@loc< fdgettext $expr$ $str:domain$ $str:singular$ $str:plural$ >>
+    | <:expr@loc< dcgettext $expr$ $str:domain$ $str:singular$ $str:plural$ >>
+    | <:expr@loc< fdcgettext $expr$ $str:domain$ $str:singular$ $str:plural$ >> ->
+      (* Add a plural / defined domain string *)
+      let t = add_translation t loc singular (Some plural) (Some domain) in
+      {< t = t >}
+
+    | e -> super#expr e
   end
-;;
 
-module AstGettext = Pr_ast_analyze.AstAnalyze(AstGettextMatch)
-;;
+  (* Called on *.mli files. *)
+  (* This was in the old code, but AFAICS interfaces can never
+   * contain translatable strings (right??).  So I've changed this
+   * to do nothing. - RWMJ 2008/03/21
+   *)
+  let print_interf ?input_file ?output_file _ = ()
 
-let output_translations m = 
-  let (fd,close_on_exit) = 
-    match !Pcaml.output_file with
-      Some f -> (open_out f,true)
-    | None -> (stdout,false)
-  in
-  Marshal.to_channel fd m [];
-  flush fd;
-  if close_on_exit then
-    close_out fd
-  else
-    ()
-;;
-    
+  (* Called on *.ml files. *)
+  let print_implem ?input_file ?output_file ast =
+    let visitor = (new visitor)#str_item in
+    let t = (visitor ast)#t in
+    output_translations ?output_file t
+end
 
-let gettext_interf lst =
-  output_translations (AstGettext.interf empty_po lst)
-;;
+(* Register the new printer. *)
+module M = Camlp4.Register.OCamlPrinter(Id)(Make) ;;
 
-let gettext_implem lst = 
-  output_translations (AstGettext.implem empty_po lst)
-;;
-
-(* Register Pcaml printer *)
-
-Pcaml.print_interf := gettext_interf
-;;
-
-Pcaml.print_implem := gettext_implem
-;;
-
+(* XXX How to do this?
 Pcaml.add_option "-default-textdomain" 
   (Arg.String ( fun textdomain -> default_textdomain := Some textdomain ) )
   "<textdomain> Defines the default textdomain"
 ;;
+*)

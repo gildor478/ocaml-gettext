@@ -60,18 +60,20 @@ include ../TopMakefile
 all: ocaml-xgettext
 
 install: ocaml-xgettext-install
-	
+
 uninstall: ocaml-xgettext-uninstall
-	
+
+# mkcamlp4 is broken in 3.10
 ocaml-xgettext: $(BUILDBIN)
-	$(MKCAMLP4)                                                          \
-           -I +camlp4 pa_o.cmo                                               \
+	$(OCAMLC)                                                            \
+           -I +camlp4 camlp4lib.cma                                          \
+           unix.cma                                                          \
           `$(OCAMLFIND) query -r -predicates byte gettext.extract -i-format` \
           `$(OCAMLFIND) query -r -predicates byte gettext.extract -a-format` \
           `$(OCAMLFIND) query -r -predicates byte gettext.extract -o-format` \
+           Camlp4Bin.cmo                                                     \
           -o $@
 	$(CP) $@ $(BUILDBIN)/
-
 
 ocaml-xgettext-install:
 	$(CP) ocaml-xgettext $(BINDIR)/

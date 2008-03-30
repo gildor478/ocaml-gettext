@@ -41,6 +41,6 @@ package "extension" (
 
 package "extract" (
   version = "@VERSION@"
-  requires = "ast-analyze gettext.extension"
+  requires = "gettext.extension"
   archive(byte) = "pr_gettext.cmo" 
 )

@@ -137,7 +137,15 @@ clean::
 INSTALLIB +=        \
  pr_gettext.cmo    
 
-pr_gettext.cmo: REQUIRES=ast-analyze
+pr_gettext.cmo: pr_gettext.ml
+	ocamlc \
+	  -I +camlp4 \
+	  -I $(shell ocamlc -where)/camlp4/Camlp4Parsers \
+	  -pp camlp4of \
+	  camlp4lib.cma \
+	  gettextBase.cma \
+	  gettextExtension.cma \
+	  -c $< -o $@
 
 include ../ConfMakefile
 include ../TopMakefile

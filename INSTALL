@@ -5,14 +5,14 @@ ocaml-gettext
 Prerequisite :
 
 In order to install you will need :
-- ocaml ( >= 3.07 )
+- ocaml ( >= 3.10.1 )
 	http://caml.inria.fr/
 - camlidl ( >= 1.04 )
 	http://caml.inria.fr/camlidl/
 - ocamlfind ( >= 0.8 ) 
 	http://www.ocaml-programming.de/packages/
 - make, a C compiler, libintl.h ( which is bundle in libc6 )
-- camomile
+- camomilea (>= 0.7.1)
 - ocaml-fileutils
 - ounit
 - benchmark
