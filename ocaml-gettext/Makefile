@@ -63,7 +63,6 @@ install: ocaml-xgettext-install
 
 uninstall: ocaml-xgettext-uninstall
 
-# mkcamlp4 is broken in 3.10
 ocaml-xgettext: $(BUILDBIN)
 	$(OCAMLC)                                                            \
            -I +camlp4 camlp4lib.cma                                          \

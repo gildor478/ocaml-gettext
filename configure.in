@@ -84,7 +84,6 @@ AC_CHECK_OCAMLFIND([],[AC_MSG_ERROR(Cannot find ocamlfind.)])
 AC_CHECK_CAMLP4([],[AC_MSG_ERROR(Cannot find camlp4.)])
 AC_CHECK_CAMLIDL([],[AC_MSG_ERROR(Cannot find camlidl.)])
 AC_CHECK_OCAMLMKLIB([],[AC_MSG_ERROR(Cannot find ocamlmklib.)])
-AC_CHECK_MKCAMLP4([],[AC_MSG_ERROR(Cannot find mkcamlp4.)])
 
 if test "x$BUILD_DOC" = "xyes"; then
   AC_CHECK_OCAMLDOC([],[AC_MSG_ERROR(Cannot find ocamldoc.)])
