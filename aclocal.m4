@@ -257,8 +257,8 @@ AC_DEFUN([AC_CHECK_PDFXSL],
 AC_CHECK_XSL(FOXSL,pdf,$1,$2,$3)
 AC_CHECK_PROG(FOP,fop,fop)
 if test "x$FOP" = "x"; then
-  AC_MSG_WARN(Cannot find fop.")
-  $4
+  AC_MSG_WARN(Cannot find fop.)
+  $3
 fi
 ]);
 

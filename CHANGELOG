@@ -1,7 +1,9 @@
 v 0.3.0 (Sun, 30 Mar 2008 17:53:58 +0200):
   * Get rid of ocaml-ast-analyze (Richard W.M. Jones)
   * Port of camlp4 extension to OCaml 3.10.1 (Richard W.M. Jones)
+  * Compile with camomile 0.7.1 (Richar W.M. Jones)
   * Check dependency on ocaml-fileutils in configure 
+  * Add --disable-doc-pdf to configure, to allow building doc without PDF (and fop)
 
 v 0.2.0 :
   * Full rewrite of ocaml-gettext.

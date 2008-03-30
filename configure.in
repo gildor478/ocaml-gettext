@@ -73,6 +73,10 @@ AC_ARG_ENABLE(doc,
         AC_HELP_STRING([--enable-doc], [Build the documentation. Default : yes]),
         BUILD_DOC=$enableval, BUILD_DOC="yes")
 
+AC_ARG_ENABLE(doc-pdf,
+        AC_HELP_STRING([--enable-doc-pdf], [Build the PDF documentation. Default : yes]),
+        BUILD_DOC_PDF=$enableval, BUILD_DOC_PDF="yes")
+
 VERSION=0.2.0
 DATE=`date`
 
@@ -89,7 +93,9 @@ if test "x$BUILD_DOC" = "xyes"; then
   AC_CHECK_OCAMLDOC([],[AC_MSG_ERROR(Cannot find ocamldoc.)])
   AC_CHECK_HTMLXSL($DOCBOOK_STYLESHEET/xhtml/chunk.xsl,[],[AC_MSG_ERROR(Cannot generate HTML pages.)])
   AC_CHECK_MANXSL($DOCBOOK_STYLESHEET/manpages/docbook.xsl,[],[AC_MSG_ERROR(Cannot generate manpages.)])
-  AC_CHECK_PDFXSL($DOCBOOK_STYLESHEET/fo/docbook.xsl,[],[AC_MSG_ERROR(Cannot generate PDF files.)])
+  if test "x$BUILD_DOC_PDF" = "xyes"; then
+    AC_CHECK_PDFXSL($DOCBOOK_STYLESHEET/fo/docbook.xsl,[],[AC_MSG_ERROR(Cannot generate PDF files.)])
+  fi
 fi
 
 OCAMLFIND_CHECK_MODULE(fileutils,[],[AC_MSG_ERROR(Cannot find ocaml-fileutils)])
@@ -144,6 +150,7 @@ AC_SUBST(BUILD_STUB)
 AC_SUBST(BUILD_TEST)
 AC_SUBST(BUILD_BENCH)
 AC_SUBST(BUILD_DOC)
+AC_SUBST(BUILD_DOC_PDF)
 
 # Finally create the Makefile from Makefile.in
 OUTPUT="ConfMakefile                \

@@ -32,7 +32,9 @@ HTML_TARGETS=$(call HTML_TARGET,reference-manual.xml)
 $(call HTML_TARGET,reference-manual.xml): IMAGES=gui.png gui-fr.png
 
 # PDF documentation
+ifeq ($(BUILD_DOC_PDF),yes)
 PDF_TARGETS=$(call PDF_TARGET,reference-manual.xml)
+endif
 
 ODOC_TARGETS=$(call ODOC_TARGET,gettext) $(call ODOC_TARGET,gettext-ext)
 
