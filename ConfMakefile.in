@@ -26,10 +26,13 @@
 # where to install the binaries
 prefix=@prefix@
 exec_prefix=@exec_prefix@
+datarootdir=@datarootdir@
+PACKAGE_TARNAME=@PACKAGE_TARNAME@
 BINDIR =@bindir@
 LIBDIR =@libdir@
 MANDIR =@mandir@
-DOCDIR =@DOCDIR@
+DOCDIR =@docdir@
+PODIR  =@localedir@
 OCAMLLIB=@OCAMLLIB@
 
 # programs to build an compile
@@ -51,9 +54,9 @@ XSLTPROC     = @XSLTPROC@
 XMLLINT      = @XMLLINT@
 OCAMLDOC     = @OCAMLDOC@
 FOP          = @FOP@
-MKDIR        = mkdir
-CP           = cp -f
-TOUCH        = touch
+INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
 
 # stylesheets
 HTMLXSL = @HTMLXSL@
@@ -61,7 +64,8 @@ MANXSL  = @MANXSL@
 FOXSL   = @FOXSL@
 
 # temporary build directory
-BUILDDIR  = @BUILDDIR@
+abs_top_srcdir = @abs_top_srcdir@
+TMPBUILDDIR  = @TMPBUILDDIR@
 
 # build target
 BUILD_CAMOMILE=@BUILD_CAMOMILE@
@@ -74,3 +78,7 @@ BUILD_DOC_PDF=@BUILD_DOC_PDF@
 # configuration
 STUB_LDFLAGS=@STUB_LDFLAGS@
 STUB_CFLAGS=@STUB_CFLAGS@
+
+# ocamlfind install/remove flags
+OCAMLFIND_INSTALL_FLAGS=@OCAMLFIND_INSTALL_FLAGS@
+OCAMLFIND_REMOVE_FLAGS=@OCAMLFIND_REMOVE_FLAGS@

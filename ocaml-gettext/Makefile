@@ -72,10 +72,10 @@ ocaml-xgettext: $(BUILDBIN)
           `$(OCAMLFIND) query -r -predicates byte gettext.extract -o-format` \
            Camlp4Bin.cmo                                                     \
           -o $@
-	$(CP) $@ $(BUILDBIN)/
+	$(INSTALL_SCRIPT) -t $(BUILDBIN) $@
 
 ocaml-xgettext-install:
-	$(CP) ocaml-xgettext $(BINDIR)/
+	$(INSTALL_SCRIPT) -t $(BINDIR) ocaml-xgettext 
 
 ocaml-xgettext-uninstall:
 	-$(RM) $(BINDIR)/ocaml-xgettext 
@@ -83,6 +83,4 @@ ocaml-xgettext-uninstall:
 clean:: 
 	-$(RM) ocaml-xgettext
 	-$(RM) $(BUILDBIN)/ocaml-xgettext
-	-$(if $(wildcard $(BUILDBIN)/*), ,$(RM) -r $(BUILDBIN))
-	-$(if $(wildcard $(BUILDDIR)/*), ,$(RM) -r $(BUILDDIR))
 endif

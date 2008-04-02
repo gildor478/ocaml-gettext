@@ -2,8 +2,8 @@
 ocaml-gettext
 --------------
 
-This library is a wrapper around gettext 
-( http://www.gnu.org/software/gettext/gettext.html ), it also provides a pure
+This library is a wrapper around gettext
+(http://www.gnu.org/software/gettext/gettext.html), it also provides a pure
 Ocaml implementation based on camomile.
 
 The primary target of this work is to bring internationalization to 
@@ -18,7 +18,7 @@ Please report me any problem : send an email to submit@bugs.gallu.homelinux.org
 beginning with 
 
 Package: libgettext-ocaml
-Version: 0.1
+Version: 0.3.0
 Severity: { choose wishlist,normal,important }
 
 and the description of your bugs.

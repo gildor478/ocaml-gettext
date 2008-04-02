@@ -25,8 +25,8 @@
 
 # destination dir
 DOCHTML=$(DOCDIR)/html
-DOCODOC=$(DOCHTML)
-DOCPDF =$(DOCDIR)
+DOCODOC=$(DOCDIR)/html
+DOCPDF =$(DOCDIR)/pdf
 
 # programs flags
 FOPFLAGS      = 
@@ -48,14 +48,14 @@ endif
 
 CLI_OCAMLFIND = $(CLI_REQUIRES) $(CLI_PREDICATES) $(CLI_SYNTAX)
 
-BUILDLIB  = $(BUILDDIR)/lib
-BUILDBIN  = $(BUILDDIR)/bin
-BUILDDOC  = $(BUILDDIR)/share/doc
+BUILDLIB  = $(TMPBUILDDIR)/lib
+BUILDBIN  = $(TMPBUILDDIR)/bin
+BUILDDOC  = $(TMPBUILDDIR)/share/doc
 BUILDHTML = $(BUILDDOC)/html
-BUILDMAN  = $(BUILDDIR)/share/man
+BUILDMAN  = $(TMPBUILDDIR)/share/man
 BUILDODOC = $(BUILDHTML)/api
 BUILDPDF  = $(BUILDDOC)
-BUILDPO   = $(BUILDDIR)/share/locale
+BUILDPO   = $(TMPBUILDDIR)/share/locale
 
 OCAMLPATH:=$(BUILDLIB)/:$(OCAMLPATH)
 export OCAMLPATH
@@ -93,6 +93,8 @@ distclean::
 
 CMX = $(patsubst dll%.so, lib%.a, $(CMO:.cmo=.cmx))
 
+INSTALL_DIR_AUX=$(INSTALL) -d $(2); $(INSTALL_DATA) -t $(2) $(wildcard $(dir $(1))*)
+INSTALL_DIR=$(call INSTALL_DIR_AUX,$(1),$(2)/$(notdir $(patsubst %/,%,$(dir $(1)))))
 
 # Build the lib
 ONLY_BYTE=$(filter-out %.o,$(filter-out %.a,$(filter-out %.cmx, $(filter-out %.cmxa,$(1))))) $(filter lib%.a,$(1))
@@ -109,9 +111,6 @@ ONLY_BYTE=$(filter-out %.o,$(filter-out %.a,$(filter-out %.cmx, $(filter-out %.c
 	 $(OCAMLC)  -a -o $*.cma $^            \
 	)
 
-$(BUILDLIB):
-	mkdir -p $(BUILDLIB)
-	
 install-buildlib-byte: REAL_INSTALLIB = $(call ONLY_BYTE,$(INSTALLIB))
 install-buildlib-byte: $(call ONLY_BYTE,$(INSTALLIB))
 install-buildlib-byte: install-buildlib-common
@@ -120,7 +119,8 @@ install-buildlib-opt: REAL_INSTALLIB =  $(INSTALLIB)
 install-buildlib-opt: $(INSTALLIB)
 install-buildlib-opt: install-buildlib-common
 
-install-buildlib-common: $(BUILDLIB)
+install-buildlib-common: 
+	$(INSTALL) -d $(BUILDLIB)
 	-$(OCAMLFIND) remove -destdir $(BUILDLIB) $(NAME) 
 	$(OCAMLFIND)  install -ldconf ignore -destdir $(BUILDLIB) $(NAME) $(REAL_INSTALLIB)
 
@@ -133,38 +133,43 @@ install-lib-opt: $(INSTALLIB)
 install-lib-opt: install-lib-common
 	
 install-lib-common:
-	$(OCAMLFIND) install $(if $(LDCONF),-ldconf $(LDCONF)) -destdir $(LIBDIR) $(NAME) $(REAL_INSTALLIB)
+	-$(OCAMLFIND) remove $(OCAMLFIND_REMOVE_FLAGS) $(NAME) 
+	$(OCAMLFIND) install $(OCAMLFIND_INSTALL_FLAGS) $(NAME) $(REAL_INSTALLIB)
 
 uninstall-lib:
-	-$(OCAMLFIND) remove -destdir $(LIBDIR) $(NAME)
+	-$(OCAMLFIND) remove $(OCAMLFIND_REMOVE_FLAGS) $(NAME)
 
 clean-lib:
 	-$(OCAMLFIND) remove -destdir $(BUILDLIB) $(NAME)
 
 # Build the executable
 
-$(BUILDBIN): 
-	mkdir -p $(BUILDBIN)
-
 BLIBS = $(addsuffix .cma,$(LIBS))
 
-install-buildprog-byte: $(BUILDBIN) $(CMO)
+install-buildprog-byte: $(CMO)
 	$(OCAMLC) -o $(NAME) $(INCLUDES) -package "$(REQUIRES)" -linkpkg \
 	-predicates "$(PREDICATES)" $(BLIBS) $(CMO)
-	$(CP) $(NAME) $(BUILDBIN)/
+	$(INSTALL) -d $(BUILDBIN)
+	$(INSTALL_SCRIPT) -t $(BUILDBIN) $(NAME)
 
 install-prog-byte: install-buildprog-byte
-	$(CP) $(NAME) $(BINDIR)/
+	$(INSTALL) -d $(BINDIR)
+	$(INSTALL_SCRIPT) -t $(BINDIR) $(NAME) 
 
 OLIBS = $(addsuffix .cmxa,$(LIBS))
 
-install-buildprog-opt: $(BUILDBIN) $(CMX)
+install-buildprog-opt: $(CMX)
 	$(OCAMLOPT) -o $(NAME) $(INCLUDES) -package "$(REQUIRES)" -linkpkg \
 	-predicates "$(PREDICATES)" $(OLIBS) $(CMX)
-	$(CP) $(NAME) $(BUILDBIN)/
+	$(INSTALL) -d $(BUILDBIN) 
+	$(INSTALL_SCRIPT) -t $(BUILDBIN) $(NAME) 
 
 install-prog-opt: install-buildprog-opt
-	$(CP) $(NAME) $(BINDIR)/
+	$(INSTALL) -d $(BINDIR)
+	$(INSTALL_SCRIPT) -t $(BINDIR)/ $(NAME) 
+
+uninstall-prog:
+	$(if $(NAME),-$(RM) $(BINDIR)/$(NAME))
 
 clean-prog:
 	-$(RM) $(NAME)
@@ -174,7 +179,7 @@ clean-prog:
 
 PDF_TARGET=$(patsubst %.xml,$(BUILDPDF)/%.pdf,$(1))
 $(BUILDPDF)/%.pdf: %.fo
-	$(MKDIR) -p $(dir $@)
+	$(INSTALL) -d $(dir $@)
 	$(FOP) $(FOPFLAGS) -fo $^ -pdf $@
 
 %.fo: %.xml
@@ -187,20 +192,22 @@ clean-doc-pdf:
 	-$(if $(PDF_TARGETS),$(RM) $(PDF_TARGETS))
 
 install-doc-pdf:
-	$(if $(PDF_TARGETS),$(CP) $(PDF_TARGETS) $(DOCPDF))
+	$(if $(PDF_TARGETS),$(INSTALL) -d $(DOCPDF))
+	$(if $(PDF_TARGETS),$(INSTALL_DATA) -t $(DOCPDF) $(PDF_TARGETS))
 
 uninstall-doc-pdf:
-	-$(if $(PDF_TARGETS),$(RM) $(foreach i,$(DOCPDF)/$(notdir $(i)),$(PDF_TARGETS)))
+	-$(if $(PDF_TARGETS),$(RM) $(foreach i,$(PDF_TARGETS),$(DOCPDF)/$(notdir $(i))))
 	
 
 # Build OCaml documentaiton
 
 ODOC_TARGET=$(BUILDODOC)/$(1)/index.html
+TARGET_ODOC=$(notdir $(patsubst %/index.html,%,$(1)))
 $(BUILDODOC)/%/index.html: 
-	$(MKDIR) -p $(dir $@)
+	$(INSTALL) -d $(dir $@)
 	EXTRAFLAGS=`$(OCAMLFIND) query -i-format -r $(REQUIRES)`; \
 	$(OCAMLDOC) $(OCAMLDOCFLAGS) $$EXTRAFLAGS -d $(dir $@) -html $^
-	$(if $(EXTRAFILES),$(CP) $(EXTRAFILES) $(dir $@))
+	$(if $(EXTRAFILES),$(INSTALL_DATA) -t $(dir $@) $(EXTRAFILES))
 
 install-builddoc-odoc: $(ODOC_TARGETS)
 
@@ -208,19 +215,21 @@ clean-doc-odoc:
 	-$(if $(ODOC_TARGETS),$(RM) -r $(dir $(ODOC_TARGETS)))
 
 install-doc-odoc:
-	$(if $(ODOC_TARGETS),$(CP) -r $(dir $(ODOC_TARGETS)) $(DOCODOC))
+	$(if $(ODOC_TARGETS),$(foreach i,$(ODOC_TARGETS), $(INSTALL) -d $(DOCODOC)/$(call TARGET_ODOC,$(i));))
+	$(if $(ODOC_TARGETS),$(foreach i,$(ODOC_TARGETS), $(INSTALL_DATA) -t $(DOCODOC)/$(call TARGET_ODOC,$(i)) $(wildcard $(dir $(i))/*);))
 
 uninstall-doc-odoc: clean-doc-odoc
-	-$(if $(ODOC_TARGETS),$(RM) -r $(foreach i,$(DOCODOC)/$(notdir $(dir $(i))),$(ODOC_TARGETS)))
+	-$(if $(ODOC_TARGETS),$(RM) -r $(foreach i,$(ODOC_TARGETS),$(DOCODOC)/$(call TARGET_ODOC,$(i))))
 
 # Build HTML files
 
 HTML_TARGET=$(patsubst %.xml,$(BUILDHTML)/%/index.html,$(1))
+TARGET_HTML=$(notdir $(patsubst %/index.html,%,$(1)))
 $(BUILDHTML)/%/index.html: %.xml
 	$(XMLLINT) $(XMLLINTFLAGS) $^ 
-	$(MKDIR) -p $(dir $@)
+	$(INSTALL) -d $(dir $@)
 	$(XSLTPROC) $(XSLTPROCFLAGS) --stringparam base.dir "$(dir $@)" $(HTMLXSL) $^
-	$(if $(IMAGES),$(CP) $(IMAGES) $(dir $@))
+	$(if $(IMAGES),$(INSTALL_DATA) -t $(dir $@) $(IMAGES))
 
 install-builddoc-html: $(HTML_TARGETS)
 
@@ -228,22 +237,22 @@ clean-doc-html:
 	-$(if $(HTML_TARGETS),$(RM) -r $(dir $(HTML_TARGETS)))
 	
 install-doc-html: install-builddoc-html
-	$(if $(HTML_TARGETS),$(CP) -r $(dir $(HTML_TARGETS)) $(DOCHTML))
+	$(if $(HTML_TARGETS),$(foreach i,$(HTML_TARGETS),$(call INSTALL_DIR,$(i),$(DOCHTML));))
 
 uninstall-doc-html: clean-doc-html
-	-$(if $(HTML_TARGETS),$(RM) -r $(foreach i,$(DOCHTML)/$(notdir $(dir $(i))),$(HTML_TARGETS)))
+	-$(if $(HTML_TARGETS),$(RM) -r $(foreach i,$(HTML_TARGETS),$(DOCHTML)/$(call TARGET_HTML,$(i))))
 
 # Build MAN files
 
 MAN_SECTION=man$(patsubst .%,%,$(suffix $(1)))
 MAN_BUILD_TARGETS=$(BUILDMAN)/$(call MAN_SECTION,$(1))/$(1)
-MAN_INSTALL_TARGETS=$(DOCMAN)/$(call MAN_SECTION,$(1))/$(1)
+MAN_INSTALL_TARGETS=$(MANDIR)/$(call MAN_SECTION,$(1))/$(1)
 
 define PROCESS_MAN
 	$(XMLLINT) $(XMLLINTFLAGS) $^
 	$(XSLTPROC) $(XSLTPROCFLAGS) $(MANXSL) $^
-	$(MKDIR) -p $(dir $(call MAN_BUILD_TARGETS,$@))
-	$(CP) $@ $(call MAN_BUILD_TARGETS,$@) 
+	$(INSTALL) -d $(dir $(call MAN_BUILD_TARGETS,$@))
+	$(INSTALL_DATA) $@ $(call MAN_BUILD_TARGETS,$@) 
 endef
 
 %.1:
@@ -271,7 +280,8 @@ clean-doc-man:
 	-$(if $(MAN_TARGETS),$(RM) $(MAN_TARGETS) $(foreach i,$(MAN_TARGETS),$(call MAN_BUILD_TARGETS,$(i))))
 
 install-doc-man: install-builddoc-man
-	$(if $(MAN_TARGETS),$(CP) -r $(BUILDMAN) $(MANDIR))
+	$(if $(MAN_TARGETS),$(foreach i,$(MAN_TARGETS),$(INSTALL) -d $(dir $(call MAN_INSTALL_TARGETS,$(i)));))
+	$(if $(MAN_TARGETS),$(foreach i,$(MAN_TARGETS),$(INSTALL_DATA) $(call MAN_BUILD_TARGETS,$(i)) $(call MAN_INSTALL_TARGETS,$(i));))
 
 uninstall-doc-man: clean-doc-man
 	-$(if $(MAN_TARGETS),$(RM) $(foreach i,$(MAN_TARGETS),$(call MAN_INSTALL_TARGETS,$(i))))

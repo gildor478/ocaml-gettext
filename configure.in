@@ -23,23 +23,21 @@
 #  Contact: sylvain@le-gall.net                                          #
 ##########################################################################
 
-AC_INIT()
+AC_INIT(ocaml-gettext, 2.61, "http://le-gall.net/sylvain+violaine/bts/index.php?tasks=all&project=1")
 
-AC_ARG_WITH(docdir,
-	AC_HELP_STRING([--with-docdir=dir], [Location of documentation ( default is ${datadir}/doc )]),
-	DOCDIR=$withval, DOCDIR=${datadir}/doc)
+AC_PROG_INSTALL
 
-AC_ARG_WITH(builddir,
-	AC_HELP_STRING([--with-builddir=dir], [Location of the build ( default is ${topdir}/build )]),
-	BUILDDIR=$withval, BUILDDIR=`pwd`/build)
+AC_ARG_WITH(tmpbuilddir,
+	AC_HELP_STRING([--with-tmpbuilddir=dir], [Location of the temporary build dir. Default: ${topdir}/build]),
+	TMPBUILDDIR=$withval, [TMPBUILDDIR='${abs_top_srcdir}/_build'])
 
 AC_ARG_WITH(defaultlocaledir,
-	AC_HELP_STRING([--with-defaultlocaledir=dir], [Location of the default locale dir ( default is /usr/share/locale )]),
+	AC_HELP_STRING([--with-defaultlocaledir=dir], [Location of the default locale dir. Default: /usr/share/locale]),
 	DEFAULTLOCALEDIR="\"$withval\"", DEFAULTLOCALEDIR="\"/usr/share/locale\"")
 
 AC_ARG_WITH(localedir,
-	AC_HELP_STRING([--with-localedir=dir], [Additional location of the locale dir ( default is /usr/local/share/locale )]),
-	LOCALEDIR=$LOCALEDIR "\"$withval\";", LOCALEDIR="\"/usr/local/share/locale\"")
+	AC_HELP_STRING([--with-localedir=dir], [Additional location of the locale dir. Default: "/usr/local/share/locale"]),
+	LOCALEDIR=$LOCALEDIR '"$withval";', LOCALEDIR='"/usr/local/share/locale"')
 
 AC_ARG_WITH(stub-cflags,
 	AC_HELP_STRING([--with-stub-cflags=flags], [Flags to use when compiling gettext-stub]),
@@ -51,33 +49,41 @@ AC_ARG_WITH(stub-ldflags,
 
 AC_ARG_WITH(docbook-stylesheet,
         AC_HELP_STRING([--with-docbook-stylesheet=dir], [Where to find the docbook stylesheets]),
-        DOCBOOK_STYLESHEET=$withval, DOCBOOK_STYLESHEET="/usr/share/xml/docbook/stylesheet/nwalsh")
+        DOCBOOK_STYLESHEET=$withval, DOCBOOK_STYLESHEET=/usr/share/xml/docbook/stylesheet/nwalsh)
 
 AC_ARG_ENABLE(camomile,
-        AC_HELP_STRING([--enable-camomile], [Build camomile extension. Default : yes]),
+        AC_HELP_STRING([--enable-camomile], [Build camomile extension. Default: yes]),
         BUILD_CAMOMILE=$enableval, BUILD_CAMOMILE="yes")
 
 AC_ARG_ENABLE(stub,
-        AC_HELP_STRING([--enable-stub], [Build stub extension. Default : yes]),
+        AC_HELP_STRING([--enable-stub], [Build stub extension. Default: yes]),
         BUILD_STUB=$enableval, BUILD_STUB="yes")
 
 AC_ARG_ENABLE(test,
-        AC_HELP_STRING([--enable-test], [Build program test. Default : no]),
+        AC_HELP_STRING([--enable-test], [Build program test. Default: no]),
         BUILD_TEST=$enableval, BUILD_TEST="no")
 
 AC_ARG_ENABLE(bench,
-        AC_HELP_STRING([--enable-bench], [Build program benchmark. Default : no]),
+        AC_HELP_STRING([--enable-bench], [Build program benchmark. Default: no]),
         BUILD_BENCH=$enableval, BUILD_BENCH="no")
 
 AC_ARG_ENABLE(doc,
-        AC_HELP_STRING([--enable-doc], [Build the documentation. Default : yes]),
+        AC_HELP_STRING([--enable-doc], [Build the documentation. Default: yes]),
         BUILD_DOC=$enableval, BUILD_DOC="yes")
 
 AC_ARG_ENABLE(doc-pdf,
-        AC_HELP_STRING([--enable-doc-pdf], [Build the PDF documentation. Default : yes]),
+        AC_HELP_STRING([--enable-doc-pdf], [Build the PDF documentation. Default: yes]),
         BUILD_DOC_PDF=$enableval, BUILD_DOC_PDF="yes")
 
-VERSION=0.2.0
+AC_ARG_WITH(ocamlfind-install-flags,
+        AC_HELP_STRING([--with-ocamlfind-install-flags], [Flags to use when installing with ocamlfind (e.g. -destdir, -ldconf). Default:]),
+        OCAMLFIND_INSTALL_FLAGS=$withval, OCAMLFIND_INSTALL_FLAGS="")
+
+AC_ARG_WITH(ocamlfind-remove-flags,
+        AC_HELP_STRING([--with-ocamlfind-remove-flags], [Flags to use when uninstalling with ocamlfind (e.g. -destdir, -ldconf). Default: (OCAMLFIND_INSTALL_FLAGS)]),
+        OCAMLFIND_REMOVE_FLAGS=$withval, OCAMLFIND_REMOVE_FLAGS='${OCAMLFIND_INSTALL_FLAGS}')
+
+VERSION=0.3.0
 DATE=`date`
 
 AC_CHECK_OCAMLC([],[AC_MSG_ERROR(Cannot find ocamlc.)])
@@ -135,7 +141,7 @@ if test "x$STUB_LDFLAGS" = "x"; then
 fi
 
 # substitutions to perform
-AC_SUBST(BUILDDIR)
+AC_SUBST(TMPBUILDDIR)
 AC_SUBST(DOCDIR)
 AC_SUBST(EXE)
 AC_SUBST(DEFAULTLOCALEDIR)
@@ -151,6 +157,8 @@ AC_SUBST(BUILD_TEST)
 AC_SUBST(BUILD_BENCH)
 AC_SUBST(BUILD_DOC)
 AC_SUBST(BUILD_DOC_PDF)
+AC_SUBST(OCAMLFIND_INSTALL_FLAGS)
+AC_SUBST(OCAMLFIND_REMOVE_FLAGS)
 
 # Finally create the Makefile from Makefile.in
 OUTPUT="ConfMakefile                \

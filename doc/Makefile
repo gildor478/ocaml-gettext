@@ -36,7 +36,7 @@ ifeq ($(BUILD_DOC_PDF),yes)
 PDF_TARGETS=$(call PDF_TARGET,reference-manual.xml)
 endif
 
-ODOC_TARGETS=$(call ODOC_TARGET,gettext) $(call ODOC_TARGET,gettext-ext)
+ODOC_TARGETS=$(call ODOC_TARGET,api) $(call ODOC_TARGET,api-ext)
 
 # Manpage documentation
 MAN_TARGETS=ocaml-gettext.1 ocaml-xgettext.1 ocaml-gettext.5
@@ -58,24 +58,24 @@ ifeq ($(BUILD_STUB),yes)
 ALL_PACKAGES+=gettext-stub
 endif
 
-$(call ODOC_TARGET,gettext):REQUIRES=$(ALL_PACKAGES)
-$(call ODOC_TARGET,gettext):OCAMLDOCFLAGS+=-I ../libgettext-ocaml/
-$(call ODOC_TARGET,gettext):../libgettext-ocaml/gettext.mli 
-$(call ODOC_TARGET,gettext):../libgettext-ocaml/gettextTypes.ml
-$(call ODOC_TARGET,gettext):../libgettext-ocaml/gettextDummy.ml
+$(call ODOC_TARGET,api):REQUIRES=$(ALL_PACKAGES)
+$(call ODOC_TARGET,api):OCAMLDOCFLAGS+=-I ../libgettext-ocaml/
+$(call ODOC_TARGET,api):../libgettext-ocaml/gettext.mli 
+$(call ODOC_TARGET,api):../libgettext-ocaml/gettextTypes.ml
+$(call ODOC_TARGET,api):../libgettext-ocaml/gettextDummy.ml
 
 ifeq ($(BUILD_CAMOMILE),yes)
-$(call ODOC_TARGET,gettext):../libgettext-camomile-ocaml/gettextCamomile.mli
-$(call ODOC_TARGET,gettext):OCAMLDOCFLAGS+=-I ../libgettext-camomile-ocaml/
+$(call ODOC_TARGET,api):../libgettext-camomile-ocaml/gettextCamomile.mli
+$(call ODOC_TARGET,api):OCAMLDOCFLAGS+=-I ../libgettext-camomile-ocaml/
 endif
 
 ifeq ($(BUILD_STUB),yes)
-$(call ODOC_TARGET,gettext):../libgettext-stub-ocaml/gettextStub.ml
-$(call ODOC_TARGET,gettext):OCAMLDOCFLAGS+=-I ../libgettext-stub-ocaml/
+$(call ODOC_TARGET,api):../libgettext-stub-ocaml/gettextStub.ml
+$(call ODOC_TARGET,api):OCAMLDOCFLAGS+=-I ../libgettext-stub-ocaml/
 endif
 
-$(call ODOC_TARGET,gettext-ext):OCAMLDOCFLAGS+=-I ../libgettext-ocaml 
-$(call ODOC_TARGET,gettext-ext):REQUIRES=$(ALL_PACKAGES)
-$(call ODOC_TARGET,gettext-ext):$(wildcard ../libgettext-ocaml/*.ml)
-$(call ODOC_TARGET,gettext-ext):$(wildcard ../libgettext-ocaml/*.mli)
+$(call ODOC_TARGET,api-ext):OCAMLDOCFLAGS+=-I ../libgettext-ocaml 
+$(call ODOC_TARGET,api-ext):REQUIRES=$(ALL_PACKAGES)
+$(call ODOC_TARGET,api-ext):$(filter-out ../libgettext-ocaml/pr_gettext.ml,$(wildcard ../libgettext-ocaml/*.ml))
+$(call ODOC_TARGET,api-ext):$(wildcard ../libgettext-ocaml/*.mli)
 endif

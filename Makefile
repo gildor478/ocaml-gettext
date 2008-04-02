@@ -40,12 +40,12 @@ install:
 	cd doc                       && $(MAKE) install
 
 uninstall:
-	cd libgettext-ocaml          && $(MAKE) uninstall
-	cd libgettext-stub-ocaml     && $(MAKE) uninstall
-	cd libgettext-camomile-ocaml && $(MAKE) uninstall
-	cd ocaml-gettext             && $(MAKE) uninstall
-	cd po                        && $(MAKE) uninstall
 	cd doc                       && $(MAKE) uninstall
+	cd po                        && $(MAKE) uninstall
+	cd ocaml-gettext             && $(MAKE) uninstall
+	cd libgettext-camomile-ocaml && $(MAKE) uninstall
+	cd libgettext-stub-ocaml     && $(MAKE) uninstall
+	cd libgettext-ocaml          && $(MAKE) uninstall
 	
 clean:
 	-cd test                      && $(MAKE) clean
@@ -56,7 +56,7 @@ clean:
 	-cd libgettext-camomile-ocaml && $(MAKE) clean
 	-cd libgettext-stub-ocaml     && $(MAKE) clean
 	-cd libgettext-ocaml          && $(MAKE) clean
-	-$(RM) -r $(BUILDDIR)
+	-$(RM) -r $(TMPBUILDDIR)
 
 distclean: clean
 	-cd test                      && $(MAKE) distclean
