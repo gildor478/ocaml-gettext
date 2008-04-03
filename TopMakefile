@@ -122,7 +122,7 @@ install-buildlib-opt: install-buildlib-common
 install-buildlib-common: 
 	$(INSTALL) -d $(BUILDLIB)
 	-$(OCAMLFIND) remove -destdir $(BUILDLIB) $(NAME) 
-	$(OCAMLFIND)  install -ldconf ignore -destdir $(BUILDLIB) $(NAME) $(REAL_INSTALLIB)
+	$(OCAMLFIND)  install -ldconf ignore -destdir $(BUILDLIB) -patch-version $(VERSION) $(NAME) $(REAL_INSTALLIB)
 
 install-lib-byte: REAL_INSTALLIB = $(call ONLY_BYTE,$(INSTALLIB))
 install-lib-byte: $(call ONLY_BYTE,$(INSTALLIB))
@@ -134,7 +134,7 @@ install-lib-opt: install-lib-common
 	
 install-lib-common:
 	-$(OCAMLFIND) remove $(OCAMLFIND_REMOVE_FLAGS) $(NAME) 
-	$(OCAMLFIND) install $(OCAMLFIND_INSTALL_FLAGS) $(NAME) $(REAL_INSTALLIB)
+	$(OCAMLFIND) install $(OCAMLFIND_INSTALL_FLAGS) -patch-version $(VERSION) $(NAME) $(REAL_INSTALLIB)
 
 uninstall-lib:
 	-$(OCAMLFIND) remove $(OCAMLFIND_REMOVE_FLAGS) $(NAME)

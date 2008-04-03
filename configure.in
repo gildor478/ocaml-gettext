@@ -161,10 +161,6 @@ AC_SUBST(OCAMLFIND_INSTALL_FLAGS)
 AC_SUBST(OCAMLFIND_REMOVE_FLAGS)
 
 # Finally create the Makefile from Makefile.in
-OUTPUT="ConfMakefile                \
-  libgettext-camomile-ocaml/META    \
-  libgettext-ocaml/gettextConfig.ml \
-  libgettext-ocaml/META             \
-  libgettext-stub-ocaml/META"
+OUTPUT="ConfMakefile libgettext-ocaml/gettextConfig.ml libgettext-ocaml/META"
 
 AC_OUTPUT([$OUTPUT])
