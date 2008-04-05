@@ -44,7 +44,7 @@ let parse_arg () =
   let tests = ref { 
     verbose        = false; 
     search_path    = []; 
-    ocaml_xgettext = make_filename [ parent_dir ; "build" ; "bin" ; "ocaml-xgettext"];
+    ocaml_xgettext = make_filename [ parent_dir ; "_build" ; "bin" ; "ocaml-xgettext"];
     test_dir       = make_filename [ current_dir ; "tests" ];
   }
   in
@@ -164,11 +164,6 @@ let format_test tests =
         true lst1 lst2
       with Invalid_argument _ ->
         false
-    in
-    let str_id = 
-      match trans_src with
-        Singular(str_id,_)
-      | Plural(str_id,_,_) -> str_id
     in
     (Printf.sprintf "%s -> %s format checking" 
     (string_of_translation trans_src)
@@ -545,6 +540,40 @@ let implementation_test tests =
     ]
 ;;
 
+(******************************)
+(* Test for multiline comment *)
+(******************************)
+
+let multiline_comment_test tests = 
+  "Gettext multiline comment test" >:::
+  [
+    "multinline-comment.po" >:: 
+    (
+      fun () ->
+        ignore(
+          let src_po =
+            make_filename [current_dir; "multiline-comment.po"]
+          in
+          let tgt_po =
+            make_filename [tests.test_dir; "multiline-comment.po"]
+          in
+          let tgt_po_bak =
+            make_filename [tests.test_dir; "multiline-comment.po.bak"]
+          in
+            cp [src_po] tgt_po;
+            GettextCompile.merge tgt_po [tgt_po] "bak";
+            match cmp tgt_po tgt_po_bak with
+              | Some -1 -> 
+                  assert_failure (tgt_po^" or "^tgt_po_bak^" doesn't exist")
+              | Some x ->
+                  assert_failure (tgt_po^" differs from "^tgt_po_bak)
+              | None ->
+                  ()
+        )
+    )
+  ]
+;;
+
 (*********************)
 (* Main test routine *)
 (*********************)
@@ -554,15 +583,16 @@ in
 let all_test = 
   "Test ocaml-gettext" >::: 
     [
-      format_test         tests;
-      split_plural_test   tests;
-      po_test             tests; 
-      compatibility_test  tests;
-      extract_test        tests;
-      install_test        tests;
-      implementation_test tests;
+      format_test            tests;
+      split_plural_test      tests;
+      po_test                tests; 
+      compatibility_test     tests;
+      extract_test           tests;
+      install_test           tests;
+      implementation_test    tests;
+      multiline_comment_test tests;
       (* BUG : to reenable when releasing v 0.3 *)
-      (*merge_test         tests;*)
+      (*merge_test           tests;*)
     ]
 in
 print_env "tests";
