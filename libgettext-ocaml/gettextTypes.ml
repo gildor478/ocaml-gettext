@@ -322,12 +322,25 @@ type po_translation =
 (** PO string localizator : represents in which file/lineno a string can be
     found 
   *)
-type po_location = filename * int
+type po_filepos = filename * int
+;;
+
+(** PO keyword: represents special keyword like fuzzy, wrap, c-format...
+  *)
+type po_special = string
+;;
+
+type po_commented_translation =
+    {
+      po_comment_special:     po_special list;
+      po_comment_filepos:     po_filepos list;
+      po_comment_translation: po_translation;
+    }
 ;;
 
 (** Mapping of PO content using the string identifier as the key.
 *)
-type po_translations = (po_location list * po_translation) MapString.t
+type po_translations = po_commented_translation MapString.t
 ;;
 
 (** Content of a PO file. Since comments should be saved, and that we only save

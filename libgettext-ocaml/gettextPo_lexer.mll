@@ -25,6 +25,7 @@
 {
 
 open GettextPo_parser;;
+open GettextPoComment_parser;;
 
 let next_line lexbuf = 
   lexbuf.Lexing.lex_curr_p <-
@@ -45,17 +46,16 @@ token = parse
 | "domain"                   { DOMAIN }
 | '['                        { LBRACKET }
 | ']'                        { RBRACKET }
-| ':'                        { COLON }
 | ['0'-'9']+ as nbr          { NUMBER (int_of_string nbr) }
 | '"'                        { STRING (string_val lexbuf) }
-| eof                        { EOF }
-| "#:"                       { COMMENT_LOCATION }
+| "#:"                       { COMMENT_FILEPOS(comment_join (Buffer.create 80) lexbuf)}
+| "#,"                       { COMMENT_SPECIAL(comment_join (Buffer.create 80) lexbuf)}
 | '#'                        { comment_skip lexbuf }
 | [' ''\t']                  { token lexbuf }
 | ['\r''\n']                 { next_line lexbuf; token lexbuf }
-| ([^' ''\t''\r''\n''"'':''0'-'9''['']''#'][^' ''\t''\r''\n''"'':''['']''#']*) as str 
-                             { FILENAME(str) }
+| eof                        { EOF }
 and
+
 string_val = parse
   "\\n"              { "\n" ^ ( string_val lexbuf) } 
 | "\\t"              { "\t" ^ ( string_val lexbuf) }
@@ -89,7 +89,29 @@ string_val = parse
 | [^'"''\\']+ as str { str ^ (string_val lexbuf) }
 | '"'                { "" }
 and
+
 comment_skip = parse
  '\n'          { next_line lexbuf; token lexbuf }
 | _            { comment_skip lexbuf }
+and
+
+comment_join strbuf = parse
+| "\n#."          { next_line lexbuf; comment_join strbuf lexbuf }
+| '\n'            { next_line lexbuf; Buffer.contents strbuf }
+| [^'\n']* as str { Buffer.add_string strbuf str; comment_join strbuf lexbuf }
+and 
+
+comment_filepos = parse
+| [' ''\t']                  { comment_filepos lexbuf }
+| ':'                        { COLON }
+| ['0'-'9']+ as nbr          { LINE (int_of_string nbr) }
+| ([^' ''\t''\r''\n''"'':''0'-'9''['']''#'][^' ''\t''\r''\n''"'':''['']''#']*) as str 
+                             { FILENAME(str) }
+| eof                        { COMMENT_EOF }
+and
+
+comment_special = parse
+| [' ''\t']                  { comment_special lexbuf }
+| [^' ''\t']+ as str         { KEYWORD str }
+| eof                        { COMMENT_EOF }
 

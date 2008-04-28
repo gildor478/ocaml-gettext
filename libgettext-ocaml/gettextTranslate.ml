@@ -246,12 +246,6 @@ module Open : TRANSLATE_TYPE =
                 | None -> 0
             )
           in
-          let check =
-            if printf_format then
-              check_format u.failsafe
-            else
-              fun x -> x
-          in
           let header = 
             input_mo_header chn
           in

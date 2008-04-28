@@ -36,7 +36,10 @@ let empty_po =
 ;;
 
 (* See GettextPo for details concerning merge of the translation *)
-let add_po_translation_aux map (location_lst,translation) =
+let add_po_translation_aux map commented_translation =
+  let translation =
+    commented_translation.po_comment_translation
+  in
   let is_lst_empty lst = 
     List.for_all ( fun lst -> (String.concat "" lst) =  "") lst
   in
@@ -57,55 +60,66 @@ let add_po_translation_aux map (location_lst,translation) =
       PoSingular(str_lst,_) 
     | PoPlural(str_lst,_,_) -> str_lst
   in
-  try
-    let (previous_location_lst,previous_translation) = 
-      MapString.find (String.concat "" str_id) map
-    in
-    let merged_translation =
-      match (previous_translation,translation) with
-        PoSingular(_,str1), PoSingular(_,str2) when is_lst_same str1 str2 ->
-          PoSingular(str_id,str1)
-      | PoSingular(_,[""]), PoSingular(_,str2) ->
-          PoSingular(str_id,str2)
-      | PoSingular(_,str1), PoSingular(_,[""]) ->
-          PoSingular(str_id,str1)
-      | PoSingular(_,str1), PoSingular(_,str2) ->
-          raise (PoInconsistentMerge(String.concat "" str1, String.concat "" str2))
-      | PoPlural(_,str1,lst1), PoPlural(_,str2,lst2) 
-        when is_lst_same str1 str2 && is_lst_empty lst1 ->
-          PoPlural(str_id,str2,lst2)
-      | PoPlural(_,str1,lst1), PoPlural(_,str2,lst2) 
-        when is_lst_same str1 str2 && is_lst_empty lst2 ->
-          PoPlural(str_id,str1,lst1)
-      | PoPlural(_,str1,lst1), PoPlural(_,str2,lst2) 
-        when is_lst_same str1 str2 && is_lst_same lst1 lst2 ->
-          PoPlural(str_id,str1,lst1)
-      | PoPlural(_,str1,lst1), PoPlural(_,str2,lst2) 
-        when is_lst_same str1 str2 ->
-          raise (PoInconsistentMerge(string_of_list lst1,string_of_list lst2))
-      | PoPlural(_,str1,_), PoPlural(_,str2,_) ->
-          raise (PoInconsistentMerge(String.concat "" str1, String.concat "" str2))
-      | PoSingular(_,str), PoPlural(_,str_plural,lst) 
-      | PoPlural(_,str_plural,lst), PoSingular(_,str) ->
-          (
-            match lst with
-              x :: tl when (String.concat "" x) = "" ->
-                PoPlural(str_id, str_plural, str :: tl) 
-            | [] ->
-                PoPlural(str_id, str_plural, [ str ])
-            | _ ->
-                raise (PoInconsistentMerge(String.concat "" str, string_of_list lst))
-          )
-    in
-    MapString.add (String.concat "" str_id) (
-      location_lst @ previous_location_lst, 
-      merged_translation
-    ) map 
-  with Not_found ->
-    MapString.add (String.concat "" str_id) (
-      location_lst,
-      translation
-    ) map
+  let new_commented_translation =
+    try
+      let previous_commented_translation = 
+        MapString.find (String.concat "" str_id) map
+      in
+      let previous_location_lst =
+        previous_commented_translation.po_comment_filepos
+      in
+      let previous_translation =
+        previous_commented_translation.po_comment_translation
+      in
+      let location_lst =
+        commented_translation.po_comment_filepos
+      in
+      let merged_translation =
+        match (previous_translation,translation) with
+          PoSingular(_,str1), PoSingular(_,str2) when is_lst_same str1 str2 ->
+            PoSingular(str_id,str1)
+        | PoSingular(_,[""]), PoSingular(_,str2) ->
+            PoSingular(str_id,str2)
+        | PoSingular(_,str1), PoSingular(_,[""]) ->
+            PoSingular(str_id,str1)
+        | PoSingular(_,str1), PoSingular(_,str2) ->
+            raise (PoInconsistentMerge(String.concat "" str1, String.concat "" str2))
+        | PoPlural(_,str1,lst1), PoPlural(_,str2,lst2) 
+          when is_lst_same str1 str2 && is_lst_empty lst1 ->
+            PoPlural(str_id,str2,lst2)
+        | PoPlural(_,str1,lst1), PoPlural(_,str2,lst2) 
+          when is_lst_same str1 str2 && is_lst_empty lst2 ->
+            PoPlural(str_id,str1,lst1)
+        | PoPlural(_,str1,lst1), PoPlural(_,str2,lst2) 
+          when is_lst_same str1 str2 && is_lst_same lst1 lst2 ->
+            PoPlural(str_id,str1,lst1)
+        | PoPlural(_,str1,lst1), PoPlural(_,str2,lst2) 
+          when is_lst_same str1 str2 ->
+            raise (PoInconsistentMerge(string_of_list lst1,string_of_list lst2))
+        | PoPlural(_,str1,_), PoPlural(_,str2,_) ->
+            raise (PoInconsistentMerge(String.concat "" str1, String.concat "" str2))
+        | PoSingular(_,str), PoPlural(_,str_plural,lst) 
+        | PoPlural(_,str_plural,lst), PoSingular(_,str) ->
+            (
+              match lst with
+                x :: tl when (String.concat "" x) = "" ->
+                  PoPlural(str_id, str_plural, str :: tl) 
+              | [] ->
+                  PoPlural(str_id, str_plural, [ str ])
+              | _ ->
+                  raise (PoInconsistentMerge(String.concat "" str, string_of_list lst))
+            )
+      in
+        (* TODO: merge po_comment_special and use fuzzy when merging *)
+        {
+          po_comment_special     = previous_commented_translation.po_comment_special @ commented_translation.po_comment_special;
+          po_comment_filepos     = location_lst @ previous_location_lst; 
+          po_comment_translation = merged_translation;
+        }
+    with Not_found ->
+      commented_translation 
+  in
+    MapString.add (String.concat "" str_id) new_commented_translation map 
 ;;
 
 let add_po_translation_no_domain po po_translation =

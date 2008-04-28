@@ -124,14 +124,20 @@ let merge_pot pot po =
         with Not_found ->
           tl
   in
-  let merge_translation map_lst key (location_pot,translation_pot) =
+  let merge_translation map_lst key commented_translation_pot =
+    let translation_pot =
+      commented_translation_pot.po_comment_translation
+    in
     let translation_merged = 
       try 
-        let (_,translation_po) = 
+        let (commented_translation_po) = 
           let map_po = 
             List.find (MapString.mem key) map_lst
           in
           MapString.find key map_po
+        in
+        let translation_po =
+          commented_translation_po.po_comment_translation
         in
         (* Implementation of the rule given above *)
         match (translation_pot,translation_po) with
@@ -147,7 +153,10 @@ let merge_pot pot po =
         (* Fallback to the translation provided in the POT *)
         translation_pot
     in
-    (location_pot,translation_merged)
+      {
+        commented_translation_pot with
+            po_comment_translation = translation_merged
+      }
   in
   (* We begin with an empty po, and merge everything according to the rule 
      above. *)
@@ -183,6 +192,9 @@ let input_po chn =
 ;;
 
 let output_po chn po =
+  let comment_max_length = 
+    80
+  in
   let fpf x = 
     Printf.fprintf chn x
   in
@@ -196,23 +208,72 @@ let output_po chn po =
         Printf.fprintf chn "%S" hd;
         List.iter ( fun s -> Printf.fprintf chn "\n%S" s) tl
   in
-  let rec output_po_translation_aux _ (location_lst,translation) = 
+
+  let comment_line str_hyphen str_sep line_max_length token_lst =
+    let str_len =
+      (List.fold_left (fun acc str -> acc + (String.length str)) 0 token_lst)
+      +
+      ((List.length token_lst) * (String.length str_sep))
+    in
+    let buff =
+      Buffer.create 
+        (str_len + (String.length str_hyphen) * (str_len / line_max_length))
+    in
+    let rec comment_line_aux first_token line_length lst =
+      match lst with 
+        | str :: tl ->
+            let sep_length =
+              if first_token then
+                0
+              else if  (String.length str) + line_length > line_max_length then
+                (
+                  Buffer.add_char buff '\n';
+                  Buffer.add_string buff str_hyphen;
+                  Buffer.add_string buff str_sep;
+                  (String.length str_hyphen) + (String.length str_sep)
+                )
+              else
+                (
+                  Buffer.add_string buff str_sep;
+                  String.length str_sep
+                )
+            in
+            Buffer.add_string buff str;
+            comment_line_aux false (sep_length + (String.length str) + line_length)  tl
+        | [] ->
+            Buffer.contents buff
+    in
+      comment_line_aux true 0 token_lst
+  in
+
+
+  let rec output_po_translation_aux _ commented_translation = 
     (
-      match location_lst with
-        [] -> 
-          ()
-      | lst ->
-        fpf "#: %s\n" (
-          String.concat " " (
-            List.map ( 
-              fun (str,line) -> 
-                str^":"^(string_of_int line) 
-            ) lst
-          )
-        )
+      match commented_translation.po_comment_filepos with
+        |  [] -> 
+            ()
+        | lst ->
+            fpf "%s\n"
+              (comment_line
+                 "#."
+                 " "
+                 comment_max_length
+                 ("#:" :: (List.map (fun (str,line) -> Printf.sprintf "%s:%d" str line) lst)))
     );
     (
-      match translation with
+      match commented_translation.po_comment_special with
+        | [] ->
+            ()
+        | lst ->
+            fpf "%s\n"
+              (comment_line
+                 "#."
+                 " "
+                 comment_max_length
+                 ("#," :: lst))
+    );
+    (
+      match commented_translation.po_comment_translation with
         PoSingular(id,str) ->
           (
             fpf "msgid %a\n" hyphens id;

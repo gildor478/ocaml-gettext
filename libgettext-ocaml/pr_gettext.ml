@@ -71,23 +71,35 @@ struct
   type t = po_content
 
   let add_translation t loc singular plural domain =
-    let location = Loc.file_name loc, Loc.start_line loc in
+    let filepos = 
+      Loc.file_name loc, Loc.start_line loc 
+    in
     let translation =
       match plural with 
-	Some plural -> ([location],PoPlural([singular],[plural],[[""];[""]]))
-      | None -> ([location],PoSingular([singular],[""]))
+        | Some plural -> 
+            {
+              po_comment_special = [];
+              po_comment_filepos = [filepos];
+              po_comment_translation = PoPlural([singular],[plural],[[""];[""]]);
+            }
+        | None -> 
+            {
+              po_comment_special = [];
+              po_comment_filepos = [filepos];
+              po_comment_translation = PoSingular([singular],[""]);
+            }
     in
     match domain with 
-      Some domain -> 
-	add_po_translation_domain domain t translation
-    | None ->
-	(
-          match !default_textdomain with
-            Some domain ->
-              add_po_translation_domain domain t translation
-          | None ->
-              add_po_translation_no_domain t translation
-	)
+      | Some domain -> 
+          add_po_translation_domain domain t translation
+      | None ->
+          (
+            match !default_textdomain with
+              Some domain ->
+                add_po_translation_domain domain t translation
+            | None ->
+                add_po_translation_no_domain t translation
+          )
 
   let output_translations ?output_file m = 
     let (fd,close_on_exit) = 

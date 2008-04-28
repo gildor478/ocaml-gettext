@@ -138,9 +138,16 @@ let compile filename_po filename_mo =
   in
   let output_one_map filename map = 
     let lst = 
-      MapString.fold ( fun _ (_,e) lst -> 
-        (GettextPo.translation_of_po_translation e) :: lst 
-      ) map []
+      MapString.fold 
+        (
+          fun _ commented_po_translation lst -> 
+            let po_translation =
+              commented_po_translation.po_comment_translation
+            in
+              (GettextPo.translation_of_po_translation po_translation) :: lst 
+        )
+        map 
+        []
     in
     let chn = 
       open_out_bin filename
@@ -178,7 +185,7 @@ let install destdir language category textdomain filename_mo_src =
   in
   (* Test of the mo file, it will raise an exception if there is any problem 
      in the MO structure *)
-  let ((),fun_plurals) =
+  let ((),_) =
     GettextMo.fold_mo RaiseException 
     ( fun x () -> () )
     ()

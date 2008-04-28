@@ -11,8 +11,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n>1;"
 
-
 #: ../dlg_test.ml:83 ../dlg_config.ml:126 ../dlg_browser.ml:76
 #. ../dlg_editor.ml:70
 msgid "<b>vocabulary</b>"
 msgstr "<b>vocabulaire</b>"
+

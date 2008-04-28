@@ -102,23 +102,28 @@ INSTALLIB +=           \
  gettextCompat.cmi     \
  gettextCompile.cmi         
 
-CMO_EXTENSION=            \
- gettextLocale_types.cmo  \
- gettextLocale_parser.cmo \
- gettextLocale_lexer.cmo  \
- gettextLocale.cmo        \
- gettextDomain.cmo        \
- gettextCharset.cmo       \
- gettextTranslate.cmo     \
- gettextRealize.cmo       \
- gettextPo_utils.cmo      \
- gettextPo_parser.cmo     \
- gettextPo_lexer.cmo      \
- gettextPo.cmo            \
+CMO_EXTENSION=                \
+ gettextLocale_types.cmo      \
+ gettextLocale_parser.cmo     \
+ gettextLocale_lexer.cmo      \
+ gettextLocale.cmo            \
+ gettextDomain.cmo            \
+ gettextCharset.cmo           \
+ gettextTranslate.cmo         \
+ gettextRealize.cmo           \
+ gettextPo_utils.cmo          \
+ gettextPoComment_parser.cmo  \
+ gettextPo_lexer.cmo          \
+ gettextPo_parser.cmo         \
+ gettextPo.cmo                \
  gettextCompile.cmo
 
-gettextPo_parser.cmo: gettextPo_parser.cmi
-gettextPo_parser.cmx: gettextPo_parser.cmi
+gettextPo_lexer.cmo: gettextPo_parser.cmi gettextPoComment_parser.cmi
+gettextPo_lexer.cmx: gettextPo_parser.cmi gettextPoComment_parser.cmi
+gettextPoComment_parser.cmo: gettextPoComment_parser.cmi
+gettextPoComment_parser.cmx: gettextPoComment_parser.cmi
+gettextPo_parser.cmo: gettextPo_parser.cmi gettextPo_lexer.cmi
+gettextPo_parser.cmx: gettextPo_parser.cmi gettextPo_lexer.cmi
 gettextLocale_parser.cmo: gettextLocale_parser.cmi
 gettextLocale_parser.cmx: gettextLocale_parser.cmi
 gettextExtension.cma: $(CMO_EXTENSION)

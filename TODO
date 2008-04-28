@@ -1,4 +1,4 @@
-v 0.3.0 :
+v 0.4.0 :
 - Better parse comments, to keep licence et al 
 - Try to be faster than gettext C library
 - Try to get GettextStub.* and GettextDummy.* be typed GettextTypes.REALIZE_TYPE ( trying to avoid

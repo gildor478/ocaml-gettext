@@ -29,14 +29,14 @@ else
       AC_MSG_WARN("$1 and $2 version differs")
     fi
   fi
+  $3
 fi
-$3
 ])
 
 
 # AC_CHECK_OCAMLC([ACTION-IF-FOUND],[ACTION-IF-NOT-FOUND])
 #---------------------------------------------------------
-# Check for the existence of ocamlc ( or ocamlc.opt )
+# Check for the existence of ocamlc (or ocamlc.opt)
 # Subst OCAMLC, OCAMLVERSION, OCAMLBEST variable.
 AC_DEFUN([AC_CHECK_OCAMLC],
 [
@@ -47,7 +47,7 @@ AC_PROG_OCAML_VERSION(ocamlc,ocamlc.opt,[
     OCAMLBEST=byte
   fi
   if ! test "x$OCAMLVERSION" = "x" && ! test "$versionval" = "$OCAMLVERSION"; then
-    AC_MSG_WARN( $versionval doesn't match ocaml v. $OCAMLVERSION)
+    AC_MSG_WARN($versionval doesn't match ocaml v. $OCAMLVERSION)
   else
     OCAMLVERSION=$versionval
   fi
@@ -59,7 +59,7 @@ AC_SUBST(OCAMLBEST)
 
 # AC_CHECK_OCAMLOPT([ACTION-IF-FOUND],[ACTION-IF-NOT-FOUND])
 #---------------------------------------------------------
-# Check for the existence of ocamlopt ( or ocamlopt.opt )
+# Check for the existence of ocamlopt (or ocamlopt.opt)
 # Subst OCAMLOPT, OCAMLVERSION, OCAMLBEST variable.
 AC_DEFUN([AC_CHECK_OCAMLOPT],
 [
@@ -70,7 +70,7 @@ AC_PROG_OCAML_VERSION(ocamlopt,ocamlopt.opt,[
     OCAMLBEST=opt
   fi
   if ! test "x$OCAMLVERSION" = "x" && ! test "$versionval" = "$OCAMLVERSION"; then
-    AC_MSG_WARN( $versionval doesn't match ocaml v. $OCAMLVERSION)
+    AC_MSG_WARN($versionval doesn't match ocaml v. $OCAMLVERSION)
   else
     OCAMLVERSION=$versionval
   fi
@@ -82,7 +82,7 @@ AC_SUBST(OCAMLBEST)
 
 # AC_CHECK_OCAMLLEX([ACTION-IF-FOUND],[ACTION-IF-NOT-FOUND])
 #---------------------------------------------------------
-# Check for the existence of ocamllex ( or ocamllex.opt )
+# Check for the existence of ocamllex (or ocamllex.opt)
 # Subst OCAMLLEX, OCAMLVERSION variable.
 AC_DEFUN([AC_CHECK_OCAMLLEX],
 [
@@ -90,7 +90,7 @@ dnl Check the presence of ocamlc/ocamlc.opt and their version
 AC_PROG_OCAML_VERSION(ocamllex,ocamllex.opt,[
   OCAMLLEX=$toolval
   if ! test "x$OCAMLVERSION" = "x" && ! test "$versionval" = "$OCAMLVERSION"; then
-    AC_MSG_WARN( $versionval doesn't match ocaml v. $OCAMLVERSION)
+    AC_MSG_WARN($versionval doesn't match ocaml v. $OCAMLVERSION)
   else
     OCAMLVERSION=$versionval
   fi
@@ -101,7 +101,7 @@ AC_SUBST(OCAMLVERSION)
 
 # AC_CHECK_OCAMLYACC([ACTION-IF-FOUND],[ACTION-IF-NOT-FOUND])
 #---------------------------------------------------------
-# Check for the existence of ocamlyacc ( or ocamlyacc.opt )
+# Check for the existence of ocamlyacc (or ocamlyacc.opt)
 # Subst OCAMLYACC variable.
 AC_DEFUN([AC_CHECK_OCAMLYACC],
 [
@@ -121,9 +121,28 @@ fi
 AC_SUBST(OCAMLYACC)
 ])
 
+# AC_CHECK_OCAMLBUILD([ACTION-IF-FOUND],[ACTION-IF-NOT-FOUND])
+#---------------------------------------------------------
+# Check for the existence of ocamlbuild.
+# Subst OCAMLBUIKD variable.
+AC_DEFUN([AC_CHECK_OCAMLBUILD],
+[
+dnl Check the presence of ocamlbuild/ocamlbuild.opt and their version
+AC_CHECK_PROG(ac_ocaml_ocamlbuild,ocamlbuild,ocamlbuild)
+if test "x$ac_ocaml_ocamlbuild" = "x"; then
+  :
+  $2
+else
+  OCAMLBUILD=$ac_ocaml_ocamlbuild
+  $1
+fi
+AC_SUBST(OCAMLBUILD)
+])
+
+
 # AC_CHECK_OCAMLFIND ([ACTION-IF-FOUND],[ACTION-IF-NOT-FOUND])
 #---------------------------------------------------------
-# Check for the existence of ocamlyacc ( or ocamlyacc.opt )
+# Check for the existence of ocamlfind.
 # Subst OCAMLFIND variable.
 AC_DEFUN([AC_CHECK_OCAMLFIND],
 [

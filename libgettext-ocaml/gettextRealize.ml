@@ -82,7 +82,7 @@ module Generic : (
           (textdomain,category) 
           (Translate.create t filename recode) 
           map_translate
-      with DomainFileDoesntExist(filenames) as exc ->
+      with DomainFileDoesntExist(filenames) ->
         map_translate
 
     let add_textdomain t map_translate textdomain =
