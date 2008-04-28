@@ -392,7 +392,7 @@ let merge_test tests =
       ]
   in
   "POT/PO file merge test" >:::
-    List.map merge_one [ (concat tests.test_dir "test4.pot","test4.po", "bak") ]
+    List.map merge_one [ (concat tests.test_dir "test4.pot","test4.po","bak") ]
 ;;
 
 (**********************************)
@@ -540,37 +540,40 @@ let implementation_test tests =
     ]
 ;;
 
-(******************************)
-(* Test for multiline comment *)
-(******************************)
+(**********************************)
+(* Test for PO processing comment *)
+(**********************************)
 
-let multiline_comment_test tests = 
-  "Gettext multiline comment test" >:::
+let po_process_test tests =
+  let copy_merge_compare fn_po =
+    let src_po =
+      make_filename [current_dir; fn_po]
+    in
+    let tgt_po =
+      make_filename [tests.test_dir; fn_po]
+    in
+      cp [src_po] tgt_po;
+      GettextCompile.merge tgt_po [tgt_po] "bak";
+      match cmp tgt_po src_po with
+        | Some -1 -> 
+            assert_failure (tgt_po^" or "^src_po^" doesn't exist")
+        | Some x ->
+            assert_failure (tgt_po^" differs from "^src_po)
+        | None ->
+            ()
+  in
+  "Gettext po process test" >:::
   [
-    "multinline-comment.po" >:: 
+    "multiline-comment.po" >:: 
     (
       fun () ->
-        ignore(
-          let src_po =
-            make_filename [current_dir; "multiline-comment.po"]
-          in
-          let tgt_po =
-            make_filename [tests.test_dir; "multiline-comment.po"]
-          in
-          let tgt_po_bak =
-            make_filename [tests.test_dir; "multiline-comment.po.bak"]
-          in
-            cp [src_po] tgt_po;
-            GettextCompile.merge tgt_po [tgt_po] "bak";
-            match cmp tgt_po tgt_po_bak with
-              | Some -1 -> 
-                  assert_failure (tgt_po^" or "^tgt_po_bak^" doesn't exist")
-              | Some x ->
-                  assert_failure (tgt_po^" differs from "^tgt_po_bak)
-              | None ->
-                  ()
-        )
-    )
+        copy_merge_compare "multiline-comment.po"
+    );
+    "utf8-fr.po" >::
+    (
+      fun () ->
+        copy_merge_compare "utf8-fr.po"
+    );
   ]
 ;;
 
@@ -590,7 +593,7 @@ let all_test =
       extract_test           tests;
       install_test           tests;
       implementation_test    tests;
-      multiline_comment_test tests;
+      po_process_test        tests;
       merge_test             tests;
     ]
 in
