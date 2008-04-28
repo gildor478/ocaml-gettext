@@ -591,8 +591,7 @@ let all_test =
       install_test           tests;
       implementation_test    tests;
       multiline_comment_test tests;
-      (* BUG : to reenable when releasing v 0.3 *)
-      (*merge_test           tests;*)
+      merge_test             tests;
     ]
 in
 print_env "tests";

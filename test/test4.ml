@@ -25,7 +25,7 @@
 let t' = ()
 ;;
 
-let _ = d_ "d_"
+let _ = s_ "s_"
 ;;
 
 let _ = f_ "f_"
@@ -73,7 +73,7 @@ let _ = dcngettext t'  "mydomain"  "dcngettext singular"  "dcngettext plural"  0
 let _ = fdcngettext t'  "mydomain"  "fdcngettext singular"  "fdcngettext plural"  0  LC_ALL 
 ;;
 
-let _ = TestGettext.d_ "TestGettext.d_"
+let _ = TestGettext.s_ "TestGettext.s_"
 ;;
 
 let _ = TestGettext.f_ "TestGettext.f_"
@@ -121,7 +121,7 @@ let _ = GettextCompat.dcngettext t'  "mydomain"  "GettextCompat.dcngettext singu
 let _ = GettextCompat.fdcngettext t'  "mydomain"  "GettextCompat.fdcngettext singular"  "GettextCompat.fdcngettext plural"  0  LC_ALL 
 ;;
 
-let _ = TestGettext.Library.d_ "TestGettext.Library.d_"
+let _ = TestGettext.Library.s_ "TestGettext.Library.s_"
 ;;
 
 let _ = TestGettext.Library.f_ "TestGettext.Library.f_"
@@ -133,7 +133,7 @@ let _ = TestGettext.Library.sn_ "TestGettext.Library.sn_ singular" "TestGettext.
 let _ = TestGettext.Library.fn_ "TestGettext.Library.fn_ singular" "TestGettext.Library.fn_ plural" 0
 ;;
 
-let _ = TestGettext.Program.d_ "TestGettext.Program.d_"
+let _ = TestGettext.Program.s_ "TestGettext.Program.s_"
 ;;
 
 let _ = TestGettext.Program.f_ "TestGettext.Program.f_"

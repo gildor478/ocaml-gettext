@@ -198,15 +198,45 @@ let output_po chn po =
   let fpf x = 
     Printf.fprintf chn x
   in
+  let escape_string str =
+    let rec escape_string_aux buff i =
+      if i < String.length str then
+        let () =
+          match String.get str i with 
+            | '\n'   -> Buffer.add_string buff "\\n"
+            | '\t'   -> Buffer.add_string buff "\\t" 
+            | '\b'   -> Buffer.add_string buff "\\b" 
+            | '\r'   -> Buffer.add_string buff "\\r" 
+            | '\012' -> Buffer.add_string buff "\\f" 
+            | '\011' -> Buffer.add_string buff "\\v" 
+            | '\007' -> Buffer.add_string buff "\\a" 
+            | '"'    -> Buffer.add_string buff "\\\""
+            | '\\'   -> Buffer.add_string buff "\\\\"
+            | e ->
+                Buffer.add_char buff e
+        in
+          escape_string_aux buff (i+1)
+      else
+        (
+        )
+    in
+    let buff = 
+      Buffer.create ((String.length str) + 2)
+    in
+      Buffer.add_char buff '"';
+      escape_string_aux buff 0;
+      Buffer.add_char buff '"';
+      Buffer.contents buff
+  in
+
   let hyphens chn lst = 
     match lst with
       [] ->
         ()
-    | [s] ->
-        Printf.fprintf chn "%S" s
-    | hd :: tl ->
-        Printf.fprintf chn "%S" hd;
-        List.iter ( fun s -> Printf.fprintf chn "\n%S" s) tl
+    | lst ->
+        Printf.fprintf chn 
+          "%s" 
+          (String.concat "\n" (List.map escape_string lst))
   in
 
   let comment_line str_hyphen str_sep line_max_length token_lst =

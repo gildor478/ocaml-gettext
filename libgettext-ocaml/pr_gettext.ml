@@ -47,6 +47,11 @@ dngettext     _          domain     singular   plural     _
 fdngettext    _          domain     singular   plural     _
 dcngettext    _          domain     singular   plural     _          _   
 fdcngettext   _          domain     singular   plural     _          _
+
+
+All this function name should also be matched when they are called using a
+module.
+                                      
 *)
 
 open Format
@@ -114,6 +119,22 @@ struct
     else
       ()
 
+  (* Check if the given node belong to the given functions *)
+  let is_like e functions = 
+    let rec function_name e =
+      match e with 
+        | <:ident<$_$.$id:e$>> ->
+          function_name e
+        | <:ident<$lid:s$>> ->
+          s
+        | _ ->
+            raise Not_found
+    in
+      try
+        List.mem (function_name e) functions
+      with Not_found ->
+        false
+
   class visitor = object
     inherit Ast.fold as super
 
@@ -121,45 +142,35 @@ struct
     method t = t
 
     method expr = function
-    | <:expr@loc< s_ $str:singular$ >>
-    | <:expr@loc< f_ $str:singular$ >> ->
+    | <:expr@loc< $id:e$ $str:singular$ >> when 
+        is_like e ["s_"; "f_"] ->
       (* Add a singular / default domain string *)
-      let t = add_translation t loc singular None None in
-      {< t = t >}
+      {< t = add_translation t loc singular None None >}
 
-    | <:expr@loc< sn_ $str:singular$ $str:plural$ >>
-    | <:expr@loc< fn_ $str:singular$ $str:plural$ >> ->
+    | <:expr@loc< $id:e$ $str:singular$ $str:plural$ >> when 
+        is_like e ["sn_"; "fn_"] ->
       (* Add a plural / default domain string *)
-      let t = add_translation t loc singular (Some plural) None in
-      {< t = t >}
+      {< t = add_translation t loc singular (Some plural) None >}
 
-    | <:expr@loc< gettext $expr$ $str:singular$ >>
-    | <:expr@loc< fgettext $expr$ $str:singular$ >> ->
+    | <:expr@loc< $id:e$ $expr$ $str:singular$ >> when 
+        is_like e ["gettext"; "fgettext"] ->
       (* Add a singular / default domain string *)
-      let t = add_translation t loc singular None None in
-      {< t = t >}
+      {< t = add_translation t loc singular None None >}
 
-    | <:expr@loc< dgettext $expr$ $str:domain$ $str:singular$ >>
-    | <:expr@loc< fdgettext $expr$ $str:domain$ $str:singular$ >>
-    | <:expr@loc< dcgettext $expr$ $str:domain$ $str:singular$ >>
-    | <:expr@loc< fdcgettext $expr$ $str:domain$ $str:singular$ >> ->
+    | <:expr@loc< $id:e$ $expr$ $str:domain$ $str:singular$ >> when 
+        is_like e ["dgettext"; "fdgettext"; "dcgettext"; "fdcgettext"] ->
       (* Add a singular / defined domain string *)
-      let t = add_translation t loc singular (Some domain) None in
-      {< t = t >}
+      {< t = add_translation t loc singular None (Some domain) >}
 
-    | <:expr@loc< nettext $expr$ $str:singular$ $str:plural$ >>
-    | <:expr@loc< fngettext $expr$ $str:singular$ $str:plural$ >> ->
+    | <:expr@loc< $id:e$ $expr$ $str:singular$ $str:plural$ >> when 
+        is_like e ["ngettext"; "fngettext"] ->
       (* Add a plural / default domain string *)
-      let t = add_translation t loc singular (Some plural) None in
-      {< t = t >}
+      {< t = add_translation t loc singular (Some plural) None >}
 
-    | <:expr@loc< dgettext $expr$ $str:domain$ $str:singular$ $str:plural$ >>
-    | <:expr@loc< fdgettext $expr$ $str:domain$ $str:singular$ $str:plural$ >>
-    | <:expr@loc< dcgettext $expr$ $str:domain$ $str:singular$ $str:plural$ >>
-    | <:expr@loc< fdcgettext $expr$ $str:domain$ $str:singular$ $str:plural$ >> ->
+    | <:expr@loc< $id:e$ $expr$ $str:domain$ $str:singular$ $str:plural$ >> when
+        is_like e ["dngettext"; "fdngettext"; "dcngettext"; "fdcngettext"] ->
       (* Add a plural / defined domain string *)
-      let t = add_translation t loc singular (Some plural) (Some domain) in
-      {< t = t >}
+      {< t = add_translation t loc singular (Some plural) (Some domain) >}
 
     | e -> super#expr e
   end
