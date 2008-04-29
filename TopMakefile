@@ -96,6 +96,7 @@ INSTALL_DIR=$(call INSTALL_DIR_AUX,$(1),$(2)/$(notdir $(patsubst %/,%,$(dir $(1)
 
 # Build the lib
 ONLY_BYTE=$(filter-out %.o,$(filter-out %.a,$(filter-out %.cmx, $(filter-out %.cmxa,$(1))))) $(filter lib%.a,$(1))
+GET_MLI=$(filter %.mli,$(patsubst %.cmi,%.mli,$(1)))
 
 %.cmxa %.a %.so:
 	$(if $(STUBSOBJS),                            \
@@ -117,22 +118,24 @@ install-buildlib-opt: REAL_INSTALLIB =  $(INSTALLIB)
 install-buildlib-opt: $(INSTALLIB)
 install-buildlib-opt: install-buildlib-common
 
-install-buildlib-common: 
+install-buildlib-common: $(call GET_MLI,$(INSTALLIB))
 	$(INSTALL) -d $(BUILDLIB)
 	-$(OCAMLFIND) remove -destdir $(BUILDLIB) $(NAME) 
-	$(OCAMLFIND)  install -ldconf ignore -destdir $(BUILDLIB) -patch-version $(VERSION) $(NAME) $(REAL_INSTALLIB)
+	$(OCAMLFIND)  install -ldconf ignore -destdir $(BUILDLIB) -patch-version $(VERSION) $(NAME) \
+	  $(REAL_INSTALLIB) $(call GET_MLI, $(REAL_INSTALLIB))
 
 install-lib-byte: REAL_INSTALLIB = $(call ONLY_BYTE,$(INSTALLIB))
 install-lib-byte: $(call ONLY_BYTE,$(INSTALLIB))
 install-lib-byte: install-lib-common
 
-install-lib-opt: REAL_INSTALLIB =  $(INSTALLIB)
-install-lib-opt: $(INSTALLIB)
+install-lib-opt: REAL_INSTALLIB = $(INSTALLIB)
+install-lib-opt: $(INSTALLIB) 
 install-lib-opt: install-lib-common
-	
-install-lib-common:
+
+install-lib-common: $(call GET_MLI,$(INSTALLIB))
 	-$(OCAMLFIND) remove $(OCAMLFIND_REMOVE_FLAGS) $(NAME) 
-	$(OCAMLFIND) install $(OCAMLFIND_INSTALL_FLAGS) -patch-version $(VERSION) $(NAME) $(REAL_INSTALLIB)
+	$(OCAMLFIND) install $(OCAMLFIND_INSTALL_FLAGS) -patch-version $(VERSION) $(NAME) \
+	  $(REAL_INSTALLIB) $(call GET_MLI,$(INSTALLIB))
 
 uninstall-lib:
 	-$(OCAMLFIND) remove $(OCAMLFIND_REMOVE_FLAGS) $(NAME)
@@ -315,6 +318,9 @@ uninstall-doc-man: clean-doc-man
 .mly.mli:
 	$(OCAMLYACC) -v $<
 	
+.ml.mli:
+	$(OCAMLC) $(INCLUDES) $(CLI_OCAMLFIND) -i $< > $@
+
 clean:: $(if $(LIBRARY),clean-lib,clean-prog)
 	-$(RM) *.cm[ioxa] *.o *.cmxa *.a *.so
 	-$(RM) $(GENERATED) *.output

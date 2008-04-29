@@ -39,14 +39,16 @@ all:
 
 REQUIRES += camomile
 
+CMO_CAMOMILE=         \
+ gettextCamomile.cmo
+
 INSTALLIB +=          \
  gettextCamomile.cma  \
  gettextCamomile.cmxa \
  gettextCamomile.a    \
  gettextCamomile.cmi
 
-CMO_CAMOMILE=         \
- gettextCamomile.cmo
+INSTALLIB += $(CMO_CAMOMILE:.cmo=.cmx)
 
 gettextCamomile.cmo: gettextCamomile.cmi
 gettextCamomile.cmx: gettextCamomile.cmi

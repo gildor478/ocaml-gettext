@@ -37,14 +37,6 @@ distclean::
 # Ocaml Gettext base library #
 ##############################
 
-INSTALLIB +=              \
- gettextBase.cma          \
- gettextBase.cmxa         \
- gettextBase.a            \
- gettextTypes.cmi         \
- gettextDummy.cmi         \
- gettext.cmi         
-
 CMO_BASE  =               \
  gettextConfig.cmo        \
  gettextCategory.cmo      \
@@ -62,6 +54,16 @@ CMO_BASE  =               \
  gettextMo.cmo            \
  gettextDummy.cmo
 
+INSTALLIB +=              \
+ gettextBase.cma          \
+ gettextBase.cmxa         \
+ gettextBase.a            \
+ gettextTypes.cmi         \
+ gettextDummy.cmi         \
+ gettext.cmi              
+
+INSTALLIB += $(CMO_BASE:.cmo=.cmx)
+
 gettextCompat.cmo: gettextCompat.cmi 
 gettextCompat.cmx: gettextCompat.cmi 
 gettext.cmo: gettext.cmi 
@@ -74,12 +76,31 @@ gettextBase.cma: $(CMO_BASE)
 gettextBase.cmxa: $(CMO_BASE:.cmo=.cmx)
 
 clean::
-	-$(RM) gettextMo_parser.output \
-	 gettextMo_parser.ml gettextMo_parser.mli
+	-$(RM) gettextMo_parser.output
+	-$(RM) gettextMo_parser.ml
+	-$(RM) gettextMo_parser.mli
+	-$(RM) gettextDummy.mli
+	-$(RM) gettextTypes.mli
 
 ###################################
 # Ocaml Gettext extension library #
 ###################################
+
+CMO_EXTENSION=                \
+ gettextLocale_types.cmo      \
+ gettextLocale_parser.cmo     \
+ gettextLocale_lexer.cmo      \
+ gettextLocale.cmo            \
+ gettextDomain.cmo            \
+ gettextCharset.cmo           \
+ gettextTranslate.cmo         \
+ gettextRealize.cmo           \
+ gettextPo_utils.cmo          \
+ gettextPoComment_parser.cmo  \
+ gettextPo_lexer.cmo          \
+ gettextPo_parser.cmo         \
+ gettextPo.cmo                \
+ gettextCompile.cmo
 
 INSTALLIB +=           \
  gettextExtension.cma  \
@@ -100,21 +121,7 @@ INSTALLIB +=           \
  gettextCompat.cmi     \
  gettextCompile.cmi         
 
-CMO_EXTENSION=                \
- gettextLocale_types.cmo      \
- gettextLocale_parser.cmo     \
- gettextLocale_lexer.cmo      \
- gettextLocale.cmo            \
- gettextDomain.cmo            \
- gettextCharset.cmo           \
- gettextTranslate.cmo         \
- gettextRealize.cmo           \
- gettextPo_utils.cmo          \
- gettextPoComment_parser.cmo  \
- gettextPo_lexer.cmo          \
- gettextPo_parser.cmo         \
- gettextPo.cmo                \
- gettextCompile.cmo
+INSTALLIB += $(CMO_EXTENSION:.cmo=.cmx)
 
 gettextPo_lexer.cmo: gettextPo_parser.cmi gettextPoComment_parser.cmi
 gettextPo_lexer.cmx: gettextPo_parser.cmi gettextPoComment_parser.cmi
@@ -128,11 +135,31 @@ gettextExtension.cma: $(CMO_EXTENSION)
 gettextExtension.cmxa: $(CMO_EXTENSION:.cmo=.cmx)
 
 clean::
-	-$(RM) \
-	 gettextPoComment_parser.output gettextPoComment_parser.ml gettextPoComment_parser.mli \
-	 gettextPo_parser.output gettextPo_parser.ml gettextPo_parser.mli \
-	 gettextFormat_parser.output gettextFormat_parser.ml gettextFormat_parser.mli \
-	 gettextLocale_parser.output gettextLocale_parser.ml gettextLocale_parser.mli
+	-$(RM) gettextPoComment_parser.output
+	-$(RM) gettextPoComment_parser.ml
+	-$(RM) gettextPoComment_parser.mli
+	-$(RM) gettextPo_parser.output
+	-$(RM) gettextPo_parser.ml
+	-$(RM) gettextPo_parser.mli
+	-$(RM) gettextFormat_parser.output
+	-$(RM) gettextFormat_parser.ml
+	-$(RM) gettextFormat_parser.mli
+	-$(RM) gettextLocale_parser.output
+	-$(RM) gettextLocale_parser.ml
+	-$(RM) gettextLocale_parser.mli
+	-$(RM) gettextLocale.mli
+	-$(RM) gettextFormat.mli
+	-$(RM) gettextCharset.mli
+	-$(RM) gettextCategory.mli
+	-$(RM) gettextRealize.mli
+	-$(RM) gettextTranslate.mli
+	-$(RM) gettextConfig.mli
+	-$(RM) gettextDomain.mli
+	-$(RM) gettextModules.mli
+	-$(RM) gettextUtils.mli
+	-$(RM) gettextPo.mli
+	-$(RM) gettextCompile.mli
+	-$(RM) gettextMo.mli
 
 ########################
 # Pa_gettext extension #

@@ -38,6 +38,11 @@ all:
 # Stub library               #
 ##############################
 
+CMO_STUB =                 \
+ gettextStubCompat_stubs.o \
+ gettextStubCompat.cmo     \
+ gettextStub.cmo 
+
 INSTALLIB +=               \
  gettextStub.cmxa          \
  gettextStub.cma           \
@@ -47,15 +52,16 @@ INSTALLIB +=               \
  gettextStub.cmi           \
  gettextStubCompat.cmi     
 
-CMO_STUB =                 \
- gettextStubCompat_stubs.o \
- gettextStubCompat.cmo     \
- gettextStub.cmo 
+INSTALLIB += $(CMO_STUB:.cmo=.cmx)
 
 gettextStub.cma: $(CMO_STUB)
 gettextStub.cmxa: $(CMO_STUB:.cmo=.cmx)
 gettextStub.cma gettextStub.cmxa: STUBSOBJS = yes 
 gettextStub.cma gettextStub.cmxa: OCAMLMKLIB_FLAGS += $(STUB_LDFLAGS)
+
+clean::
+	-$(RM) gettextStub.mli
+	-$(RM) gettextStubCompat.mli
 
 endif
 
