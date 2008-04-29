@@ -1,7 +1,7 @@
 (**************************************************************************)
-(*  Ocaml-gettext : a library to translate messages                       *)
+(*  ocaml-gettext : a library to translate messages                       *)
 (*                                                                        *)
-(*  Copyright (C) 2003, 2004, 2005 Sylvain Le Gall <sylvain@le-gall.net>  *)
+(*  Copyright (C) 2003-2007 Sylvain Le Gall <sylvain@le-gall.net>         *)
 (*                                                                        *)
 (*  This library is free software; you can redistribute it and/or         *)
 (*  modify it under the terms of the GNU Lesser General Public            *)
@@ -18,8 +18,6 @@
 (*  License along with this library; if not, write to the Free Software   *)
 (*  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307   *)
 (*  USA                                                                   *)
-(*                                                                        *)
-(*  Contact: sylvain@le-gall.net                                          *)
 (**************************************************************************)
 
 (** Camlp4 dumper to extract strings.
