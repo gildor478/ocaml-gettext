@@ -1,9 +1,21 @@
-v 0.3.0 (Sun, 30 Mar 2008 17:53:58 +0200):
+v 0.3.0 (Tue, 29 Apr 2008 22:58:22 +0200):
   * Get rid of ocaml-ast-analyze (Richard W.M. Jones)
   * Port of camlp4 extension to OCaml 3.10.1 (Richard W.M. Jones)
   * Compile with camomile 0.7.1 (Richar W.M. Jones)
   * Check dependency on ocaml-fileutils in configure 
   * Add --disable-doc-pdf to configure, to allow building doc without PDF (and fop)
+  * Get rid of camlidl
+  * Distribute .mli and .cmx file
+  * Handle multiline comment when merging, especially location "#:" and special
+    comment "#,"
+  * Partially handle UTF-8, by not escaping string using "Printf.fprintf
+    "%S"" but by using the same rule as the one used for reading escaped string
+  * Rework build system to:
+    * use "install" programm to create dir and copy files
+    * use --docdir and --prefix from configure
+  * Don't build PDF document by default
+  * Install documentation in $docdir/html/{api|api-ref|reference-manual}
+  * Fix typo in documentation
 
 v 0.2.0 :
   * Full rewrite of ocaml-gettext.
