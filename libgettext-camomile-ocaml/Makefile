@@ -35,9 +35,6 @@ INSTALLIB  = META
 
 all:
 
-distclean::
-	-$(RM) META
-
 ##########################
 # Ocaml Gettext Camomile #
 ##########################

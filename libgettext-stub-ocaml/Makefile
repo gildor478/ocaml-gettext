@@ -36,9 +36,6 @@ INCLUDES   = $(STUB_CFLAGS)
 
 all:
 
-distclean::
-	-$(RM) META
-
 ##############################
 # Stub library               #
 ##############################

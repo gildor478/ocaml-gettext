@@ -79,3 +79,8 @@ $(call ODOC_TARGET,api-ext):REQUIRES=$(ALL_PACKAGES)
 $(call ODOC_TARGET,api-ext):$(filter-out ../libgettext-ocaml/pr_gettext.ml,$(wildcard ../libgettext-ocaml/*.ml))
 $(call ODOC_TARGET,api-ext):$(wildcard ../libgettext-ocaml/*.mli)
 endif
+
+clean::
+	-$(RM) '$(CURDIR)/ocaml-gettext.5'
+	-$(RM) '$(CURDIR)/ocaml-xgettext.1'
+	-$(RM) '$(CURDIR)/ocaml-gettext.1'
