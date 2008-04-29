@@ -25,6 +25,16 @@ open CamomileLibrary;;
 open Default.Camomile;;
 open GettextTypes;;
 
+(** Error reported when something goes wrong during Camomile initialization.
+  *)
+exception GettextCamomileCreate of string * exn
+;;
+
+(** Error reported when something goes wrong during Camomile operation.
+  *)
+exception GettextCamomileRecode of string * exn
+;;
+
 (** Charset module, that is derived directly from the camomile library. *)
 module Charset : GettextCharset.CHARSET_TYPE =
   struct
@@ -36,14 +46,42 @@ module Charset : GettextCharset.CHARSET_TYPE =
       out_enc  : CharEncoding.t;
     }
 
-    let create t in_enc out_enc = {
-      failsafe = t.GettextTypes.failsafe;
-      in_enc   = CharEncoding.of_name in_enc;
-      out_enc  = CharEncoding.of_name out_enc;
-    }
+    let create t in_enc out_enc = 
+      try
+        {
+          failsafe = t.GettextTypes.failsafe;
+          in_enc   = CharEncoding.of_name in_enc;
+          out_enc  = CharEncoding.of_name out_enc;
+        }
+      with e ->
+        GettextUtils.fail_or_continue 
+          t.GettextTypes.failsafe
+          (GettextCamomileCreate(
+            Printf.sprintf 
+              "Cannot create conversion from %s to %s" 
+              in_enc 
+              out_enc,
+            e))
+          {
+            failsafe = t.GettextTypes.failsafe;
+            in_enc   = CharEncoding.of_name "ISO-8859-1";
+            out_enc  = CharEncoding.of_name "ISO-8859-1";
+          }
 
     let recode u str = 
-      CharEncoding.recode_string u.in_enc u.out_enc str
+      try
+        CharEncoding.recode_string u.in_enc u.out_enc str
+      with e ->
+        GettextUtils.fail_or_continue 
+          u.failsafe
+          (GettextCamomileCreate(
+            Printf.sprintf 
+              "Cannot create convert string %s from %s to %s" 
+              str
+              (CharEncoding.name_of u.in_enc)
+              (CharEncoding.name_of u.out_enc),
+            e))
+          str
   end
 ;;
 
