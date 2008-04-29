@@ -1,7 +1,7 @@
 (**************************************************************************)
 (*  ocaml-gettext : a library to translate messages                       *)
 (*                                                                        *)
-(*  Copyright (C) 2003-2007 Sylvain Le Gall <sylvain@le-gall.net>         *)
+(*  Copyright (C) 2003-2008 Sylvain Le Gall <sylvain@le-gall.net>         *)
 (*                                                                        *)
 (*  This library is free software; you can redistribute it and/or         *)
 (*  modify it under the terms of the GNU Lesser General Public            *)
