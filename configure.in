@@ -69,8 +69,8 @@ AC_ARG_ENABLE(doc,
         BUILD_DOC=$enableval, BUILD_DOC="yes")
 
 AC_ARG_ENABLE(doc-pdf,
-        AC_HELP_STRING([--enable-doc-pdf], [Build the PDF documentation. Default: yes]),
-        BUILD_DOC_PDF=$enableval, BUILD_DOC_PDF="yes")
+        AC_HELP_STRING([--enable-doc-pdf], [Build the PDF documentation. Default: no]),
+        BUILD_DOC_PDF=$enableval, BUILD_DOC_PDF="no")
 
 AC_ARG_WITH(ocamlfind-install-flags,
         AC_HELP_STRING([--with-ocamlfind-install-flags], [Flags to use when installing with ocamlfind (e.g. -destdir, -ldconf). Default:]),

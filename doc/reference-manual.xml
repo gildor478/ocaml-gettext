@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!--**********************************************************************-->
 <!-- ocaml-gettext : a library to translate messages                      -->
 <!--                                                                      -->
@@ -20,6 +21,8 @@
 <!-- USA                                                                  -->
 <!--**********************************************************************-->
 
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+"/usr/share/xml/schema/dtd/4.3/docbookx.dtd" [
 <!-- Source code -->
 <!ENTITY expl                          '../examples'>
 <!ENTITY xi                            'http://www.w3.org/2001/XInclude'>
