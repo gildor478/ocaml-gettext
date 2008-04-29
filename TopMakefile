@@ -319,7 +319,10 @@ uninstall-doc-man: clean-doc-man
 	$(OCAMLYACC) -v $<
 	
 .ml.mli:
-	$(OCAMLC) $(INCLUDES) $(CLI_OCAMLFIND) -i $< > $@
+	$(OCAMLC) $(INCLUDES) $(CLI_OCAMLFIND) -i $< > $@ || $(RM) $@
+	# Set date of the target to the date of the source
+	touch -r $< $@
+
 
 clean:: $(if $(LIBRARY),clean-lib,clean-prog)
 	-$(RM) *.cm[ioxa] *.o *.cmxa *.a *.so
