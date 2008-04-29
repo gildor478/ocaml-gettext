@@ -69,29 +69,20 @@ module Native : GettextTypes.REALIZE_TYPE =
             | None ->
                 t.codeset
           in
-          let str : string = 
-            GettextStubCompat.bind_textdomain_codeset textdomain codeset
-          in
-          ()
+            ignore(GettextStubCompat.bind_textdomain_codeset textdomain codeset)
         );
         (
           match dir_opt with
-            Some dir ->
-              let str : string =
-                GettextStubCompat.bindtextdomain textdomain dir
-              in
-              ()
-          | None ->
-              (
-                match default_dir with
-                  Some dir ->
-                    let str : string = 
-                      GettextStubCompat.bindtextdomain textdomain dir
-                    in
-                    ()
-                | None ->
-                    ()
-              )
+            | Some dir ->
+                ignore(GettextStubCompat.bindtextdomain textdomain dir)
+            | None ->
+                (
+                  match default_dir with
+                    | Some dir ->
+                        ignore(GettextStubCompat.bindtextdomain textdomain dir)
+                    | None ->
+                        ()
+                )
         )
       in
       (* We only use the first path of t.path, since there is no notion of search path 
@@ -100,31 +91,28 @@ module Native : GettextTypes.REALIZE_TYPE =
            - directory pointed by bindtextdomain,
            - default directory of gettext.
        *)
-      let str : string = 
+      let _ = 
         GettextStubCompat.textdomain t.default
       in
-      let old_language : string = 
+      let _ = 
           match t.language with
             Some language ->
               (
                 try
                   GettextStubCompat.setlocale GettextStubCompat.LC_ALL language
-                with Failure("setlocale(invalid localization)" as str) as exc ->
+                with Failure("setlocale(invalid localization)") as exc ->
                   let () = 
                     fail_or_continue t.failsafe exc () 
                   in
-                  GettextStubCompat.setlocale GettextStubCompat.LC_ALL ""
+                    GettextStubCompat.setlocale GettextStubCompat.LC_ALL ""
               )
           | None ->
               GettextStubCompat.setlocale GettextStubCompat.LC_ALL ""
       in
       let () = 
-        MapCategory.iter ( fun cat locale -> 
-          let str : string = 
-            GettextStubCompat.setlocale (native_category_of_category cat) locale
-          in
-          ()
-        ) t.categories
+        MapCategory.iter 
+          (fun cat locale -> ignore(GettextStubCompat.setlocale (native_category_of_category cat) locale)) 
+          t.categories
       in
       let () = 
         MapTextdomain.iter bind_textdomain_one t.textdomains
@@ -175,15 +163,13 @@ module Preload : GettextTypes.REALIZE_TYPE =
       let t' = Native.realize t
       in
       let () = 
-        MapTextdomain.iter ( fun textdomain _ ->
-          (* We only load LC_MESSAGES, since it is what is mainly use with
-             gettext. Anyway, this is just a local optimization... 
-           *)
-          let str : string = 
-            t' false (Some textdomain) "" None LC_MESSAGES
-          in
-          ()
-        ) t.textdomains
+        MapTextdomain.iter 
+          (fun textdomain _ ->
+             (* We only load LC_MESSAGES, since it is what is mainly use with
+              * gettext. Anyway, this is just a local optimization... 
+              *)
+             ignore(t' false (Some textdomain) "" None LC_MESSAGES)) 
+          t.textdomains
       in
       t'
 

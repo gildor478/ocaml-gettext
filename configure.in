@@ -44,7 +44,7 @@ AC_ARG_WITH(stub-cflags,
 	STUB_CFLAGS=$withval, STUB_CFLAGS="")
 
 AC_ARG_WITH(stub-ldflags,
-        AC_HELP_STRING([--with-stub-ldflags=flags], [Flags to use when linking gettext-stub. Default: -L(OCAMLLIB) -lcamlidl]),
+        AC_HELP_STRING([--with-stub-ldflags=flags], [Flags to use when linking gettext-stub. Default: -L(OCAMLLIB)]),
         STUB_LDFLAGS=$withval, STUB_LDFLAGS="")
 
 AC_ARG_WITH(docbook-stylesheet,
@@ -92,7 +92,6 @@ AC_CHECK_OCAMLLEX([],[AC_MSG_ERROR(Cannot find ocamllex.)])
 AC_CHECK_OCAMLYACC([],[AC_MSG_ERROR(Cannot find ocamlyacc.)])
 AC_CHECK_OCAMLFIND([],[AC_MSG_ERROR(Cannot find ocamlfind.)])
 AC_CHECK_CAMLP4([],[AC_MSG_ERROR(Cannot find camlp4.)])
-AC_CHECK_CAMLIDL([],[AC_MSG_ERROR(Cannot find camlidl.)])
 AC_CHECK_OCAMLMKLIB([],[AC_MSG_ERROR(Cannot find ocamlmklib.)])
 
 if test "x$BUILD_DOC" = "xyes"; then
@@ -132,12 +131,6 @@ if test "$BUILD_STUB" = "no" || test "$BUILD_CAMOMILE" = "no"; then
   if test "$BUILD_BENCH" = "yes"; then
     AC_MSG_ERROR(Cannot build bench since it depends on both gettext-stub and gettext-camomile)
   fi
-fi
-
-# if stub ldflags are not set, set it.
-
-if test "x$STUB_LDFLAGS" = "x"; then
-  STUB_LDFLAGS="-L$OCAMLLIB -lcamlidl"
 fi
 
 # substitutions to perform

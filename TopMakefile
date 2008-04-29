@@ -100,15 +100,15 @@ INSTALL_DIR=$(call INSTALL_DIR_AUX,$(1),$(2)/$(notdir $(patsubst %/,%,$(dir $(1)
 ONLY_BYTE=$(filter-out %.o,$(filter-out %.a,$(filter-out %.cmx, $(filter-out %.cmxa,$(1))))) $(filter lib%.a,$(1))
 
 %.cmxa %.a %.so:
-	$(if $(STUBSOBJS),                     \
-	 $(OCAMLMKLIB)  -o $* $^ $(STUBSOBJS), \
-	 $(OCAMLOPT) -a -o $*.cmxa $^          \
+	$(if $(STUBSOBJS),                            \
+	 $(OCAMLMKLIB)  -o $* $^ $(OCAMLMKLIB_FLAGS), \
+	 $(OCAMLOPT) -a -o $*.cmxa $^                 \
 	)
 
 %.cma %.a %.so:
-	$(if $(STUBSOBJS),                     \
-	 $(OCAMLMKLIB) -o $* $^ $(STUBSOBJS),  \
-	 $(OCAMLC)  -a -o $*.cma $^            \
+	$(if $(STUBSOBJS),                            \
+	 $(OCAMLMKLIB) -o $* $^ $(OCAMLMKLIB_FLAGS),  \
+	 $(OCAMLC)  -a -o $*.cma $^                   \
 	)
 
 install-buildlib-byte: REAL_INSTALLIB = $(call ONLY_BYTE,$(INSTALLIB))

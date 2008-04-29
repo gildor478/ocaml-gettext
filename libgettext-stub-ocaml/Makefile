@@ -57,15 +57,11 @@ CMO_STUB =                 \
  gettextStubCompat.cmo     \
  gettextStub.cmo 
 
-gettextStubCompat.cmo: gettextStubCompat.cmi
-gettextStubCompat.cmx: gettextStubCompat.cmi
 gettextStub.cma: $(CMO_STUB)
 gettextStub.cmxa: $(CMO_STUB:.cmo=.cmx)
-gettextStub.cma gettextStub.cmxa: STUBSOBJS = $(STUB_LDFLAGS)
+gettextStub.cma gettextStub.cmxa: STUBSOBJS = yes 
+gettextStub.cma gettextStub.cmxa: OCAMLMKLIB_FLAGS += $(STUB_LDFLAGS)
 
-clean::
-	-$(RM) gettextStubCompat.ml gettextStubCompat.mli 
-	-$(RM) gettextStubCompat.h gettextStubCompat_stubs.c 
 endif
 
 include ../TopMakefile
