@@ -1,31 +1,34 @@
 To: caml-list@inria.fr
 Bcc: hump@caml.inria.fr
-Subject: [ANN] ocaml-gettext v 0.2.0
+Subject: [ANN] ocaml-gettext v0.3.0
 
 Hello,
 
-General :
-Ocaml-gettext is a library that enables string translation in Ocaml. The
-API is based on GNU gettext. It comes with a tool to extract the string
-which needs to be translated from Ocaml source file.
+General:
+ocaml-gettext is a library that enables string translation in OCaml.  The API
+is based on GNU gettext. It comes with a tool to extract the string which needs
+to be translated from OCaml source file.
 
-This enable Ocaml program to output string in the native language of the
-user ( if you also provide a file containing the translation of the 
-english string contains in the program to the one in the native language 
-of the user ).
+This enable OCaml program to output string in the native language of the user
+(if you also provide a file containing the translation of the english string
+contains in the program to the one in the native language of the user).
 
-The translation is base on string ( this means that you need to provide
-a string and not a unique identifier, like in some other catalog 
-system ). This string is in english, and will be returned if the native 
-language of the user doesn't have translation catalog.
+The translation is base on string (this means that you need to provide a string
+and not a unique identifier, like in some other catalog system). This string is
+in english, and will be returned if the native language of the user doesn't
+have translation catalog.
 
 Changes:
-v 0.2.0 is the first public release. Former release was simple wrapper
-around GNU gettext. This release have a wrapper to GNU gettext AND a 
-pure Ocaml implementation of the library ( based on Camomile ).
+v 0.3.0 has been long awaited but is now ready. It fix a lot of bugs concerning
+merging PO and POT file (multiline comments, UTF-8...). This is also the first
+release that works with camlp4 3.10. 
+
+This new version doesn't need camlidl and ocaml-ast-analyze anymore, in order
+to simplify installation. When building, it is also possible to not use
+Camomile in favor of a simple gettext C library.
 
 Link :
-http://www.carva.org/sylvain.le-gall/ocaml-gettext.html
+http://le-gall.net/sylvain+violaine/ocaml-gettext.html
 
-Regard
+Regards
 Sylvain Le Gall
