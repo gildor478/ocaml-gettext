@@ -1,5 +1,5 @@
 (**************************************************************************)
-(*  ocaml-gettext : a library to translate messages                       *)
+(*  ocaml-gettext: a library to translate messages                        *)
 (*                                                                        *)
 (*  Copyright (C) 2003-2008 Sylvain Le Gall <sylvain@le-gall.net>         *)
 (*                                                                        *)

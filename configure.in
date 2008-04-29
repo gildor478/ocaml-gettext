@@ -1,5 +1,5 @@
 dnl **************************************************************************
-dnl *  ocaml-gettext : a library to translate messages                       *
+dnl *  ocaml-gettext: a library to translate messages                        *
 dnl *                                                                        *
 dnl *  Copyright (C) 2003-2008 Sylvain Le Gall <sylvain@le-gall.net>         *
 dnl *                                                                        *
