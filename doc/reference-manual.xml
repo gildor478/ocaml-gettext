@@ -1030,6 +1030,47 @@
     </para>
   </chapter>
   <appendix>
+    <title>Tips and tricks</title>
+
+    <section>
+      <title>Adding gettext support without depending on ocaml-gettext</title>
+
+      <para>
+        You want to 'gettextify' your program, adding 's_' and 'f_'
+        annotations throughout. However now your program has an additional
+        dependency, ocaml-gettext. You can make ocaml-gettext optional by
+        creating a set of dummy functions which do nothing:
+      </para>
+
+      <example>
+        <title><filename>prog_gettext.ml</filename></title>
+        <programlisting>
+          (* This file is generated automatically by ./configure. *)
+          module Gettext = 
+          struct
+            external s_ : string -> string = "%identity"
+            external f_ : ('a -> 'b, 'c, 'd) format -> ('a -> 'b, 'c, 'd) format = "%identity"
+            
+            let sn_ : string -> string -> int -> string = 
+              fun s p n -> 
+                if n = 1 then s else p
+                
+            let fn_ : ('a -> 'b, 'c, 'd) format -> ('a -> 'b, 'c, 'd) format -> int -> ('a -> 'b, 'c, 'd) format = 
+              fun s p n -> 
+                if n = 1 then s else p
+          end
+        </programlisting>
+      </example>
+
+      <para>
+        You have to arrange for your configure script to place the above
+        content or the real ProgramGettext module into 'prog_gettext.ml',
+        depending on whether it detects that ocaml-gettext is installed
+        (eg. using 'ocamlfind query gettext' or some other method).
+      </para>
+    </section>
+  </appendix>
+  <appendix>
     <title>Links</title>
     <itemizedlist>
       <listitem>
