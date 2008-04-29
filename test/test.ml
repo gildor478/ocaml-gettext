@@ -574,6 +574,11 @@ let po_process_test tests =
       fun () ->
         copy_merge_compare "utf8-fr.po"
     );
+    "utf8-ja.po" >::
+    (
+      fun () ->
+        copy_merge_compare "utf8-ja.po"
+    );
   ]
 ;;
 
