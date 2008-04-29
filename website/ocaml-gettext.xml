@@ -35,17 +35,17 @@
 
   <section>
     <title>Goals</title>
-    <para>Ocaml-gettext should provide a support for internationalization of Ocaml program.</para>
-    <para>Constraints :</para>
+    <para>ocaml-gettext should provide a support for internationalization of OCaml program.</para>
+    <para>Constraints:</para>
     <itemizedlist>
       <listitem>
-        <para>provides a pure Ocaml implementation,</para>
+        <para>provides a pure OCaml implementation,</para>
       </listitem>
       <listitem>
         <para>the API should be as close as possible to GNU gettext,</para>
       </listitem>
       <listitem>
-        <para>provides a way to automatically extract translatable strings from Ocaml source
+        <para>provides a way to automatically extract translatable strings from OCaml source
         code.</para>
       </listitem>
     </itemizedlist>
@@ -63,30 +63,41 @@
     </para>
 
     <para>
-      It is possible to make things very simple ( at least i think so ), for internationalizing
+      It is possible to make things very simple (at least i think so), for internationalizing
       a program. GNU gettext seems a very good solution. You just need to use a special function
       to translate strings, that need to be translated and they are treated automatically. After 
-      having include this function ( in the case of ocaml-gettext, functions are &quot;s_&quot;,
-      &quot;f_&quot;,&quot;sn_&quot; and &quot;fn_&quot;.
+      having include this function (in the case of ocaml-gettext, functions are &quot;s_&quot;,
+      &quot;f_&quot;,&quot;sn_&quot; and &quot;fn_&quot;).
     </para>
 
     <para>For now, ocaml-gettext provides enough service to build a basic internationalized 
-      program. It comes with :</para>
+      program. It comes with:</para>
     <itemizedlist>
       <listitem>
-        <para>a pure Ocaml implementation, based on Camomile,</para>
+        <para>a pure OCaml implementation, based on Camomile,</para>
       </listitem>
       <listitem>
         <para>a binding to GNU gettext library,</para>
       </listitem>
       <listitem>
-        <para><command>ocaml-gettext</command> a tool to extract strings from Ocaml source.</para>
+        <para><command>ocaml-gettext</command> a tool to extract strings from OCaml source.</para>
       </listitem>
     </itemizedlist>
   </section>
 
   <section>
     <title>News</title>
+
+    <section>
+      <sectioninfo><date>April, 30th 2008</date></sectioninfo>
+      <title>Version 0.3.0</title>
+
+      <para>
+        New version that works with OCaml 3.10.0. It also use less dependencies
+        (no more camlidl, nor ocaml-ast-analyze). Improve PO file merging. This
+        release fix a lot of bugs, making its usage easier.
+      </para>
+    </section>
 
     <section>
       <sectioninfo><date>April, 16th 2005</date></sectioninfo>
