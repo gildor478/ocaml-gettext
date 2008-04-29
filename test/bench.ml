@@ -98,12 +98,10 @@ let gettext_bench benchs str_gettext fun_gettext =
     let ((debug_str,t',textdomain,tr),buffer) = 
       get_buffer !ref_translations
     in
-    let translation = 
       print_debug benchs 
       (Printf.sprintf "Translation of %S from %s" (string_of_translation tr) debug_str);
-      fun_gettext t' textdomain tr
-    in
-    ref_translations := buffer
+      ignore(fun_gettext t' textdomain tr);
+      ref_translations := buffer
   in
   let parameters_lst = 
     List.map parameters_of_filename mo_files_data
@@ -181,11 +179,8 @@ let realize_bench benchs =
         print_debug benchs ("Creating t for "^parameters.fl_mo);
         t_of_parameters parameters
       in
-      let t' = 
         print_debug benchs ("Realizing t for "^parameters.fl_mo);
-        realize t
-      in
-      ()
+        ignore(realize t)
     in
     List.iter f_one parameters_lst
   in
@@ -210,13 +205,10 @@ let realize_bench benchs =
 let s_bench benchs = 
   let fun_gettext t' textdomain translation = 
     match translation with
-      Singular(str,_) ->
-        let str : string = 
-          GettextCompat.dgettext t' textdomain str
-        in
-        ()
-    | _ ->
-        ()
+      | Singular(str,_) ->
+          ignore(GettextCompat.dgettext t' textdomain str)
+      | _ ->
+          ()
   in
   gettext_bench benchs "s_" fun_gettext 
 ;;
@@ -228,13 +220,10 @@ let s_bench benchs =
 let f_bench benchs = 
   let fun_gettext t' textdomain translation = 
     match translation with
-      Singular(str,_) ->
-        let str = 
-          GettextCompat.fdgettext t' textdomain str
-        in
-        ()
-    | _ ->
-        ()
+      | Singular(str,_) ->
+          ignore(GettextCompat.fdgettext t' textdomain str)
+      | _ ->
+          ()
   in
   gettext_bench benchs "f_" fun_gettext 
 ;;
@@ -246,22 +235,13 @@ let f_bench benchs =
 let sn_bench benchs = 
   let fun_gettext t' textdomain translation = 
     match translation with
-      Plural(str_id,str_plural,_) ->
-        let str0 : string = 
-          GettextCompat.dngettext t' textdomain str_id str_plural 0
-        in
-        let str1 : string = 
-          GettextCompat.dngettext t' textdomain str_id str_plural 1
-        in
-        let str2 : string = 
-          GettextCompat.dngettext t' textdomain str_id str_plural 2
-        in
-        let str3 : string = 
-          GettextCompat.dngettext t' textdomain str_id str_plural 3
-        in
-        ()
-    | _ ->
-        ()
+      | Plural(str_id,str_plural,_) ->
+          ignore(GettextCompat.dngettext t' textdomain str_id str_plural 0);
+          ignore(GettextCompat.dngettext t' textdomain str_id str_plural 1);
+          ignore(GettextCompat.dngettext t' textdomain str_id str_plural 2);
+          ignore(GettextCompat.dngettext t' textdomain str_id str_plural 3)
+      | _ ->
+          ()
   in
   gettext_bench benchs "sn_" fun_gettext 
 ;;
@@ -273,22 +253,13 @@ let sn_bench benchs =
 let fn_bench benchs = 
   let fun_gettext t' textdomain translation = 
     match translation with
-      Plural(str_id,str_plural,_) ->
-        let str0 = 
-          GettextCompat.fdngettext t' textdomain str_id str_plural 0
-        in
-        let str1 = 
-          GettextCompat.fdngettext t' textdomain str_id str_plural 1
-        in
-        let str2 = 
-          GettextCompat.fdngettext t' textdomain str_id str_plural 2
-        in
-        let str3 = 
-          GettextCompat.fdngettext t' textdomain str_id str_plural 3
-        in
-        ()
-    | _ ->
-        ()
+      | Plural(str_id,str_plural,_) ->
+          ignore(GettextCompat.fdngettext t' textdomain str_id str_plural 0);
+          ignore(GettextCompat.fdngettext t' textdomain str_id str_plural 1);
+          ignore(GettextCompat.fdngettext t' textdomain str_id str_plural 2);
+          ignore(GettextCompat.fdngettext t' textdomain str_id str_plural 3) 
+      | _ ->
+          ()
   in
   gettext_bench benchs ("fn_") fun_gettext 
 ;;

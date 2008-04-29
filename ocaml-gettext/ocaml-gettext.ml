@@ -97,12 +97,6 @@ exception InstallUninstallTooManyFilename;;
 exception CompileTooManyFilename;;
 
 let string_of_exception exc =
-  let spf x = 
-    Printf.sprintf x
-  in
-  let f_ x = 
-    OcamlGettext.f_ x
-  in
   let s_ x = 
     OcamlGettext.s_ x
   in
@@ -197,11 +191,12 @@ let guess_language_textdomain (language_option,textdomain_option) lst =
       List.map (fun fl_mo -> ((chop_extension fl_mo),textdomain,fl_mo)) lst
   | None, None, lst ->
       List.map (fun fl_mo -> 
+        (* BUG: should be able to have get_extension working *)
+        (*
         let str_reduce = 
           chop_extension fl_mo
         in 
-        (* BUG: should be able to have get_extension working *)
-        (*(((chop_extension str_reduce), (get_extension str_reduce)),fl_mo)*)
+        * (((chop_extension str_reduce), (get_extension str_reduce)),fl_mo)*)
         raise (Failure
 "FilePath suffers from a default with the handling of
 chop/get_extension. This bug should disappears with 
