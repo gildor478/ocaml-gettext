@@ -67,7 +67,7 @@
 <!ENTITY download-fop               'http://www.apache.org/dyn/closer.cgi/xml/fop'>
   ]>
 <book>
-  <title>Ocaml-gettext reference manual</title>
+  <title>ocaml-gettext reference manual</title>
   <bookinfo>
     <legalnotice>
       <para>
@@ -96,12 +96,12 @@
     <section>
       <title>What is ocaml-gettext ?</title>
       <para>
-        Ocaml-gettext is a library to support string translation in OCaml. It provides a simple interface 
+        ocaml-gettext is a library to support string translation in OCaml. It provides a simple interface 
         to help programmers and translators to create programs that can support different languages. This
         allows the internationalisation of programs.
       </para>
       <para>
-        OCaml-gettext provides two main functionalities: 
+        ocaml-gettext provides two main functionalities: 
         <itemizedlist>
           <listitem>
             <para>
@@ -136,7 +136,7 @@
         </itemizedlist>
       </para>
       <para>
-        Ocaml-gettext was initially only a wrapper of gettext. It comes with a patch against the source of
+        ocaml-gettext was initially only a wrapper of gettext. It comes with a patch against the source of
         xgettext to add support of the OCaml language. As i already used this approach, 
         i was convinced that this library should be better integrated by using more advanced features of 
         OCaml ( such as <command>camlp4</command> ). 
@@ -167,7 +167,7 @@
     <section>
       <title>How is ocaml-gettext related to gettext ?</title>
       <para>
-        Ocaml-gettext is a close cousin of gettext. In fact, the API is based on gettext. Almost everything 
+        ocaml-gettext is a close cousin of gettext. In fact, the API is based on gettext. Almost everything 
         in ocaml-gettext is compatible with gettext:
         <itemizedlist>
           <listitem>
@@ -992,7 +992,7 @@
   <chapter>
     <title>Translating ocaml-gettext programs and libraries</title>
     <para>
-      Ocaml-gettext has been built around gettext. This allows translators to use exactly the same technics as they should
+      ocaml-gettext has been built around gettext. This allows translators to use exactly the same technics as they should
       use with gettext. All the documentation required for translating can be found in <link linkend="gettext-documentation">
       gettext documentation</link>.
     </para>
@@ -1015,7 +1015,7 @@
   <chapter>
     <title>Using ocaml-gettext programs</title>
     <para>
-      Ocaml-gettext program can be used just as any OCaml program. The only difference with standard OCaml program is that
+      ocaml-gettext program can be used just as any OCaml program. The only difference with standard OCaml program is that
       they come with a bunch of command line options which are specific to OCaml program. In most cases, you just have to define
       a well suited <varname>LC_ALL</varname> or <varname>LANG</varname> environment variable. Since ocaml-gettext is compatible
       with gettext, if your environment variable works with gettext, it should also works with ocaml-gettext.
@@ -1091,7 +1091,7 @@
       </listitem>
       <listitem>
         <para>
-          <ulink url="&site-ocaml-fileutils;">Ocaml-fileutils website</ulink>
+          <ulink url="&site-ocaml-fileutils;">ocaml-fileutils website</ulink>
         </para>
       </listitem>
       <listitem>
@@ -1101,7 +1101,7 @@
       </listitem>
       <listitem>
         <para>
-          <ulink url="&site-ocaml-benchmark;">Ocaml-benchmark website</ulink>
+          <ulink url="&site-ocaml-benchmark;">ocaml-benchmark website</ulink>
         </para>
       </listitem>
       <listitem>

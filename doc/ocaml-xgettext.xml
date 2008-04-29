@@ -26,6 +26,12 @@
 "/usr/share/xml/schema/dtd/4.3/docbookx.dtd" [
 ]>
 <refentry>
+  <refentryinfo>
+    <productname>ocaml-gettext</productname>
+    <productnumber/>
+    <date>2008-04-29</date>
+  </refentryinfo>
+
   <refmeta>
     <refentrytitle>OCAML-XGETTEXT</refentrytitle>
     <manvolnum>1</manvolnum>
@@ -33,7 +39,7 @@
 
   <refnamediv>
     <refname><command>ocaml-xgettext</command></refname>
-    <refpurpose>program to extract translatable strings from Ocaml source file.</refpurpose>
+    <refpurpose>program to extract translatable strings from OCaml source file.</refpurpose>
   </refnamediv>
 
   <refsynopsisdiv>
@@ -53,8 +59,8 @@
       
     <para>
       <command>ocaml-xgettext</command> is a <command>camlp4</command> top level. This top level is compiled with the 
-      printer module <filename>pr_gettext.cmo</filename>. It outputs an Ocaml marshalled data structure that can only
-      be understood by <command>ocaml-gettext</command>. The purpose of this program is to be a back end for Ocaml source
+      printer module <filename>pr_gettext.cmo</filename>. It outputs an OCaml marshalled data structure that can only
+      be understood by <command>ocaml-gettext</command>. The purpose of this program is to be a back end for OCaml source
       code string extraction. You should not use it directly.
     </para>
   </refsect1>

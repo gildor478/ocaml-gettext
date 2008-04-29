@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!--==================================================================
-  ocaml-gettext : a library to translate messages
+  ocaml-gettext: a library to translate messages
   
   Copyright (C) 2003-2008 Sylvain Le Gall <sylvain@le-gall.net>
   
@@ -26,6 +26,12 @@
 "/usr/share/xml/schema/dtd/4.3/docbookx.dtd" [
 ]>
 <refentry>
+  <refentryinfo>
+    <productname>ocaml-gettext</productname>
+    <productnumber/>
+    <date>2008-04-29</date>
+  </refentryinfo>
+
   <refmeta>
     <refentrytitle>OCAML-GETTEXT</refentrytitle>
     <manvolnum>5</manvolnum>
@@ -34,7 +40,7 @@
   <refnamediv>
     <refname>ocaml-gettext</refname>
     <refpurpose>
-      common options to manage internationalisation in Ocaml program through 
+      common options to manage internationalisation in OCaml program through 
       ocaml-gettext library.
     </refpurpose>
   </refnamediv>
@@ -42,20 +48,26 @@
   <refsynopsisdiv>
     <cmdsynopsis id="ocaml-gettext-options-cmdsynopsis">
       <arg choice="opt">--gettext-failsafe
+        <sbr/>
         <group>
           <arg choice="req">ignore</arg>
           <arg choice="req">inform-stderr</arg>
           <arg choice="req">raise-exception</arg>
         </group>
       </arg>
+      <sbr/>
       <arg choice="opt">--gettext-disable</arg>
       <arg choice="opt">--gettext-domain-dir 
         <arg choice="req"><replaceable>textdomain</replaceable></arg>
         <arg choice="req"><replaceable>dir</replaceable></arg>
       </arg>
+      <sbr/>
       <arg choice="opt">--gettext-dir <arg choice="req"><replaceable>dir</replaceable></arg></arg>
+      <sbr/>
       <arg choice="opt">--gettext-language <arg choice="req"><replaceable>language</replaceable></arg></arg>
+      <sbr/>
       <arg choice="opt">--gettext-codeset <arg choice="req"><replaceable>codeset</replaceable></arg></arg>
+      <sbr/>
     </cmdsynopsis>
   </refsynopsisdiv>
 
@@ -142,9 +154,9 @@
         <listitem>
           <para>
             Sets the language to use in ocaml-gettext library. The language should be POSIX compliant. The language should
-            follow the following convention : lang[_territory][.charset][@modifier]. The lang and territory should be 
-            two letters ISO code. Charset should be a valid ISO character set ( at least recognised by the underlying 
-            charset recoding routine ). For example, valid languages are : fr_FR.ISO-8859-1@euro, de_DE.UTF-8.
+            follow the following convention: lang[_territory][.charset][@modifier]. The lang and territory should be 
+            two letters ISO code. Charset should be a valid ISO character set (at least recognised by the underlying 
+            charset recoding routine). For example, valid languages are: fr_FR.ISO-8859-1@euro, de_DE.UTF-8.
           </para>
         </listitem>
       </varlistentry>
@@ -164,13 +176,13 @@
       Users should be aware that these command line options, apply only for strings after the initialisation of the library. 
       This means that if the options initially guessed by ocaml-gettext don't match the command line provided, there should 
       be some untranslated string, because these strings are translated before parsing options. This is particularly true 
-      for the usage message itself ( <option>--help</option> ) : even if the strings are  translated, they are translated 
+      for the usage message itself (<option>--help</option>): even if the strings are  translated, they are translated 
       before setting the correct option.
     </para>
 
     <para>
-      Some options ( <option>--gettext-codeset</option> for example ) are overrided internally for particular use. It
-      should be required to always translate strings to UTF-8 in graphical user interface ( because GTK2 requires it ).
+      Some options (<option>--gettext-codeset</option> for example) are overrided internally for particular use. It
+      should be required to always translate strings to UTF-8 in graphical user interface (because GTK2 requires it).
     </para>
   </refsect1>
 </refentry>
