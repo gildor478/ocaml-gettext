@@ -20,7 +20,7 @@ dnl *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307   *
 dnl *  USA                                                                   *
 dnl **************************************************************************
 
-AC_INIT(ocaml-gettext, 2.61, "http://le-gall.net/sylvain+violaine/bts/index.php?tasks=all&project=1")
+AC_INIT(ocaml-gettext, 0.3.1, "http://le-gall.net/sylvain+violaine/bts/index.php?tasks=all&project=1")
 
 AC_PROG_INSTALL
 
@@ -80,9 +80,6 @@ AC_ARG_WITH(ocamlfind-remove-flags,
         AC_HELP_STRING([--with-ocamlfind-remove-flags], [Flags to use when uninstalling with ocamlfind (e.g. -destdir, -ldconf). Default: (OCAMLFIND_INSTALL_FLAGS)]),
         OCAMLFIND_REMOVE_FLAGS=$withval, OCAMLFIND_REMOVE_FLAGS='${OCAMLFIND_INSTALL_FLAGS}')
 
-VERSION=0.3.0
-DATE=`date`
-
 AC_CHECK_OCAMLC([],[AC_MSG_ERROR(Cannot find ocamlc.)])
 AC_CHECK_OCAMLOPT([],[AC_MSG_WARN(Cannot find ocamlopt, byte compilation only)])
 AC_CHECK_OCAMLLEX([],[AC_MSG_ERROR(Cannot find ocamllex.)])
@@ -139,8 +136,6 @@ AC_SUBST(EXE)
 AC_SUBST(DEFAULTLOCALEDIR)
 AC_SUBST(LOCALEDIR)
 AC_SUBST(CODESET)
-AC_SUBST(DATE)
-AC_SUBST(VERSION)
 AC_SUBST(STUB_CFLAGS)
 AC_SUBST(STUB_LDFLAGS)
 AC_SUBST(BUILD_CAMOMILE)

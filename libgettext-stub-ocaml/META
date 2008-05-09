@@ -20,7 +20,7 @@
 #  USA                                                                   #
 ##########################################################################
 
-version = "@VERSION@"
+version = "@PACKAGE_VERSION@"
 requires = "gettext.extension"
 archive(byte) = "gettextStub.cma"
 archive(native) = "gettextStub.cmxa"

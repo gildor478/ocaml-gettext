@@ -1,6 +1,6 @@
+From: Sylvain Le Gall <sylvain@le-gall.net>
 To: caml-list@inria.fr
-Bcc: hump@caml.inria.fr
-Subject: [ANN] ocaml-gettext v0.3.0
+Subject: [ANN] ocaml-gettext v0.3.1
 
 Hello,
 
@@ -14,22 +14,17 @@ user (if you also provide a file containing the translation of the
 english string contains in the program to the one in the native language
 of the user).
 
-The translation is base on string (this means that you need to provide a
+The translation is based on string (this means that you need to provide a
 string and not a unique identifier, like in some other catalog system).
 This string is in english, and will be returned if the native language
 of the user doesn't have translation catalog.
 
 Changes:
-v 0.3.0 has been long awaited but is now ready. It fix a lot of bugs
-concerning merging PO and POT file (multiline comments, UTF-8...). This
-is also the first release that works with camlp4 3.10. 
+v 0.3.1 is a bug fix release
 
-This new version doesn't need camlidl and ocaml-ast-analyze anymore, in
-order to simplify installation. When building, it is also possible to
-not use Camomile in favor of a simple gettext C library.
-
-Link :
+Links:
 http://le-gall.net/sylvain+violaine/ocaml-gettext.html
+http://le-gall.net/sylvain+violaine/download/ocaml-gettext-0.3.1.tar.gz
 
 Regards
 Sylvain Le Gall

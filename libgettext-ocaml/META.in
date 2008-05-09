@@ -20,25 +20,25 @@
 #  USA                                                                   #
 ##########################################################################
 
-version = "@VERSION@"
+version = "@PACKAGE_VERSION@"
 predicates = ""
 
 package "base" (
-  version = "@VERSION@"
+  version = "@PACKAGE_VERSION@"
   requires = "fileutils"
   archive(byte) = "gettextBase.cma"
   archive(native) = "gettextBase.cmxa"
 )
 
 package "extension" (
-  version = "@VERSION@"
+  version = "@PACKAGE_VERSION@"
   requires = "gettext.base"
   archive(byte) = "gettextExtension.cma"
   archive(native) = "gettextExtension.cmxa"
 )
 
 package "extract" (
-  version = "@VERSION@"
+  version = "@PACKAGE_VERSION@"
   requires = "gettext.extension"
   archive(byte) = "pr_gettext.cmo" 
 )

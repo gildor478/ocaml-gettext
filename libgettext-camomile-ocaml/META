@@ -20,7 +20,7 @@
 #  USA                                                                   #
 ##########################################################################
 
-version = "@VERSION@"
+version = "@PACKAGE_VERSION@"
 predicates = ""
 requires = "gettext.extension camomile"
 archive(byte) = "gettextCamomile.cma"
