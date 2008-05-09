@@ -27,7 +27,6 @@ open FilePath.DefaultPath;;
 (* Version data *)
 let print_env str = 
   print_endline ("Version         : ocaml-gettext "^(GettextConfig.version));
-  print_endline ("Build date      : "^(GettextConfig.build_date));
   print_endline ("OS              : "^(Sys.os_type));
   print_endline ("Running "^str^" ...")
 ;;

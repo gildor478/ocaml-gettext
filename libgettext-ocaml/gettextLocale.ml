@@ -58,21 +58,24 @@ let posix_getenv t category =
         Some str -> 
           str
       | None ->
-          let best_env = 
-            List.find ( 
-              fun s -> 
-                try 
-                  ignore(Sys.getenv s); 
-                  true 
-                with Not_found -> 
-                  false 
-              ) [ 
-                "LANGUAGE" ; 
-                string_of_category LC_ALL ; 
-                string_of_category category;
-                "LANG" ]
-          in
-          Sys.getenv best_env
+          try
+            let best_env = 
+              List.find ( 
+                fun s -> 
+                  try 
+                    ignore(Sys.getenv s); 
+                    true 
+                  with Not_found -> 
+                    false 
+                ) [ 
+                  "LANGUAGE" ; 
+                  string_of_category LC_ALL ; 
+                  string_of_category category;
+                  "LANG" ]
+            in
+              Sys.getenv best_env
+          with Not_found ->
+            "C"
 ;;
 
 module Posix : LOCALE_TYPE =

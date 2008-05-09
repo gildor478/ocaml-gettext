@@ -34,6 +34,7 @@ type tests = {
   verbose        : bool;
   search_path    : string list;
   ocaml_xgettext : string;
+  ocaml_gettext  : string;
   test_dir       : string;
 }
 ;;
@@ -43,6 +44,7 @@ let parse_arg () =
     verbose        = false; 
     search_path    = []; 
     ocaml_xgettext = make_filename [ parent_dir ; "_build" ; "bin" ; "ocaml-xgettext"];
+    ocaml_gettext  = make_filename [ parent_dir ; "_build" ; "bin" ; "ocaml-gettext"];
     test_dir       = make_filename [ current_dir ; "tests" ];
   }
   in
@@ -67,6 +69,13 @@ let parse_arg () =
           tests := { !tests with ocaml_xgettext = s }
         )
       ,"cmd Specify the ocaml-xgettext executable."
+    );
+    (
+      "--ocaml-gettext", Arg.String (
+        fun s ->
+          tests := { !tests with ocaml_gettext = s }
+        )
+      ,"cmd Specify the ocaml-gettext executable."
     );
     (
       "--test-dir", Arg.String (
@@ -581,6 +590,46 @@ let po_process_test tests =
   ]
 ;;
 
+(********************************************)
+(* Test for running ocaml-gettext program   *)
+(* (spot also problem with runtime behavior *)
+(* of ocaml-gettext library)                *)
+(********************************************)
+
+let run_ocaml_gettext tests =
+  "Running ocaml-gettext" >:::
+  [
+    "ocaml-gettext with LC_ALL and LANG unset" >::
+    (
+      fun () ->
+        let process =
+          Unix.open_process_full tests.ocaml_gettext [||]
+        in
+        let () = 
+          let (_, _, err) = 
+            process
+          in
+            try 
+              while true do
+                ignore(input_line err)
+              done
+            with _ ->
+              ()
+        in
+        let return_status =
+          Unix.close_process_full process
+        in
+          match return_status with
+            | Unix.WEXITED 1 ->
+                ()
+            | Unix.WEXITED code | Unix.WSIGNALED code | Unix.WSTOPPED code ->
+                assert_failure (Printf.sprintf "ocaml-gettext exited with code %d" code)
+            return_status
+    )
+  ]
+;;
+
+
 (*********************)
 (* Main test routine *)
 (*********************)
@@ -599,6 +648,7 @@ let all_test =
       implementation_test    tests;
       po_process_test        tests;
       merge_test             tests;
+      run_ocaml_gettext      tests;
     ]
 in
 print_env "tests";
