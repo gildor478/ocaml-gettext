@@ -624,7 +624,6 @@ let run_ocaml_gettext tests =
                 ()
             | Unix.WEXITED code | Unix.WSIGNALED code | Unix.WSTOPPED code ->
                 assert_failure (Printf.sprintf "ocaml-gettext exited with code %d" code)
-            return_status
     )
   ]
 ;;

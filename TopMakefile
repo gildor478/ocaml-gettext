@@ -174,7 +174,6 @@ uninstall-prog:
 
 clean-prog:
 	-$(RM) $(NAME)
-	-$(RM) $(BUILDBIN)/$(NAME)
 
 # Build PDF files
 
@@ -190,7 +189,6 @@ $(BUILDPDF)/%.pdf: %.fo
 install-builddoc-pdf: $(PDF_TARGETS)
 
 clean-doc-pdf:
-	-$(if $(PDF_TARGETS),$(RM) $(PDF_TARGETS))
 
 install-doc-pdf:
 	$(if $(PDF_TARGETS),$(INSTALL) -d $(DOCPDF))
@@ -213,7 +211,6 @@ $(BUILDODOC)/%/index.html:
 install-builddoc-odoc: $(ODOC_TARGETS)
 
 clean-doc-odoc: 
-	-$(if $(ODOC_TARGETS),$(RM) -r $(dir $(ODOC_TARGETS)))
 
 install-doc-odoc:
 	$(if $(ODOC_TARGETS),$(foreach i,$(ODOC_TARGETS), $(INSTALL) -d $(DOCODOC)/$(call TARGET_ODOC,$(i));))
@@ -235,7 +232,6 @@ $(BUILDHTML)/%/index.html: %.xml
 install-builddoc-html: $(HTML_TARGETS)
 
 clean-doc-html: 
-	-$(if $(HTML_TARGETS),$(RM) -r $(dir $(HTML_TARGETS)))
 	
 install-doc-html: install-builddoc-html
 	$(if $(HTML_TARGETS),$(foreach i,$(HTML_TARGETS),$(call INSTALL_DIR,$(i),$(DOCHTML));))
@@ -278,7 +274,6 @@ endef
 install-builddoc-man: $(MAN_TARGETS)
 
 clean-doc-man:
-	-$(if $(MAN_TARGETS),$(RM) $(MAN_TARGETS) $(foreach i,$(MAN_TARGETS),$(call MAN_BUILD_TARGETS,$(i))))
 
 install-doc-man: install-builddoc-man
 	$(if $(MAN_TARGETS),$(foreach i,$(MAN_TARGETS),$(INSTALL) -d $(dir $(call MAN_INSTALL_TARGETS,$(i)));))
