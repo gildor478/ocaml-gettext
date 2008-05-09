@@ -1,6 +1,7 @@
 v 0.3.1 (Fri, 09 May 2008 23:10:59 +0200):
   * Fix bug when no LANG or LC_ALL is set
   * Better autoconf use of @VERSION@
+  * Only remove build dir in top Makefile
 
 v 0.3.0 (Tue, 29 Apr 2008 22:58:22 +0200):
   * Get rid of ocaml-ast-analyze (Richard W.M. Jones)
