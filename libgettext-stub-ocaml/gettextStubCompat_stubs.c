@@ -22,6 +22,7 @@
 
 #include <caml/alloc.h>
 #include <caml/fail.h>
+#include <caml/memory.h>
 #include <locale.h>
 #include <libintl.h>
 
@@ -35,6 +36,24 @@
     caml_failwith("NULL string not expected at "TOSTRING(__LINE__)" in "__FILE__); \
   }; \
   return copy_string(res); \
+}
+
+/* Make a string option value from a const string which might be NULL. */
+static value
+return_string_option (const char *str)
+{
+  CAMLparam0 ();
+  CAMLlocal2 (rv, strv);
+
+  if (str == NULL)
+    rv = Val_int (0);		/* None */
+  else {
+    strv = caml_copy_string (str);
+    rv = caml_alloc (1, 0);
+    Store_field (rv, 0, strv);
+  }
+
+  CAMLreturn (rv);
 }
 
 int ml2c_lc_tab[7] = {
@@ -56,7 +75,7 @@ CAMLprim value gettextStubCompat_setlocale(
 	value v_n,
 	value v_val)
 {
-  RETURN_COPY_STRING_NOT_NULL(
+  return_string_option (
       setlocale(
         ml2c_lc(v_n),
         String_val(v_val)));
@@ -142,33 +161,33 @@ CAMLprim value gettextStubCompat_dcngettext(
 CAMLprim value gettextStubCompat_textdomain(
 	value v_domainname)
 {
-  RETURN_COPY_STRING_NOT_NULL(
+  return_string_option (
       textdomain(String_val(v_domainname)));
 }
 
 CAMLprim value gettextStubCompat_get_textdomain(value _unit)
 {
-  RETURN_COPY_STRING_NOT_NULL(
-      textdomain(NULL))
+  return_string_option (
+      textdomain(NULL));
 }
 
 CAMLprim value gettextStubCompat_bindtextdomain(
 	value v_domainname,
 	value v_dirname)
 {
-  RETURN_COPY_STRING_NOT_NULL(
+  return_string_option (
       bindtextdomain(
         String_val(v_domainname), 
-        String_val(v_dirname)))
+        String_val(v_dirname)));
 }
 
 CAMLprim value gettextStubCompat_bind_textdomain_codeset(
 	value v_domainname,
 	value v_codeset)
 {
-  RETURN_COPY_STRING_NOT_NULL(
+  return_string_option (
       bind_textdomain_codeset(
         String_val(v_domainname),
-        String_val(v_codeset)))
+        String_val(v_codeset)));
 }
 

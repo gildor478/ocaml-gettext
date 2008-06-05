@@ -37,7 +37,7 @@ type lc =
 
 (** Set the current localization for the category
   *)
-external setlocale : lc -> string -> string
+external setlocale : lc -> string -> string option
 	= "gettextStubCompat_setlocale"
 ;;
 
@@ -86,27 +86,27 @@ external dcngettext : string -> string -> string -> int -> lc -> string
 (** Set the current default message catalog to DOMAINNAME.If DOMAINNAME is "",
   * reset to the default of "messages".
   *)
-external textdomain : string -> string
+external textdomain : string -> string option
 	= "gettextStubCompat_textdomain"
 ;;
 
 (** Get the current default message catalog to DOMAINNAME.
   *)
-external get_textdomain : unit -> string
+external get_textdomain : unit -> string option
 	= "gettextStubCompat_get_textdomain"
 ;;
 
 (** Specify that the DOMAINNAME message catalog will be foundin DIRNAME rather
   * than in the system locale data base.
   *)
-external bindtextdomain : string -> string -> string
+external bindtextdomain : string -> string -> string option
 	= "gettextStubCompat_bindtextdomain"
 ;;
 
 (** Specify the character encoding in which the messages from theDOMAINNAME
   * message catalog will be returned.
   *)
-external bind_textdomain_codeset : string -> string -> string
+external bind_textdomain_codeset : string -> string -> string option
 	= "gettextStubCompat_bind_textdomain_codeset"
 ;;
 

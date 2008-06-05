@@ -629,6 +629,23 @@ let run_ocaml_gettext tests =
 ;;
 
 
+(************************************************)
+(* Set bad locale and spot error when setlocale *)
+(* returns NULL                                 *)
+(************************************************)
+
+let bad_setlocale tests =
+  "Call setlocale with bad locale" >:::
+  [
+    "setlocale with bad locale" >::
+    (
+      fun () ->
+	ignore (GettextStubCompat.setlocale GettextStubCompat.LC_ALL "xx");
+    )
+  ]
+;;
+
+
 (*********************)
 (* Main test routine *)
 (*********************)
@@ -648,6 +665,7 @@ let all_test =
       po_process_test        tests;
       merge_test             tests;
       run_ocaml_gettext      tests;
+      bad_setlocale          tests;
     ]
 in
 print_env "tests";

@@ -1,3 +1,6 @@
+v 0.3.2 (Thu, 05 Jun 2008 22:12:51 +0200):
+  * Fix bug when buggy LANG/LC_ALL is set, using gettext stub (Richard W.M. Jones)
+
 v 0.3.1 (Fri, 09 May 2008 23:10:59 +0200):
   * Fix bug when no LANG or LC_ALL is set
   * Better autoconf use of @VERSION@
@@ -24,8 +27,8 @@ v 0.3.0 (Tue, 29 Apr 2008 22:58:22 +0200):
 
 v 0.2.0 :
   * Full rewrite of ocaml-gettext.
-  * Contains two version of the gettext engine : one is based on a purely OCaml approach ( gettext-camomile ),
-   one is base on the former one ( gettext-stub ).
+  * Contains two version of the gettext engine : one is based on a purely OCaml approach (gettext-camomile),
+   one is base on the former one (gettext-stub).
   * The two engines shared a common interface based on gettext.base module.
   * Most of the encoding/settings choice are accessible through command line option.
   * Simplify the functions to accesse to gettext : 4 functions to translate
