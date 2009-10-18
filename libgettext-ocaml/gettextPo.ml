@@ -29,8 +29,7 @@ open GettextTypes;;
 open GettextMo;;
 
 open FileUtil;;
-open FileUtil.StrUtil;;
-open FilePath.DefaultPath;;
+open FilePath;;
 
 (** empty_po : value representing an empty PO *)
 let empty_po = 

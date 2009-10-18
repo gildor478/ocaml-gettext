@@ -26,8 +26,7 @@
     
 open GettextTypes;;
 open FileUtil;;
-open FileUtil.StrUtil;;
-open FilePath.DefaultPath;;
+open FilePath;;
 
 let po_of_filename filename = 
   let chn = 

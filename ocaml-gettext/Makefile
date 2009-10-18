@@ -63,7 +63,7 @@ uninstall: ocaml-xgettext-uninstall
 
 ocaml-xgettext: $(BUILDBIN)
 	$(OCAMLC)                                                            \
-           -I +camlp4 camlp4lib.cma                                          \
+           -I +camlp4 dynlink.cma camlp4lib.cma                              \
            unix.cma                                                          \
           `$(OCAMLFIND) query -r -predicates byte gettext.extract -i-format` \
           `$(OCAMLFIND) query -r -predicates byte gettext.extract -a-format` \

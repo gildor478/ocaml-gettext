@@ -25,9 +25,7 @@
   *)
 
 open FilePath;;
-open FilePath.DefaultPath;;
 open FileUtil;;
-open FileUtil.StrUtil;;
 open GettextTypes;;
 open GettextUtils;;
 open GettextCategory;;

@@ -25,7 +25,6 @@
   *)
 
 open FileUtil;;
-open FileUtil.StrUtil;;
 open GettextTypes;;
 open GettextCategory;;
 

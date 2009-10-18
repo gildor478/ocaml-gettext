@@ -96,7 +96,8 @@ INSTALL_DIR=$(call INSTALL_DIR_AUX,$(1),$(2)/$(notdir $(patsubst %/,%,$(dir $(1)
 
 # Build the lib
 ONLY_BYTE=$(filter-out %.o,$(filter-out %.a,$(filter-out %.cmx, $(filter-out %.cmxa,$(1))))) $(filter lib%.a,$(1))
-GET_MLI=$(filter %.mli,$(patsubst %.cmi,%.mli,$(1)))
+ML_OR_MLI=$(if $(wildcard $(1).mli),$(1).mli,$(1).ml)
+GET_MLI=$(foreach interf,$(patsubst %.mli,%,$(filter %.mli,$(patsubst %.cmi,%.mli,$(1)))),$(call ML_OR_MLI,$(interf)))
 
 %.cmxa %.a %.so:
 	$(if $(STUBSOBJS),                            \
