@@ -36,7 +36,7 @@ ifdef GETTEXT_MODULES
 #################################
 
 NAME       = ocaml-gettext
-CMO        = ocaml-gettext.cmo      
+CMO        = OCamlGettext.cmo      
 REQUIRES   = gettext.extension fileutils
 
 ifeq ($(GETTEXT_MODULES),CAMOMILE)
