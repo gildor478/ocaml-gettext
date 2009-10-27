@@ -75,10 +75,11 @@ CAMLprim value gettextStubCompat_setlocale(
 	value v_n,
 	value v_val)
 {
-  return_string_option (
-      setlocale(
-        ml2c_lc(v_n),
-        String_val(v_val)));
+  return 
+    return_string_option (
+        setlocale(
+          ml2c_lc(v_n),
+          String_val(v_val)));
 }
 
 CAMLprim value gettextStubCompat_gettext(
@@ -161,33 +162,33 @@ CAMLprim value gettextStubCompat_dcngettext(
 CAMLprim value gettextStubCompat_textdomain(
 	value v_domainname)
 {
-  return_string_option (
-      textdomain(String_val(v_domainname)));
+  return return_string_option (textdomain(String_val(v_domainname)));
 }
 
 CAMLprim value gettextStubCompat_get_textdomain(value _unit)
 {
-  return_string_option (
-      textdomain(NULL));
+  return return_string_option (textdomain(NULL));
 }
 
 CAMLprim value gettextStubCompat_bindtextdomain(
 	value v_domainname,
 	value v_dirname)
 {
-  return_string_option (
-      bindtextdomain(
-        String_val(v_domainname), 
-        String_val(v_dirname)));
+  return 
+    return_string_option (
+        bindtextdomain(
+          String_val(v_domainname), 
+          String_val(v_dirname)));
 }
 
 CAMLprim value gettextStubCompat_bind_textdomain_codeset(
 	value v_domainname,
 	value v_codeset)
 {
-  return_string_option (
-      bind_textdomain_codeset(
-        String_val(v_domainname),
-        String_val(v_codeset)));
+  return 
+    return_string_option (
+        bind_textdomain_codeset(
+          String_val(v_domainname),
+          String_val(v_codeset)));
 }
 

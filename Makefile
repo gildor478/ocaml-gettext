@@ -20,6 +20,8 @@
 #  USA                                                                   #
 ##########################################################################
 
+default: test 
+
 all:
 	cd libgettext-ocaml          && $(MAKE) all
 	cd libgettext-stub-ocaml     && $(MAKE) all
@@ -79,4 +81,9 @@ dist:
 	tar czf $(DIST_DIR).tar.gz $(DIST_DIR)
 	$(RM) -r $(DIST_DIR)
 
+test: all
+	cd test && ./test
+
 -include ConfMakefile
+
+.PHONY: all install uninstall clean distclean dist test

@@ -221,16 +221,16 @@ let do_install t =
 let do_uninstall t =
   let uninstall (language,textdomain,_) =
     GettextCompile.uninstall 
-    t.install_destdir 
-    language 
-    t.install_category 
-    textdomain 
+      t.uninstall_orgdir 
+      language 
+      t.uninstall_category 
+      textdomain 
   in
-  List.iter uninstall (
-    guess_language_textdomain
-    (t.uninstall_language_option,t.uninstall_textdomain_option) 
-    t.input_files
-  )
+    List.iter 
+      uninstall 
+      (guess_language_textdomain
+         (t.uninstall_language_option,t.uninstall_textdomain_option) 
+         t.input_files)
 ;;
 
 let do_merge t =

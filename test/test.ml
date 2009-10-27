@@ -22,10 +22,7 @@
 
 open OUnit;;
 open FileUtil;;
-(* BUG: should be independant of Str *)
-open FileUtil.StrUtil;;
 open FilePath;;
-open FilePath.DefaultPath;;
 open GettextTypes;;
 open GettextCategory;;
 open Common;;
@@ -101,7 +98,7 @@ let print_debug tests str =
 
 let load_mo_file tests fl_mo = 
   [
-    "Loading ( header )" >::
+    "Loading (header)" >::
     ( fun () ->
       try
         let mo = open_in_bin fl_mo
@@ -114,7 +111,7 @@ let load_mo_file tests fl_mo =
         assert_failure (fl_mo^" doesn't load properly: "^(Gettext.string_of_exception x))
     );
 
-    "Loading ( informations )" >::
+    "Loading (informations)" >::
     ( fun () ->
       try
         let mo = open_in_bin fl_mo
@@ -256,7 +253,7 @@ let compatibility_test tests =
 ;;
 
 (*******************************************)
-(* Test of Ocaml source file PO extraction *)
+(* Test of OCaml source file PO extraction *)
 (*******************************************)
 
 let extract_test tests = 
@@ -264,23 +261,64 @@ let extract_test tests =
   in
   let filename_options = MapString.empty
   in
-  let extract_test_one fl_ml = 
+  let extract_test_one (fl_ml, contents) = 
     (* BUG : should use add_extension *)
     let fl_pot = concat tests.test_dir ((chop_extension fl_ml)^".pot")
     in
     fl_ml >:::
       [ 
         "Extracting" >::
-          ( fun () ->
-            try
-              GettextCompile.extract tests.ocaml_xgettext default_options filename_options [fl_ml] fl_pot
-            with x ->
-              assert_failure (fl_ml^" doesn't extract correctly: "^(Gettext.string_of_exception x))
+          (fun () ->
+             (
+               (* Extract data from files *)
+               try
+                 GettextCompile.extract 
+                   tests.ocaml_xgettext 
+                   default_options 
+                   filename_options 
+                   [fl_ml] 
+                   fl_pot
+               with x ->
+                 assert_failure 
+                   (fl_ml^" doesn't extract correctly: "^
+                    (Gettext.string_of_exception x))
+             );
+             (* Load POT file *) 
+             let po = 
+                let chn = 
+                  open_in fl_pot
+                in
+                let res = 
+                  GettextPo.input_po chn
+                in
+                  close_in chn;
+                  res
+             in
+
+             (* Check result *)
+             List.iter 
+               (fun str ->
+                  if MapString.mem str po.no_domain then
+                    ()
+                  else
+                    assert_failure
+                      (Printf.sprintf 
+                         "Cannot find %S in %s"
+                         str
+                         fl_pot))
+               contents
           )
       ]
   in
   "Ocaml file extraction test" >:::
-    List.map extract_test_one [ "test4.ml" ]
+    List.map extract_test_one 
+      [ 
+        "test4.ml", [];
+        "escape-char.ml", ["hello world!\n"; 
+                           "goodbye world!\n"; 
+                           "goodby world 2!"; 
+                           "and then\tbye-bye"];
+      ]
 ;;
 
 (********************************)

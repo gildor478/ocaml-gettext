@@ -73,18 +73,30 @@ struct
 
   type t = po_content
 
-  let add_translation t loc singular plural domain =
+  let string_of_ocaml_string str =
+    Scanf.sscanf 
+      (Printf.sprintf "\"%s\"" str)
+      "%S"
+      (fun s -> s)
+
+  let add_translation t loc ocaml_singular plural_opt domain =
     let filepos = 
       Loc.file_name loc, Loc.start_line loc 
     in
+    let singular = 
+      string_of_ocaml_string ocaml_singular
+    in
     let translation =
-      match plural with 
-        | Some plural -> 
-            {
-              po_comment_special = [];
-              po_comment_filepos = [filepos];
-              po_comment_translation = PoPlural([singular],[plural],[[""];[""]]);
-            }
+      match plural_opt with 
+        | Some plural_ocaml -> 
+            let plural = 
+              string_of_ocaml_string plural_ocaml
+            in
+              {
+                po_comment_special = [];
+                po_comment_filepos = [filepos];
+                po_comment_translation = PoPlural([singular],[plural],[[""];[""]]);
+              }
         | None -> 
             {
               po_comment_special = [];

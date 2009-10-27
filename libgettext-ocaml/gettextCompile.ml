@@ -200,10 +200,7 @@ let uninstall orgdir language category textdomain =
   let filename_mo_org = 
     GettextDomain.make_filename orgdir language category textdomain
   in
-  if test Exists filename_mo_org then
     rm [filename_mo_org]
-  else
-    ()
 ;;
 
 (** merge fln_pot fln_po_lst backup_ext : use fln_pot as a POT file and
