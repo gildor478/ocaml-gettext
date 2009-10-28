@@ -120,7 +120,7 @@ msgfmt:
 
 comment:
 | COMMENT_FILEPOS 
-  { 
+  {
     let lexbuf =
       Lexing.from_string $1
     in
@@ -129,7 +129,7 @@ comment:
         GettextPo_lexer.comment_filepos
         lexbuf
     in
-    CommentFilePos lst
+      CommentFilePos lst
   }
 | COMMENT_SPECIAL 
   {   

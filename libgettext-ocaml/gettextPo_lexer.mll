@@ -89,18 +89,19 @@ string_val = parse
 and
 
 comment_skip = parse
- '\n'          { next_line lexbuf; token lexbuf }
+ ['\n']    { next_line lexbuf; token lexbuf }
 | _            { comment_skip lexbuf }
 and
 
 comment_join strbuf = parse
 | "\n#."          { next_line lexbuf; comment_join strbuf lexbuf }
 | '\n'            { next_line lexbuf; Buffer.contents strbuf }
-| [^'\n']* as str { Buffer.add_string strbuf str; comment_join strbuf lexbuf }
+| '\r'            { comment_join strbuf lexbuf }
+| [^'\n''\r']* as str { Buffer.add_string strbuf str; comment_join strbuf lexbuf }
 and 
 
 comment_filepos = parse
-| [' ''\t']                  { comment_filepos lexbuf }
+| [' ''\t''\r']              { comment_filepos lexbuf }
 | ':'                        { COLON }
 | ['0'-'9']+ as nbr          { LINE (int_of_string nbr) }
 | ([^' ''\t''\r''\n''"'':''0'-'9''['']''#'][^' ''\t''\r''\n''"'':''['']''#']*) as str 
@@ -109,7 +110,7 @@ comment_filepos = parse
 and
 
 comment_special = parse
-| [' ''\t']                  { comment_special lexbuf }
-| [^' ''\t']+ as str         { KEYWORD str }
+| [' ''\t''\r']              { comment_special lexbuf }
+| [^' ''\t''\r']+ as str     { KEYWORD str }
 | eof                        { COMMENT_EOF }
 

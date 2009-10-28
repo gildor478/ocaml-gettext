@@ -326,7 +326,14 @@ let po_test tests =
       load_po_file tests fl_po
   in
   "PO processing test" >:::
-    List.map po_test_one ["test1.po"; "test2.po" ; "test3.po"; "test4.po"]
+    List.map po_test_one 
+      [
+        "test1.po"; 
+        "test2.po"; 
+        "test3.po"; 
+        "test4.po";
+        "test11.po";
+      ]
 ;;
 
 
