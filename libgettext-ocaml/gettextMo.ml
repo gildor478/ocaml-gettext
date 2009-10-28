@@ -263,9 +263,10 @@ let input_mo_informations failsafe chn mo_header =
       with 
         Parsing.Parse_error 
       | Failure("lexing: empty token") ->
-          fail_or_continue failsafe 
-          (MoInvalidPlurals(lexbuf,field_plural_forms))
-          (2,germanic_plural)
+          fail_or_continue 
+            failsafe 
+            (MoInvalidPlurals(lexbuf,field_plural_forms))
+            (2,germanic_plural)
     with Not_found ->
       (2,germanic_plural)
   in

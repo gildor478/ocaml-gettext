@@ -87,6 +87,7 @@ type t =
     merge_filename_pot          : string;
     merge_backup_extension      : string;
     input_files                 : string list;
+    strict                      : bool;
   }
 ;;
 
@@ -205,11 +206,12 @@ newer version of ocaml-fileutils")
 let do_install t =
   let install (language,textdomain,fl_mo) =
     GettextCompile.install 
-    t.install_destdir 
-    language 
-    t.install_category 
-    textdomain 
-    fl_mo
+      t.strict
+      t.install_destdir 
+      language 
+      t.install_category 
+      textdomain 
+      fl_mo
   in
   List.iter install (
     guess_language_textdomain
@@ -295,6 +297,7 @@ let () =
       merge_filename_pot          = "messages.pot";
       merge_backup_extension      = "bak";
       input_files                 = [];
+      strict                      = false;
     }
   in
   let actions = [
@@ -429,6 +432,12 @@ let () =
           ),
           spf (f_ "dirname Base dir used when installing a MO file. Default: %s.")
           !t.install_destdir
+        );
+        (
+          "--strict",
+          Arg.Unit (fun () -> t := {!t with strict = true}),
+          spf (f_ " Additional check are errors during install. Default: %b.")
+            !t.strict
         );
         (
           "--uninstall-language",

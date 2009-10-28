@@ -173,7 +173,7 @@ let compile filename_po filename_mo =
     filename ( should be a MO file ) to the filename defined by all the
     other parameters ( typically destdir/language/category/textdomain.mo ).
 *)
-let install destdir language category textdomain filename_mo_src =
+let install strict destdir language category textdomain filename_mo_src =
   let filename_mo_dst = 
     GettextDomain.make_filename destdir language category textdomain
   in
@@ -183,10 +183,19 @@ let install destdir language category textdomain filename_mo_src =
   (* Test of the mo file, it will raise an exception if there is any problem 
      in the MO structure *)
   let ((),_) =
-    GettextMo.fold_mo RaiseException 
-    ( fun x () -> () )
-    ()
-    filename_mo_src
+    GettextMo.fold_mo 
+      (if strict then
+         RaiseException
+       else 
+         InformStderr
+           (function
+              | (MoInvalidPlurals _) as e ->
+                  Gettext.string_of_exception e
+              | e ->
+                  raise e))
+      (fun x () -> ())
+      ()
+      filename_mo_src
   in
   mkdir ~parent:true dirname_mo_dst;
   cp [filename_mo_src] filename_mo_dst

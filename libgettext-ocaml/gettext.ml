@@ -127,7 +127,7 @@ let get_global_t' () =
 (* High level functions *)
 
 module Library =
-  functor ( Init : INIT_TYPE ) ->
+  functor (Init : INIT_TYPE) ->
   struct
     let init = (Init.textdomain, Init.codeset, Init.dir) :: Init.dependencies
 

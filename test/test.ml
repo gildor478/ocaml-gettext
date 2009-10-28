@@ -85,7 +85,7 @@ let parse_arg () =
   (fun str -> ())
   ("Test utility for ocaml-gettext v"^(GettextConfig.version)^" by Sylvain Le Gall\n"^
    "Copyright (C) 2004-2008 Sylvain Le Gall <sylvain@le-gall.net>\n"^
-   "Licensed under LGPL v2.1 with Ocaml exception.");
+   "Licensed under LGPL v2.1 with OCaml exception.");
   !tests
 ;;
 
@@ -170,7 +170,7 @@ let run_and_read prog ?(env=[||]) cli =
         input_fn fn_out
       in
         cleanup ();
-        command, return_code, err, out
+        command, return_code, out, err
     with e ->
       (
         cleanup ();
@@ -181,32 +181,43 @@ let run_and_read prog ?(env=[||]) cli =
 let load_mo_file tests fl_mo = 
   [
     "Loading (header)" >::
-    ( fun () ->
+    (fun () ->
       try
-        let mo = open_in_bin fl_mo
+        let mo = 
+          open_in_bin fl_mo
         in
-        let mo_header = GettextMo.input_mo_header mo
+        let mo_header = 
+          GettextMo.input_mo_header mo
         in
-        print_debug tests (GettextMo.string_of_mo_header mo_header);
-        close_in mo
+          print_debug tests (GettextMo.string_of_mo_header mo_header);
+          close_in mo
       with x ->
-        assert_failure (fl_mo^" doesn't load properly: "^(Gettext.string_of_exception x))
+        assert_failure 
+          (fl_mo^" doesn't load properly: "^(Gettext.string_of_exception x))
     );
 
     "Loading (informations)" >::
-    ( fun () ->
+    (fun () ->
       try
-        let mo = open_in_bin fl_mo
+        let mo = 
+          open_in_bin fl_mo
         in
-        let mo_header = GettextMo.input_mo_header mo
+        let mo_header = 
+          GettextMo.input_mo_header mo
         in
-        let mo_informations = GettextMo.input_mo_informations
-          RaiseException mo mo_header
+        let mo_informations = 
+          GettextMo.input_mo_informations
+            RaiseException 
+            mo 
+            mo_header
         in
-        print_debug tests (GettextMo.string_of_mo_informations mo_informations);
-        close_in mo
+          print_debug 
+            tests 
+            (GettextMo.string_of_mo_informations mo_informations);
+          close_in mo
       with x ->
-        assert_failure (fl_mo^" doesn't load properly: "^(Gettext.string_of_exception x))
+        assert_failure 
+          (fl_mo^" doesn't load properly: "^(Printexc.to_string x))
     );
   ]
 ;;
@@ -392,7 +403,7 @@ let extract_test tests =
           )
       ]
   in
-  "Ocaml file extraction test" >:::
+  "OCaml file extraction test" >:::
     List.map extract_test_one 
       [ 
         "test4.ml", [];
@@ -408,68 +419,121 @@ let extract_test tests =
 (********************************)
 
 let install_test tests =
-  let install_test_one (language, category, textdomain, fl_mo, fl_dst) =  
+  let install_test_one (language, category, textdomain, fl_mo, fl_dsts) =  
     fl_mo >::
-      ( fun () ->
-        try 
-          GettextCompile.install tests.test_dir language category textdomain fl_mo;
-          if test Exists fl_dst then
-            ()
-          else
-            assert_failure (fl_mo^" is not installed at "^fl_dst)
-        with x ->
-          assert_failure ("Unexpected error while processing "^fl_mo
-          ^" ( "^(Printexc.to_string x)^" )")
-      )
+      (fun () ->
+         let fl_dst = 
+           make_filename fl_dsts
+         in
+           GettextCompile.install 
+             true 
+             tests.test_dir 
+             language 
+             category 
+             textdomain 
+             fl_mo;
+          assert_bool
+            (Printf.sprintf "%s is not installed at %s" fl_mo fl_dst)
+            (test Exists fl_dst))
   in
-  let install_fail_test_one (fl_mo,exc,error) =
-    (fl_mo^" ( "^error^" ) ") >::
-      ( fun () ->
-        try
-          GettextCompile.install tests.test_dir "fr" LC_MESSAGES "gettext-fail" fl_mo;
-          assert_failure 
-          ("Installation of "^fl_mo^" should have failed with error "^error)
-        with x when x = exc ->
-          ()
-      )
+
+  let install_fail_test_one (fl_mo, exc) =
+    let  error = 
+      Printexc.to_string exc
+    in
+      (Printf.sprintf "%s (%s)" fl_mo error) >::
+        (fun () ->
+           assert_raises
+            ~msg:(Printf.sprintf 
+                    "Installation of %s should have failed with error %s" 
+                    fl_mo error)
+             exc
+             (fun () ->
+                GettextCompile.install
+                  true 
+                  tests.test_dir 
+                  "fr" 
+                  LC_MESSAGES 
+                  "gettext-fail"
+                  fl_mo))
   in
-  "MO file installation test" >:::
-    (
-      List.map install_test_one [
-        (
-          "fr",LC_MESSAGES, "gettext-test1", concat tests.test_dir "test1.mo", 
-          make_filename [ tests.test_dir ; "fr" ; "LC_MESSAGES" ; "gettext-test1.mo" ]
-        );
-        (
-          "fr_FR",LC_MESSAGES, "gettext-test2", concat tests.test_dir "test2.mo", 
-          make_filename [ tests.test_dir ; "fr_FR" ; "LC_MESSAGES" ; "gettext-test2.mo"]
-        );
-        (
-          "fr",LC_TIME, "gettext-test3", concat tests.test_dir "test3.mo", 
-          make_filename [ tests.test_dir ; "fr" ; "LC_TIME" ; "gettext-test3.mo" ]
-        );
-        (
-          "fr_FR@euro",LC_MESSAGES, "gettext-test4", concat tests.test_dir "test4.mo",
-          make_filename [ tests.test_dir ; "fr_FR@euro" ; "LC_MESSAGES" ; "gettext-test4.mo" ]
-        );
-      ]
-    ) @
-    (
-      let i32 = Int32.of_int
-      in
-      List.map install_fail_test_one [
-        "test5.mo",MoInvalidFile,
-          "MO file invalid ( magic number )";
-        "test6.mo",MoInvalidHeaderTableStringOutOfBound((i32 28, i32 2626),(i32 (-1), i32 159)),
-          "Offset of table with original strings is out of bound";
-        "test7.mo",MoInvalidHeaderTableTranslationOutOfBound((i32 28, i32 2626),(i32 (-49), i32 111)),
-          "Offset of table with translation strings is out of bound";
-        "test8.mo",MoInvalidStringOutOfBound(2626, 36),
-          "Offset of first string is out of bound";
-        "test9.mo",MoInvalidTranslationOutOfBound(2626, 196),
-          "Offset of first translation is out of bound";
-      ]
-    )
+
+  let install_warning_test_one (language, category, textdomain, fl_mo, exp_err, fl_dsts) =  
+    (Printf.sprintf "%s warning" fl_mo) >::
+     (fun () ->
+        let command, return_code, out, err = 
+          run_and_read 
+            tests.ocaml_gettext
+            [
+              "--action"; "install";
+              "--install-language"; language;
+              "--install-category"; category;
+              "--install-textdomain"; textdomain;
+              "--install-destdir"; tests.test_dir;
+              fl_mo
+            ]
+        in
+        let fl_dst =
+          make_filename fl_dsts
+        in
+          assert_equal 
+            ~msg:(command^" return code")
+            ~printer:string_of_int
+            0
+            return_code;
+          assert_equal
+            ~msg:(command^" standard output")
+            ~printer:(Printf.sprintf "%S")
+            ""
+            out;
+          assert_equal
+            ~msg:(command^" error output")
+            ~printer:(Printf.sprintf "%S")
+            exp_err
+            err;
+          assert_bool
+            (Printf.sprintf "File %s doesn't exist" fl_dst)
+            (test Exists fl_dst))
+  in
+
+    "MO file installation test" >:::
+      (List.map install_test_one 
+         [
+           "fr",LC_MESSAGES, "gettext-test1", concat tests.test_dir "test1.mo", 
+           [tests.test_dir; "fr"; "LC_MESSAGES"; "gettext-test1.mo"];
+
+           "fr_FR",LC_MESSAGES, "gettext-test2", concat tests.test_dir "test2.mo", 
+           [tests.test_dir; "fr_FR"; "LC_MESSAGES"; "gettext-test2.mo"];
+
+           "fr",LC_TIME, "gettext-test3", concat tests.test_dir "test3.mo", 
+           [tests.test_dir; "fr"; "LC_TIME"; "gettext-test3.mo"];
+
+           "fr_FR@euro",LC_MESSAGES, "gettext-test4", concat tests.test_dir "test4.mo",
+           [tests.test_dir; "fr_FR@euro"; "LC_MESSAGES"; "gettext-test4.mo"];
+         ]) @
+      (List.map install_fail_test_one 
+         [
+           "test5.mo", 
+           MoInvalidFile;
+
+           "test6.mo", 
+           MoInvalidHeaderTableStringOutOfBound((28l, 2626l),(-1l, 159l));
+
+           "test7.mo", 
+           MoInvalidHeaderTableTranslationOutOfBound((28l, 2626l),(-49l, 111l));
+
+           "test8.mo", 
+           MoInvalidStringOutOfBound(2626, 36);
+
+           "test9.mo", 
+           MoInvalidTranslationOutOfBound(2626, 196);
+         ]) @
+      (List.map install_warning_test_one
+         [
+           "fr", "LC_MESSAGES", "test10", "test10.mo", 
+           "Error while processing parsing of plural at line 1 character 10: \" nplurals=INTEGER; plural=EXPRESSION;\".\n",
+           [tests.test_dir; "fr"; "LC_MESSAGES"; "test10.mo"];
+         ])
 ;;
 
 (************************)
@@ -786,27 +850,27 @@ let compile_ocaml _ =
      [
        "unsound_warning.ml", 0, "", "";
        "valid_format.ml", 0, "", "";
-       "invalid_format1.ml", 2,  
+       "invalid_format1.ml", 2, "",
        "File \"invalid_format1.ml\", line 5, characters 21-22:\n\
         Error: This expression has type int but an expression was expected of type\n\
-       \         int32\n", "";
-       "invalid_format2.ml", 2,
+       \         int32\n";
+       "invalid_format2.ml", 2, "", 
        "File \"invalid_format2.ml\", line 5, characters 21-22:\n\
         Error: This expression has type int but an expression was expected of type\n\
-       \         int64\n", "";
-       "invalid_format3.ml", 2,
+       \         int64\n";
+       "invalid_format3.ml", 2, "",
        "File \"invalid_format3.ml\", line 5, characters 20-21:\n\
         Error: This expression has type int but an expression was expected of type\n\
-       \         string\n", "";
-       "invalid_format4.ml", 2,
+       \         string\n";
+       "invalid_format4.ml", 2, "",
        "File \"invalid_format4.ml\", line 5, characters 20-21:\n\
         Error: This expression has type int but an expression was expected of type\n\
-       \         bool\n", "";
-       "invalid_format5.ml", 2,
+       \         bool\n";
+       "invalid_format5.ml", 2, "",
        "File \"invalid_format5.ml\", line 5, characters 29-45:\n\
         Error: This expression has type (int64 -> 'a, 'b, 'c, 'd, 'd, 'a) format6\n\
        \       but an expression was expected of type\n\
-       \         (int -> 'e, 'f, 'g, 'g, 'g, 'e) format6\n", "";
+       \         (int -> 'e, 'f, 'g, 'g, 'g, 'e) format6\n";
      ])
 ;;
 
