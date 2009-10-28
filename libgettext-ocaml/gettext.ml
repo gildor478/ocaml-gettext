@@ -221,7 +221,7 @@ let string_of_exception exc =
       spf (f_ "Offset of string table is out of bound ([%ld,%ld] should be in [%ld,%ld]).")
       b1 e1 b2 e2
   | MoInvalidHeaderTableTranslationOutOfBound((b1,e1),(b2,e2)) ->
-      spf (f_ "Offset of translation table is out of bound ([%ld,%ld] should be in [%ld,%dl]).")
+      spf (f_ "Offset of translation table is out of bound ([%ld,%ld] should be in [%ld,%ld]).")
       b1 e1 b2 e2
   | MoInvalidHeaderTableTranslationStringOverlap((b1,e1),(b2,e2)) ->
       spf (f_ "Translation table and string table overlap ([%ld,%ld] and [%ld,%ld] have a non empty intersection).")

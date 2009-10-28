@@ -314,10 +314,10 @@ uninstall-doc-man: clean-doc-man
 .mly.mli:
 	$(OCAMLYACC) -v $<
 	
-.ml.mli:
-	$(OCAMLC) $(INCLUDES) $(CLI_OCAMLFIND) -i $< > $@ || $(RM) $@
-	# Set date of the target to the date of the source
-	touch -r $< $@
+#.ml.mli:
+#	$(OCAMLC) $(INCLUDES) $(CLI_OCAMLFIND) -i $< > $@ || $(RM) $@
+#	# Set date of the target to the date of the source
+#	touch -r $< $@
 
 
 clean:: $(if $(LIBRARY),clean-lib,clean-prog)

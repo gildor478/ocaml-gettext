@@ -96,6 +96,88 @@ let print_debug tests str =
     ()
 ;;
 
+let run_and_read prog ?(env=[||]) cli = 
+
+  (* Temporary file to retain data from command *)
+  let fn_out, chn_out = 
+    Filename.open_temp_file "ocaml-gettext-out" ".txt"
+  in
+  let fn_err, chn_err = 
+    Filename.open_temp_file "ocaml-gettext-err" ".txt"
+  in
+
+  (* Clean after run *)
+  let cleanup () =
+    let safe f a =
+      try 
+        f a 
+      with _ ->
+        ()
+    in
+      safe close_out chn_out; safe close_out chn_err;
+      safe Sys.remove fn_out; safe Sys.remove fn_err;
+  in
+
+  let input_fn fn = 
+    let chn_in =
+      open_in fn
+    in
+    let buff =
+      Buffer.create 13
+    in
+      Buffer.add_channel buff chn_in (in_channel_length chn_in);
+      close_in chn_in;
+      Buffer.contents buff
+  in
+
+    try 
+      let stdin_in, stdin_out = 
+        Unix.pipe ()
+      in
+
+      let command_array =
+          (Array.of_list (prog :: cli))
+      in
+      let command = 
+        String.concat " " (Array.to_list command_array)
+      in
+
+      let pid = 
+        Unix.create_process_env 
+          prog
+          command_array
+          env
+          stdin_in
+          (Unix.descr_of_out_channel chn_out)
+          (Unix.descr_of_out_channel chn_err)
+      in
+      let () = 
+        Unix.close stdin_in; Unix.close stdin_out
+      in
+      let return_code =
+        match snd (Unix.waitpid [] pid) with 
+          | Unix.WEXITED code 
+          | Unix.WSIGNALED code 
+          | Unix.WSTOPPED code ->
+              code
+      in
+      let err =
+        close_out chn_err;
+        input_fn fn_err
+      in
+      let out =
+        close_out chn_out;
+        input_fn fn_out
+      in
+        cleanup ();
+        command, return_code, err, out
+    with e ->
+      (
+        cleanup ();
+        raise e
+      )
+;;
+
 let load_mo_file tests fl_mo = 
   [
     "Loading (header)" >::
@@ -638,31 +720,17 @@ let run_ocaml_gettext tests =
   "Running ocaml-gettext" >:::
   [
     "ocaml-gettext with LC_ALL and LANG unset" >::
-    (
-      fun () ->
-        let process =
-          Unix.open_process_full tests.ocaml_gettext [||]
-        in
-        let () = 
-          let (_, _, err) = 
-            process
-          in
-            try 
-              while true do
-                ignore(input_line err)
-              done
-            with _ ->
-              ()
-        in
-        let return_status =
-          Unix.close_process_full process
-        in
-          match return_status with
-            | Unix.WEXITED 1 ->
-                ()
-            | Unix.WEXITED code | Unix.WSIGNALED code | Unix.WSTOPPED code ->
-                assert_failure (Printf.sprintf "ocaml-gettext exited with code %d" code)
-    )
+    (fun () ->
+       let command, return_code, _, _ = 
+         run_and_read 
+           tests.ocaml_gettext
+           ["--help"]
+       in
+         assert_equal
+           ~msg:("return code of "^command)
+           ~printer:string_of_int
+           0
+           return_code)
   ]
 ;;
 
@@ -683,6 +751,64 @@ let bad_setlocale tests =
   ]
 ;;
 
+(******************)
+(* Try to compile *)
+(******************)
+
+let compile_ocaml _ = 
+  "Compile OCaml code" >:::
+  (List.map 
+     (fun (fn, exp_return_code, exp_out, exp_err) ->
+        fn >::
+        (fun () ->
+           let command, return_code, out, err = 
+             run_and_read 
+               "ocamlc" 
+               ["-c"; "-I"; "../libgettext-ocaml/"; "-I"; "../libgettext-stub-ocaml/"; "TestGettext.ml"; fn]
+           in
+             FileUtil.rm (List.map (FilePath.replace_extension fn) ["cmo"; "cmi"]);
+             FileUtil.rm (List.map (FilePath.add_extension "TestGettext") ["cmo"; "cmi"]);
+             assert_equal 
+               ~msg:("error output of "^command)
+               ~printer:(Printf.sprintf "%S")
+               exp_err
+               err;
+             assert_equal 
+               ~msg:("standard output of "^command)
+               ~printer:(Printf.sprintf "%S")
+               exp_out
+               out;
+             assert_equal 
+               ~msg:("return code of "^command)
+               ~printer:string_of_int
+               exp_return_code
+               return_code))
+     [
+       "unsound_warning.ml", 0, "", "";
+       "valid_format.ml", 0, "", "";
+       "invalid_format1.ml", 2,  
+       "File \"invalid_format1.ml\", line 5, characters 21-22:\n\
+        Error: This expression has type int but an expression was expected of type\n\
+       \         int32\n", "";
+       "invalid_format2.ml", 2,
+       "File \"invalid_format2.ml\", line 5, characters 21-22:\n\
+        Error: This expression has type int but an expression was expected of type\n\
+       \         int64\n", "";
+       "invalid_format3.ml", 2,
+       "File \"invalid_format3.ml\", line 5, characters 20-21:\n\
+        Error: This expression has type int but an expression was expected of type\n\
+       \         string\n", "";
+       "invalid_format4.ml", 2,
+       "File \"invalid_format4.ml\", line 5, characters 20-21:\n\
+        Error: This expression has type int but an expression was expected of type\n\
+       \         bool\n", "";
+       "invalid_format5.ml", 2,
+       "File \"invalid_format5.ml\", line 5, characters 29-45:\n\
+        Error: This expression has type (int64 -> 'a, 'b, 'c, 'd, 'd, 'a) format6\n\
+       \       but an expression was expected of type\n\
+       \         (int -> 'e, 'f, 'g, 'g, 'g, 'e) format6\n", "";
+     ])
+;;
 
 (*********************)
 (* Main test routine *)
@@ -704,6 +830,7 @@ let all_test =
       merge_test             tests;
       run_ocaml_gettext      tests;
       bad_setlocale          tests;
+      compile_ocaml          tests;
     ]
 in
 print_env "tests";
