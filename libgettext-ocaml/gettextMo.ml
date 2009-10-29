@@ -171,19 +171,27 @@ let input_mo_untranslated failsafe chn mo_header number =
 
 let input_mo_translated failsafe chn mo_header number = 
   if number < (Int32.to_int mo_header.number_of_strings) then
-    let offset_pair = 
-      (Int32.to_int mo_header.offset_table_translation) + number * 8
-    in
-    let str = 
-      try
-        seek_in chn offset_pair;
-        input_int32_pair_string chn mo_header.endianess
-      with End_of_file ->
-        raise (MoInvalidTranslationOutOfBound(in_channel_length chn,offset_pair))
-    in
-    split_plural str 
+    (
+      let offset_pair = 
+        (Int32.to_int mo_header.offset_table_translation) + number * 8
+      in
+      let str = 
+        try
+          seek_in chn offset_pair;
+          input_int32_pair_string chn mo_header.endianess
+        with End_of_file ->
+          raise (MoInvalidTranslationOutOfBound
+                   (in_channel_length chn,offset_pair))
+      in
+        split_plural str 
+    )
   else
-    raise (MoInvalidStringOutOfBound(Int32.to_int mo_header.number_of_strings, number))
+    (
+      raise 
+        (MoInvalidStringOutOfBound
+           (Int32.to_int mo_header.number_of_strings, 
+            number))
+    )
 ;;
 
 let input_mo_translation failsafe chn mo_header number =
@@ -193,17 +201,19 @@ let input_mo_translation failsafe chn mo_header number =
   let translated = 
     input_mo_translated failsafe chn mo_header number
   in
-  match untranslated with
-    [ id ] -> Singular ( id, String.concat "\000" translated )
-  | id :: id_plural :: [] -> Plural ( id, id_plural, translated )
-  | id :: id_plural :: tl ->
-      fail_or_continue failsafe 
-      (MoJunk (id, tl)) 
-      (Plural (id, id_plural, translated))
-  | [] ->
-      fail_or_continue failsafe
-      MoEmptyEntry
-      (Singular ( "", ""))
+    match untranslated with
+      | [id] -> 
+          Singular (id, String.concat "\000" translated)
+      | id :: id_plural :: [] -> 
+          Plural (id, id_plural, translated)
+      | id :: id_plural :: tl ->
+          fail_or_continue failsafe 
+            (MoJunk (id, tl)) 
+            (Plural (id, id_plural, translated))
+      | [] ->
+          fail_or_continue failsafe
+            MoEmptyEntry
+            (Singular ("", ""))
 ;;
 
 let get_translated_value failsafe translation plural_number =
@@ -367,16 +377,30 @@ let output_mo ?(endianess = LittleEndian) chn lst =
     in
     (final_pos, List.rev lst_rev)
   in
+  let no_empty_lst = 
+    (* Avoid using empty translated string *)
+    List.filter
+      (function
+         | Singular (_, "") ->
+             false 
+         | Plural (_, _, lst) when String.concat "" lst = "" ->
+             false
+         | _ ->
+             true)
+      lst
+  in
   let sorted_lst = 
     let compare_entry entry1 entry2 = 
       let value_of_entry entry = 
         match entry with 
-          Singular (id, _) -> id
-        | Plural (id, _, _) -> id
+          | Singular (id, _) -> id
+          | Plural (id, _, _) -> id
       in
-      String.compare ( value_of_entry entry1) (value_of_entry entry2)
+        String.compare 
+          (value_of_entry entry1) 
+          (value_of_entry entry2)
     in
-    List.sort compare_entry lst
+      List.sort compare_entry no_empty_lst
   in
   let untranslated = 
     let to_string entry = 
@@ -384,7 +408,7 @@ let output_mo ?(endianess = LittleEndian) chn lst =
         Singular (id, _) -> id
       | Plural (id, id_plural, _) -> id ^ "\000" ^ id_plural
     in
-    null_terminated (List.map to_string sorted_lst)
+      null_terminated (List.map to_string sorted_lst)
   in
   let translated = 
     let to_string entry = 
@@ -392,9 +416,9 @@ let output_mo ?(endianess = LittleEndian) chn lst =
         Singular (_,str) -> str
       | Plural (_, _, lst) -> String.concat "\000" lst
     in
-    null_terminated (List.map to_string sorted_lst)
+      null_terminated (List.map to_string sorted_lst)
   in
-  let gN = List.length lst
+  let gN = List.length sorted_lst
   in
   let gO = 28 (* Size of the header *)
   in

@@ -178,76 +178,27 @@ let run_and_read prog ?(env=[||]) cli =
       )
 ;;
 
-let load_mo_file tests fl_mo = 
-  [
-    "Loading (header)" >::
-    (fun () ->
-      try
-        let mo = 
-          open_in_bin fl_mo
-        in
-        let mo_header = 
-          GettextMo.input_mo_header mo
-        in
-          print_debug tests (GettextMo.string_of_mo_header mo_header);
-          close_in mo
-      with x ->
-        assert_failure 
-          (fl_mo^" doesn't load properly: "^(Gettext.string_of_exception x))
-    );
-
-    "Loading (informations)" >::
-    (fun () ->
-      try
-        let mo = 
-          open_in_bin fl_mo
-        in
-        let mo_header = 
-          GettextMo.input_mo_header mo
-        in
-        let mo_informations = 
-          GettextMo.input_mo_informations
-            RaiseException 
-            mo 
-            mo_header
-        in
-          print_debug 
-            tests 
-            (GettextMo.string_of_mo_informations mo_informations);
-          close_in mo
-      with x ->
-        assert_failure 
-          (fl_mo^" doesn't load properly: "^(Printexc.to_string x))
-    );
-  ]
-;;
-
-let load_po_file tests fl_po = 
-  (* BUG : should use add_extension *)
-  let fl_mo = concat tests.test_dir ((chop_extension fl_po)^".mo")
+let load_mo_file tests f_test_mo fl_mo =
+  let mo = 
+    open_in_bin fl_mo
   in
-  [
-    "Parsing" >:: 
-      ( fun () -> 
-        try 
-          let chn = open_in fl_po
-          in
-          ignore (GettextPo.input_po chn);
-          close_in chn
-        with x ->
-          assert_failure (fl_po^" doesn't parse correctly: "^(Gettext.string_of_exception x))
-      );
-
-      "Compiling" >::
-      ( fun () ->
-        try
-          let _ = GettextCompile.compile fl_po fl_mo
-          in
-          () 
-        with x ->
-          assert_failure (fl_po^" doesn't compile correctly"^(Gettext.string_of_exception x))
-      );
-  ] @ (load_mo_file tests fl_mo)
+  let mo_header = 
+    GettextMo.input_mo_header mo
+  in
+  let mo_informations = 
+    GettextMo.input_mo_informations
+      RaiseException 
+      mo 
+      mo_header
+  in
+    print_debug 
+      tests 
+      (GettextMo.string_of_mo_header mo_header);
+    print_debug 
+      tests 
+      (GettextMo.string_of_mo_informations mo_informations);
+    close_in mo;
+    f_test_mo fl_mo 
 ;;
 
 (**********************************)
@@ -321,20 +272,59 @@ let split_plural_test tests =
 (*************************)
 
 let po_test tests = 
-  let po_test_one fl_po = 
-    fl_po >:::
-      load_po_file tests fl_po
+  let po_test_one f_test_mo fl_po = 
+    let fl_mo = 
+      concat 
+        tests.test_dir 
+        (replace_extension fl_po "mo")
+    in
+      (Printf.sprintf "Load and compile %s" fl_po) >:: 
+        (fun () ->
+           let chn = 
+             open_in fl_po
+           in
+             ignore (GettextPo.input_po chn);
+             close_in chn;
+             GettextCompile.compile fl_po fl_mo;
+             load_mo_file tests f_test_mo fl_mo)
   in
-  "PO processing test" >:::
-    List.map po_test_one 
-      [
-        "test1.po"; 
-        "test2.po"; 
-        "test3.po"; 
-        "test4.po";
-        "test11.po";
-      ]
+    "PO processing test" >:::
+      (List.map (po_test_one ignore)
+         [
+           "test1.po"; 
+           "test2.po"; 
+           "test3.po"; 
+           "test4.po";
+           "test11.po";
+         ])
+    @
+    [
+      po_test_one 
+        (fun fl_mo ->
+           let (), _ = 
+             GettextMo.fold_mo
+               RaiseException 
+               (fun trslt () ->
+                  match trslt with 
+                    | Singular(id, "") 
+                    | Plural(id, _, []) 
+                    | Plural(id, _, [""]) ->
+                        assert_failure
+                          (Printf.sprintf 
+                             "%s contains an empty translation for %s"
+                             fl_mo
+                             id)
+                    | _ ->
+                        ()) 
+                 ()
+                 fl_mo
+           in 
+             ())
+        "test12.po"
+    ]
 ;;
+
+
 
 
 (****************************************************)
@@ -343,13 +333,19 @@ let po_test tests =
 
 let compatibility_test tests =
   let test_one_mo fl =
-    fl >::: (load_mo_file tests fl)
+    (Printf.sprintf "Loading %s" fl) >:: 
+     (fun () -> load_mo_file tests ignore fl)
   in
-  "Test compatibility" >:::
-    List.fold_left ( 
-      fun lst dir -> 
-        find (Has_extension "mo") dir (fun lst fln -> (test_one_mo fln) :: lst ) lst
-    ) [] tests.search_path
+    "Test compatibility" >:::
+      List.fold_left 
+        (fun lst dir -> 
+           find 
+             (Has_extension "mo") 
+             dir 
+             (fun lst fln -> (test_one_mo fln) :: lst) 
+             lst) 
+        [] 
+        tests.search_path
 ;;
 
 (*******************************************)
@@ -357,13 +353,15 @@ let compatibility_test tests =
 (*******************************************)
 
 let extract_test tests = 
-  let default_options = "-I +camlp4 pa_o.cmo"
+  let default_options = 
+    "-I +camlp4 pa_o.cmo"
   in
-  let filename_options = MapString.empty
+  let filename_options = 
+    MapString.empty
   in
   let extract_test_one (fl_ml, contents) = 
-    (* BUG : should use add_extension *)
-    let fl_pot = concat tests.test_dir ((chop_extension fl_ml)^".pot")
+    let fl_pot = 
+      concat tests.test_dir (replace_extension fl_ml "pot")
     in
     fl_ml >:::
       [ 
@@ -562,8 +560,7 @@ let merge_test tests =
                 cp [fl_po] fl_po_cp
               in
               let fl_backup = 
-                (* BUG : should use add_extension *)
-                fl_po_cp^"."^backup_ext
+                add_extension fl_po_cp backup_ext
               in
               GettextCompile.merge fl_pot [fl_po_cp] backup_ext;
               (
