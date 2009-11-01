@@ -109,39 +109,41 @@ module Native : GettextTypes.REALIZE_TYPE =
       in
       let () = 
         MapCategory.iter 
-          (fun cat locale -> ignore(GettextStubCompat.setlocale (native_category_of_category cat) locale)) 
+          (fun cat locale -> 
+             ignore(GettextStubCompat.setlocale 
+                      (native_category_of_category cat) locale)) 
           t.categories
       in
       let () = 
         MapTextdomain.iter bind_textdomain_one t.textdomains
       in
-      fun printf_format textdomain_opt str_id str_plural_opt cat ->
-        let check x = 
-          if printf_format then
-            match GettextFormat.check_format t.failsafe (Singular(str_id,x)) with
-              Singular(_,str) -> str
-            | _ -> str_id
-          else
-            x
-        in
-        let ncat = 
-          native_category_of_category cat
-        in
-        let textdomain = 
-          match textdomain_opt with
-            Some textdomain ->
-              textdomain
-          | None ->
-              t.default
-        in
-        let translation = 
-          match str_plural_opt with
-              Some(str_plural,n) ->
-                GettextStubCompat.dcngettext textdomain str_id str_plural n ncat
+        fun printf_format textdomain_opt str_id str_plural_opt cat ->
+          let check x = 
+            if printf_format then
+              match GettextFormat.check_format t.failsafe (Singular(str_id,x)) with
+                | Singular(_, str) -> str
+                | _ -> str_id
+            else
+              x
+          in
+          let ncat = 
+            native_category_of_category cat
+          in
+          let textdomain = 
+            match textdomain_opt with
+              Some textdomain ->
+                textdomain
             | None ->
-                GettextStubCompat.dcgettext textdomain str_id ncat
-        in
-        check translation
+                t.default
+          in
+          let translation = 
+            match str_plural_opt with
+                Some(str_plural,n) ->
+                  GettextStubCompat.dcngettext textdomain str_id str_plural n ncat
+              | None ->
+                  GettextStubCompat.dcgettext textdomain str_id ncat
+          in
+            check translation
 
   end
 ;;

@@ -28,11 +28,12 @@ open Lexing;;
 
 (* Function the main global variable of gettext with/without thread *)
 
-type global_type = {
-  t          : t option;
-  realize    : t -> t'; 
-  t'         : t' option;
-}
+type global_type = 
+  {
+    t          : t option;
+    realize    : t -> t'; 
+    t'         : t' option;
+  }
 ;;
 
 (* Default value *)
@@ -259,8 +260,8 @@ let string_of_exception exc =
 
 
 module Program = 
-  functor ( Init : INIT_TYPE ) ->
-  functor ( Realize : REALIZE_TYPE ) ->
+  functor (Init : INIT_TYPE) ->
+  functor (Realize : REALIZE_TYPE) ->
   struct
     let textdomain = Init.textdomain
 
@@ -295,99 +296,93 @@ module Program =
         set_global_realize (Realize.realize) 
       in      
       [  
-          (
-          "--gettext-failsafe",
-          ( Arg.Symbol 
-            (
-              ["ignore"; "inform-stderr"; "raise-exception"],
-              ( fun x ->
-                  match x with
-                    "ignore"          -> set_global_t { (get_global_t ()) with failsafe = Ignore }
-                  | "inform-stderr"   -> set_global_t { (get_global_t ()) with failsafe = InformStderr string_of_exception }
-                  | "raise-exception" -> set_global_t { (get_global_t ()) with failsafe = RaiseException }
-                  | _                 -> ()
-              )
-            )
-          ),
-          spf (f_ " Choose how to handle failure in ocaml-gettext. Default: %s.")
-          (
-            ( function 
-                  Ignore -> "ignore" 
-                | InformStderr _ -> "inform-stderr" 
-                | RaiseException -> "raise-exception"    
-            ) (get_global_t ()).failsafe
-          )
-        );
-        (
-          "--gettext-disable",
-          ( Arg.Unit 
-            ( fun () -> set_global_realize dummy_realize 
-            )
-          ),
-          (s_ " Disable the translation perform by ocaml-gettext. Default: enable.")
-        );
-        (
-          "--gettext-domain-dir",
-          ( 
-            let current_textdomain = ref textdomain 
-            in
-            Arg.Tuple 
-            [
-              Arg.String ( fun textdomain -> current_textdomain := textdomain );
-              Arg.String ( fun dir -> 
-                set_global_t 
-                (bindtextdomain !current_textdomain dir (get_global_t ()))
-              );
-            ]
-          ),
-          spf (f_ "textdomain dir Set a dir to search ocaml-gettext files for the specified domain. Default: %s.")
-          (
-            string_of_list 
-            (
-              MapTextdomain.fold ( fun textdomain (_,dir_opt) lst -> 
-                match dir_opt with
-                  Some dir -> (spf ("%s: %s") textdomain dir) :: lst
-                | None -> lst
-              ) (get_global_t ()).textdomains []
-            )
-          )
-        );
-        (
-          "--gettext-dir",
-          ( Arg.String
-            ( fun s -> set_global_t { 
-                (get_global_t ()) with 
-                path = s :: (get_global_t ()).path 
-              }
-            )
-          ),
-          spf (f_ "dir Add a search dir for ocaml-gettext files. Default: %s.") 
-          (string_of_list (get_global_t ()).path)
-        );
-        (
-          "--gettext-language",
-          ( Arg.String
-            ( fun s -> set_global_t { (get_global_t ()) with language = Some s }
-            )
-          ),
-          spf (f_ "language Set the default language for ocaml-gettext. Default: %s.")
-          (
-            ( function 
-                Some s -> s
-              | None -> "(none)"
-            ) (get_global_t ()).language
-          )
-        );
-        (
-          "--gettext-codeset",
-          ( Arg.String
-            ( fun s -> set_global_t { (get_global_t ()) with codeset = s }
-            )
-          ),
-          spf (f_ "codeset Set the default codeset for outputting string with ocaml-gettext. Default: %s.")
-          (get_global_t ()).codeset
-        );
-      ], GettextConfig.copyright
+        "--gettext-failsafe",
+        (Arg.Symbol
+           (["ignore"; "inform-stderr"; "raise-exception"],
+            (fun x ->
+               match x with
+                 | "ignore" -> 
+                     set_global_t 
+                       {(get_global_t ()) with 
+                            failsafe = Ignore}
+                 | "inform-stderr" -> 
+                     set_global_t 
+                       {(get_global_t ()) with 
+                            failsafe = InformStderr string_of_exception}
+                 | "raise-exception" -> 
+                     set_global_t {(get_global_t ()) with 
+                                       failsafe = RaiseException}
+                 | _ -> 
+                     ()))),
+        spf 
+          (f_ " Choose how to handle failure in ocaml-gettext. Default: %s.")
+          (match (get_global_t ()).failsafe with 
+             | Ignore -> "ignore" 
+             | InformStderr _ -> "inform-stderr" 
+             | RaiseException -> "raise-exception");
+
+        "--gettext-disable",
+        (Arg.Unit (fun () -> set_global_realize dummy_realize)),
+        s_ " Disable the translation perform by ocaml-gettext. \
+             Default: enable.";
+
+
+        "--gettext-domain-dir",
+        (let current_textdomain = 
+           ref textdomain 
+         in
+           Arg.Tuple 
+             [
+               Arg.String (fun textdomain -> 
+                             current_textdomain := textdomain);
+               Arg.String (fun dir -> 
+                              set_global_t 
+                                (bindtextdomain 
+                                   !current_textdomain 
+                                   dir 
+                                   (get_global_t ())));
+             ]),
+        spf 
+          (f_ "textdomain dir Set a dir to search ocaml-gettext files \
+               for the specified domain. Default: %s.")
+          (string_of_list 
+             (MapTextdomain.fold 
+                (fun textdomain (_,dir_opt) lst -> 
+                   match dir_opt with
+                     | Some dir -> (spf ("%s: %s") textdomain dir) :: lst
+                     | None -> lst) 
+                (get_global_t ()).textdomains []));
+
+
+        "--gettext-dir",
+        (Arg.String
+           (fun s -> set_global_t 
+                       {(get_global_t ()) with 
+                            path = s :: (get_global_t ()).path})),
+        spf 
+          (f_ "dir Add a search dir for ocaml-gettext files. Default: %s.") 
+          (string_of_list (get_global_t ()).path);
+
+        "--gettext-language",
+        (Arg.String (fun s -> 
+                       set_global_t 
+                         {(get_global_t ()) with 
+                              language = Some s})),
+        spf 
+          (f_ "language Set the default language for ocaml-gettext. \
+               Default: %s.")
+          (match (get_global_t ()).language with 
+             | Some s -> s
+             | None -> "(none)");
+
+        "--gettext-codeset",
+        (Arg.String (fun s -> set_global_t 
+                                {(get_global_t ()) with codeset = s})),
+        spf (f_ "codeset Set the default codeset for outputting string with \
+                 ocaml-gettext. Default: %s.")
+        (get_global_t ()).codeset;
+      ], 
+      GettextConfig.copyright
       
     let s_  str = dgettext (get_global_t' ()) textdomain str
     let f_  str = fdgettext (get_global_t' ()) textdomain str

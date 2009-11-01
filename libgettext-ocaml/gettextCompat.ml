@@ -64,7 +64,7 @@ let dgettext t' textdomain str =
 let fdgettext t' textdomain fmt =
   unsafe_format_of_string 
     fmt
-    (t' false (Some textdomain) (string_of_format fmt) None LC_MESSAGES)
+    (t' true (Some textdomain) (string_of_format fmt) None LC_MESSAGES)
 ;;
   
 let dcgettext t' textdomain str category = 
