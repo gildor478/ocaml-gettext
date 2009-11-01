@@ -1,3 +1,18 @@
+v 0.3.3 (Sun, 01 Nov 2009 23:59:13 +0100):
+  * Upgrade ocaml-fileutils 0.4.0
+  * Improve gettext-stub C parts (memory management)
+  * Correctly handle OCaml string, wrt of escape char (Closes: FS#70)
+  * Remove the right file when uninstalling (Closes: FS#61)
+  * Enforce type safety for format string and plural (Closes: FS#72)
+  * Only output warning for install check that can be handle afterwards i
+    (Closes: FS#74)
+  * Add a --strict flag to ocaml-gettext to make an error for every install check
+    failed.
+  * Take into account Windows eol '\r' when parsing comments
+    (Closes: FS#75)
+  * Don't include empty translation (Closes: FS#90)
+  * Check returned format string for fdgettext (Closes: FS#91)
+
 v 0.3.2 (Thu, 05 Jun 2008 22:12:51 +0200):
   * Fix bug when buggy LANG/LC_ALL is set, using gettext stub (Richard W.M. Jones)
 
