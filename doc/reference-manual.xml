@@ -94,7 +94,7 @@
   <chapter>
     <title>Overview</title>
     <section>
-      <title>What is ocaml-gettext ?</title>
+      <title>What is ocaml-gettext?</title>
       <para>
         ocaml-gettext is a library to support string translation in OCaml. It provides a simple interface 
         to help programmers and translators to create programs that can support different languages. This
@@ -105,7 +105,7 @@
         <itemizedlist>
           <listitem>
             <para>
-              translate English strings into localised strings ( depending on which gettext data are installed ),
+              translate English strings into localised strings (depending on which gettext data are installed),
             </para>
           </listitem>
           <listitem>
@@ -124,7 +124,7 @@
           </listitem>
           <listitem>
             <para>
-              for the translator: this library provides a standard file format ( PO file ) to help the translator,
+              for the translator: this library provides a standard file format (PO file) to help the translator,
             </para>
           </listitem>
           <listitem>
@@ -139,14 +139,14 @@
         ocaml-gettext was initially only a wrapper of gettext. It comes with a patch against the source of
         xgettext to add support of the OCaml language. As i already used this approach, 
         i was convinced that this library should be better integrated by using more advanced features of 
-        OCaml ( such as <command>camlp4</command> ). 
+        OCaml (such as <command>camlp4</command>). 
       </para>
       <para>
         As a result of porting gettext to ocaml-gettext, we have :
         <itemizedlist>
           <listitem>
             <para>
-              a library that can understood the native format of gettext file ( MO file ),
+              a library that can understood the native format of gettext file (MO file),
             </para>
           </listitem>
           <listitem>
@@ -165,7 +165,7 @@
       </para>
     </section>
     <section>
-      <title>How is ocaml-gettext related to gettext ?</title>
+      <title>How is ocaml-gettext related to gettext?</title>
       <para>
         ocaml-gettext is a close cousin of gettext. In fact, the API is based on gettext. Almost everything 
         in ocaml-gettext is compatible with gettext:
@@ -332,8 +332,8 @@
       <title>Debian distribution</title>
       <para>
         <!-- Debian package -->
-        A debian package is available in the official Debian archive ( release &quot;unstable&quot;,
-        &quot;main&quot; section ). 
+        A debian package is available in the official Debian archive (release &quot;unstable&quot;,
+        &quot;main&quot; section). 
       </para>
       <para>
         To install it, use the command :
@@ -404,8 +404,8 @@
       <para>
         <!-- Description of the function realize -->
         All the work of the library is done in the function <varname>realize</varname>. This function is
-        not provided in the base package. It is build out of real implementation of ocaml-gettext ( such as
-        <varname>gettext-camomile</varname> or <varname>gettext-stub</varname> ). This function could handle
+        not provided in the base package. It is build out of real implementation of ocaml-gettext (such as
+        <varname>gettext-camomile</varname> or <varname>gettext-stub</varname>). This function could handle
         all the parameters in different ways. Concerning <varname>gettext-camomile</varname>, it builds a 
         translation table for all the files found which correspond to a declared <varname>textdomain</varname>.
       </para>
@@ -486,7 +486,7 @@
                 </para>
               </footnote>
               : a package used to extend ocaml-gettext. It is reserved for very
-              particular functions ( such as creating a new <varname>realize</varname> function ),
+              particular functions (such as creating a new <varname>realize</varname> function),
             </para>
           </listitem>
         </itemizedlist>
@@ -494,8 +494,8 @@
           <listitem>
             <para>
               gettext.extract<footnoteref linkend="advanced-features"/>: a package that enables 
-              to create special <command>camlp4</command> program ( such as 
-              <command>ocaml-xgettext</command> ),
+              to create special <command>camlp4</command> program (such as 
+              <command>ocaml-xgettext</command>),
             </para>
           </listitem>
         </itemizedlist>
@@ -550,7 +550,7 @@
           </listitem>
           <listitem>
             <para>
-              if needed his charset and directory binding ( but it is not recommended to do so ).
+              if needed his charset and directory binding (but it is not recommended to do so).
             </para>
           </listitem>
         </itemizedlist>
@@ -613,8 +613,8 @@
         The only constraint when using ocaml-gettext in your library is to provide an access to the value 
         <varname>Gettext.Library.init</varname>. This value is used as dependencies for other libraries and
         programs that depend on it. For example, since you use the library ocaml-gettext, your primary dependency
-        is the function <varname>init</varname> provided in the top level ( the function <varname>Gettext.string_of_exception</varname>
-        is localised ).
+        is the function <varname>init</varname> provided in the top level (the function <varname>Gettext.string_of_exception</varname>
+        is localised).
       </para>
       <warning>
         <para>
@@ -660,7 +660,7 @@
         </screen>
       </example>
       <para>
-        If you want to include a manpage ( or info file ), that describes the command line option of ocaml-gettext, you should use the Docbook 
+        If you want to include a manpage (or info file), that describes the command line option of ocaml-gettext, you should use the Docbook 
         XML fragment distributed with this application. Docbook should be enough generic to allow you to link it into your documentation. 
         If you don't want to link it with your documentation, you can refer to <link linkend="ocaml-gettext-options">
         ocaml-gettext-options manpage</link>.
@@ -677,8 +677,8 @@
 
       <para>
         You should take care of what implementation of ocaml-gettext you are using. In order to choose the right implementation
-        you should consider your program and every characteristic of it ( how many strings does it need to fetch ? Does it use already
-        a C library that link with gettext ? ).
+        you should consider your program and every characteristic of it (how many strings does it need to fetch? Does it use already
+        a C library that link with gettext?).
         <table>
           <title>Characteristics of ocaml-gettext implementation.</title>
           <tgroup cols="3">
@@ -725,8 +725,8 @@
                     </listitem>
                     <listitem>
                       <para>
-                        Threaded program ( since it use OCaml Map, it should be thread safe without
-                        problem ).
+                        Threaded program (since it use OCaml Map, it should be thread safe without
+                        problem).
                       </para>
                     </listitem>
                   </itemizedlist>
@@ -852,7 +852,8 @@
                     </listitem>
                     <listitem>
                       <para>
-                        Partial load of all MO file before any translation, use <varname>mmap</varname>.
+                        Partial load of all MO file before any translation, use
+                        <varname>mmap</varname>.
                       </para>
                     </listitem>
                   </itemizedlist>
@@ -866,8 +867,10 @@
                     </listitem>
                     <listitem>
                       <para>
-                        Should work with threaded program, provided that the <varname>gettext</varname> 
-                        work in threaded environment.
+                        Should work with threaded program, provided that the
+                        <varname>gettext</varname> work in threaded
+                        environment. To support a language, the corresponding
+                        locales need to be generated.
                       </para>
                     </listitem>
                   </itemizedlist>
@@ -904,8 +907,10 @@
                     </listitem>
                     <listitem>
                       <para>
-                        Should work with threaded program, provided that the <varname>gettext</varname> 
-                        work in threaded environment.
+                        Should work with threaded program, provided that the
+                        <varname>gettext</varname> work in threaded
+                        environment. To support a language, the corresponding
+                        locales need to be generated.
                       </para>
                     </listitem>
                   </itemizedlist>
@@ -937,9 +942,9 @@
       </para>
       <para>
         You should use the first alternative : it is easier for a translator to extract strings, without having to compile
-        your application ( it enables translators that don't know OCaml to help you ). In order to do so, you should use the native
-        <command>xgettext</command> binary ( provided with gettext ). It should support the format of the translatable strings found
-        in your GUI file ( for example, <command>xgettext</command> supports glade file ).
+        your application (it enables translators that don't know OCaml to help you). In order to do so, you should use the native
+        <command>xgettext</command> binary (provided with gettext). It should support the format of the translatable strings found
+        in your GUI file (for example, <command>xgettext</command> supports glade file).
       </para>
       <para>
         But for now you can only use the second alternative, because OCaml is not yet supported in <command>xgettext</command>. This
@@ -952,7 +957,7 @@
         </footnote>.
       </para>
       <para>
-        In the two cases, you just have to add your GUI file ( in OCaml or native form ) to <filename>POTFILES</filename>.
+        In the two cases, you just have to add your GUI file (in OCaml or native form) to <filename>POTFILES</filename>.
       </para>
       <para>
         Graphical user interfaces are good candidates for settings a fixed <varname>Init.codeset</varname>. Typically, GTK2 interfaces require 
