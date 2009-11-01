@@ -27,20 +27,9 @@
 #include <libintl.h>
 
 #define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
-#define RETURN_COPY_STRING_NOT_NULL(x) \
-{ \
-  char *res = (x); \
-  if (res == NULL) \
-  { \
-    caml_failwith("NULL string not expected at "TOSTRING(__LINE__)" in "__FILE__); \
-  }; \
-  return copy_string(res); \
-}
 
 /* Make a string option value from a const string which might be NULL. */
-static value
-return_string_option (const char *str)
+static value return_string_option (const char *str)
 {
   CAMLparam0 ();
   CAMLlocal2 (rv, strv);
@@ -75,31 +64,31 @@ CAMLprim value gettextStubCompat_setlocale(
 	value v_n,
 	value v_val)
 {
-  return 
-    return_string_option (
+  CAMLparam2(v_n, v_val);
+  CAMLreturn(
+      return_string_option (
         setlocale(
           ml2c_lc(v_n),
-          String_val(v_val)));
+          String_val(v_val))));
 }
 
 CAMLprim value gettextStubCompat_gettext(
 	value v_msgid)
 {
-  return 
-    copy_string(
-        gettext(
-          String_val(v_msgid)));
+  CAMLparam1(v_msgid);
+  CAMLreturn(copy_string(gettext(String_val(v_msgid))));
 }
 
 CAMLprim value gettextStubCompat_dgettext(
 	value v_domainname,
 	value v_msgid)
 {
-  return 
-    copy_string(
+  CAMLparam2(v_domainname, v_msgid);
+  CAMLreturn(
+      copy_string(
         dgettext(
           String_val(v_domainname), 
-          String_val(v_msgid)));
+          String_val(v_msgid))));
 }
 
 CAMLprim value gettextStubCompat_dcgettext(
@@ -107,12 +96,13 @@ CAMLprim value gettextStubCompat_dcgettext(
 	value v_msgid,
 	value v_category)
 {
-  return 
-    copy_string(
+  CAMLparam3(v_domainname, v_msgid, v_category);
+  CAMLreturn(
+      copy_string(
         dcgettext(
           String_val(v_domainname), 
           String_val(v_msgid), 
-          ml2c_lc(v_category)));
+          ml2c_lc(v_category))));
 }
 
 CAMLprim value gettextStubCompat_ngettext(
@@ -120,12 +110,13 @@ CAMLprim value gettextStubCompat_ngettext(
 	value v_msgid2,
 	value v_n)
 {
-  return 
-    copy_string(
+  CAMLparam3(v_msgid1, v_msgid2, v_n);
+  CAMLreturn(
+      copy_string(
         ngettext(
           String_val(v_msgid1), 
           String_val(v_msgid2), 
-          Long_val(v_n)));
+          Long_val(v_n))));
 }
 
 CAMLprim value gettextStubCompat_dngettext(
@@ -134,13 +125,14 @@ CAMLprim value gettextStubCompat_dngettext(
 	value v_msgid2,
 	value v_n)
 {
-  return 
-    copy_string(
+  CAMLparam4(v_domainname, v_msgid1, v_msgid2, v_n);
+  CAMLreturn(
+      copy_string(
         dngettext(
           String_val(v_domainname), 
           String_val(v_msgid1), 
           String_val(v_msgid2), 
-          Long_val(v_n)));
+          Long_val(v_n))));
 }
 
 CAMLprim value gettextStubCompat_dcngettext(
@@ -150,45 +142,59 @@ CAMLprim value gettextStubCompat_dcngettext(
 	value v_n,
 	value v_category)
 {
-  RETURN_COPY_STRING_NOT_NULL(
-      dcngettext(
-        String_val(v_domainname), 
-        String_val(v_msgid1), 
-        String_val(v_msgid2), 
-        Long_val(v_n), 
-        ml2c_lc(v_category)));
+
+  char *res = NULL;
+
+  CAMLparam5(v_domainname, v_msgid1, v_msgid2, v_n, v_category);
+  res = dcngettext(
+      String_val(v_domainname), 
+      String_val(v_msgid1), 
+      String_val(v_msgid2), 
+      Long_val(v_n), 
+      ml2c_lc(v_category));
+
+  if (res == NULL) 
+  { 
+    caml_failwith("NULL string not expected at "STRINGIFY(__LINE__)" in "__FILE__); 
+  }; 
+
+  CAMLreturn(copy_string(res));
 }
 
 CAMLprim value gettextStubCompat_textdomain(
 	value v_domainname)
 {
-  return return_string_option (textdomain(String_val(v_domainname)));
+  CAMLparam1(v_domainname);
+  CAMLreturn(return_string_option(textdomain(String_val(v_domainname))));
 }
 
-CAMLprim value gettextStubCompat_get_textdomain(value _unit)
+CAMLprim value gettextStubCompat_get_textdomain(value v_unit)
 {
-  return return_string_option (textdomain(NULL));
+  CAMLparam1(v_unit);
+  CAMLreturn(return_string_option(textdomain(NULL)));
 }
 
 CAMLprim value gettextStubCompat_bindtextdomain(
 	value v_domainname,
 	value v_dirname)
 {
-  return 
-    return_string_option (
+  CAMLparam2(v_domainname, v_dirname);
+  CAMLreturn(
+      return_string_option (
         bindtextdomain(
           String_val(v_domainname), 
-          String_val(v_dirname)));
+          String_val(v_dirname))));
 }
 
 CAMLprim value gettextStubCompat_bind_textdomain_codeset(
 	value v_domainname,
 	value v_codeset)
 {
-  return 
-    return_string_option (
+  CAMLparam2(v_domainname, v_codeset);
+  CAMLreturn(
+      return_string_option (
         bind_textdomain_codeset(
           String_val(v_domainname),
-          String_val(v_codeset)));
+          String_val(v_codeset))));
 }
 
