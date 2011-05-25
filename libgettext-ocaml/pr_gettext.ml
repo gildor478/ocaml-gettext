@@ -71,13 +71,49 @@ struct
   module Loc = Syntax.Loc
   module Ast = Syntax.Ast
 
-  type t = po_content
+  type untranslated_t = 
+      {
+        str:        string; (* Real string, not OCaml one *)
+        locations:  (string * int) list; (* Location in the file *)
+      }
+
+  type t = 
+      {
+        po_content:   po_content;
+        translated:   SetString.t;
+        untranslated: untranslated_t MapString.t;
+      }
 
   let string_of_ocaml_string str =
+    prerr_endline str;
     Scanf.sscanf 
       (Printf.sprintf "\"%s\"" str)
       "%S"
       (fun s -> s)
+
+  let string_not_translated t ocaml_str = 
+    not (SetString.mem ocaml_str t.translated)
+
+  let add_untranslated t loc ocaml_str = 
+    let cur = 
+      try 
+        MapString.find ocaml_str t.untranslated 
+      with Not_found ->
+        {
+          str = string_of_ocaml_string ocaml_str;
+          locations = [];
+        }
+    in
+    let untranslated =
+      MapString.add 
+        ocaml_str 
+        {cur with 
+             locations = 
+               (Loc.file_name loc, Loc.start_line loc) :: cur.locations}
+        t.untranslated
+    in
+      {t with untranslated = untranslated}
+
 
   let add_translation t loc ocaml_singular plural_opt domain =
     let filepos = 
@@ -86,48 +122,58 @@ struct
     let singular = 
       string_of_ocaml_string ocaml_singular
     in
-    let translation =
+    let translated = 
+      SetString.add ocaml_singular t.translated
+    in
+    let translated, translation =
       match plural_opt with 
-        | Some plural_ocaml -> 
+        | Some ocaml_plural -> 
             let plural = 
-              string_of_ocaml_string plural_ocaml
+              string_of_ocaml_string ocaml_plural
             in
+              SetString.add ocaml_plural translated,
               {
                 po_comment_special = [];
                 po_comment_filepos = [filepos];
                 po_comment_translation = PoPlural([singular],[plural],[[""];[""]]);
               }
         | None -> 
+            translated,
             {
               po_comment_special = [];
               po_comment_filepos = [filepos];
               po_comment_translation = PoSingular([singular],[""]);
             }
     in
-    match domain with 
-      | Some domain -> 
-          add_po_translation_domain domain t translation
-      | None ->
-          (
-            match !default_textdomain with
-              Some domain ->
-                add_po_translation_domain domain t translation
-            | None ->
-                add_po_translation_no_domain t translation
-          )
-
-  let output_translations ?output_file m = 
-    let (fd,close_on_exit) = 
-      match output_file with
-	Some f -> (open_out f,true)
-      | None -> (stdout,false)
+    let po_content = 
+      match domain, !default_textdomain with 
+        | Some domain, _ -> 
+            add_po_translation_domain domain t.po_content translation
+        | None, Some domain ->
+            add_po_translation_domain domain t.po_content translation
+        | None, None ->
+            add_po_translation_no_domain t.po_content translation
     in
-    Marshal.to_channel fd m [];
-    flush fd;
-    if close_on_exit then
-      close_out fd
-    else
-      ()
+      {t with 
+           po_content = po_content;
+           translated = translated}
+
+  let output_translations ?output_file t = 
+    let fd = 
+      match output_file with
+        | Some f -> open_out f
+        | None -> stdout
+    in
+      MapString.iter
+        (fun _ {str = str; locations = locs} ->
+           List.iter
+             (fun (fn, lineno) ->
+                Printf.eprintf 
+                  "%s:%d String %S not translated\n%!"
+                  fn lineno str)
+             locs)
+        t.untranslated;
+      Marshal.to_channel fd t.po_content []
 
   (* Check if the given node belong to the given functions *)
   let is_like e functions = 
@@ -148,7 +194,13 @@ struct
   class visitor = object
     inherit Ast.fold as super
 
-    val t = empty_po
+    val t = 
+      {
+        po_content   = empty_po;
+        untranslated = MapString.empty;
+        translated   = SetString.empty;
+      }
+
     method t = t
 
     method expr = function
@@ -182,14 +234,15 @@ struct
       (* Add a plural / defined domain string *)
       {< t = add_translation t loc singular (Some plural) (Some domain) >}
 
+    | <:expr@loc<$str:str$>> when
+        string_not_translated t str ->
+      {< t = add_untranslated t loc str >}
+
     | e -> super#expr e
+
   end
 
-  (* Called on *.mli files. *)
-  (* This was in the old code, but AFAICS interfaces can never
-   * contain translatable strings (right??).  So I've changed this
-   * to do nothing. - RWMJ 2008/03/21
-   *)
+  (* Called on *.mli files, but cannot contain translateable strings. *)
   let print_interf ?input_file ?output_file _ = ()
 
   (* Called on *.ml files. *)

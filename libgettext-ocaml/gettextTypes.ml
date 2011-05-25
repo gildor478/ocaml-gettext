@@ -156,11 +156,8 @@ module type INIT_TYPE =
 
 (** {1 Extended core types} *)
 
-module MapString = Map.Make (struct
-  type t      = string
-  let compare = String.compare
-end)
-;;
+module MapString = Map.Make(String);;
+module SetString = Set.Make(String);;
  
 module MapTextdomain = Map.Make (struct
   type t      = textdomain

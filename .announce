@@ -1,30 +1,25 @@
 From: Sylvain Le Gall <sylvain@le-gall.net>
 To: caml-list@inria.fr
-Subject: [ANN] ocaml-gettext v0.3.1
+Subject: [ANN] ocaml-gettext v0.3.3
 
 Hello,
 
 General: 
-ocaml-gettext is a library that enables string translation in OCaml.
-The API is based on GNU gettext. It comes with a tool to extract
-the string which needs to be translated from OCaml source file.
+ocaml-gettext is a library that enables string translation in OCaml. The API
+is based on GNU gettext. It comes with a tool to extract strings which need to
+be translated from OCaml source files.
 
-This enable OCaml program to output string in the native language of the
-user (if you also provide a file containing the translation of the
-english string contains in the program to the one in the native language
-of the user).
-
-The translation is based on string (this means that you need to provide a
-string and not a unique identifier, like in some other catalog system).
-This string is in english, and will be returned if the native language
-of the user doesn't have translation catalog.
+This enables OCaml program to output string in the native language of the user,
+if a corresponding translation file of the English strings is provided.
 
 Changes:
-v 0.3.1 is a bug fix release
+v 0.3.3 is a bug fix release:
+* compatible with ocaml-fileutils 0.4.0
+* more static type-check of format string
 
 Links:
 http://le-gall.net/sylvain+violaine/ocaml-gettext.html
-http://le-gall.net/sylvain+violaine/download/ocaml-gettext-0.3.1.tar.gz
+http://le-gall.net/sylvain+violaine/download/ocaml-gettext-0.3.3.tar.gz
 
 Regards
 Sylvain Le Gall

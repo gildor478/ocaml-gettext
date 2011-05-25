@@ -20,8 +20,6 @@
 #  USA                                                                   #
 ##########################################################################
 
-default: test 
-
 all:
 	cd libgettext-ocaml          && $(MAKE) all
 	cd libgettext-stub-ocaml     && $(MAKE) all
