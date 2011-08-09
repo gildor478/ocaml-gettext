@@ -73,11 +73,7 @@ headache: distclean
 
 DIST_DIR=$(PACKAGE_TARNAME)-$(VERSION)
 dist:
-	-$(RM) -r $(DIST_DIR)
-	svn export . $(DIST_DIR)
-	cd $(DIST_DIR) && autoconf && $(RM) -r autom4te.cache
-	tar czf $(DIST_DIR).tar.gz $(DIST_DIR)
-	$(RM) -r $(DIST_DIR)
+	darcs dist -d $(DIST_DIR)
 
 test: all
 	cd test && ./test

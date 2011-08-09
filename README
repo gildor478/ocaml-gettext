@@ -14,13 +14,4 @@ and try to use it with some program of my creation... ).
 Feel free to use it in your application. There is no real doc coming
 with it, but i will prepare some in the next future. 
 
-Please report me any problem : send an email to submit@bugs.gallu.homelinux.org
-beginning with 
-
-Package: libgettext-ocaml
-Version: 0.3.0
-Severity: { choose wishlist,normal,important }
-
-and the description of your bugs.
-
 Sylvain LE GALL

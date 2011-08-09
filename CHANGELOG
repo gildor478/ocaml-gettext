@@ -1,3 +1,6 @@
+v 0.3.4 (Tue, 09 Aug 2011 10:12:55 +0000):
+  * Use camomile 0.8.3
+
 v 0.3.3 (Sun, 01 Nov 2009 23:59:13 +0100):
   * Upgrade ocaml-fileutils 0.4.0
   * Improve gettext-stub C parts (memory management)

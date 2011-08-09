@@ -21,8 +21,7 @@
 (**************************************************************************)
 
 
-open CamomileLibrary;;
-open Default.Camomile;;
+open CamomileLibraryDefault.Camomile;;
 open GettextTypes;;
 
 (** Error reported when something goes wrong during Camomile initialization.

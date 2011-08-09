@@ -114,3 +114,7 @@
 ^setup.data$
 ^setup.log$
 ^_build$
+^ConfMakefile$
+^configure$
+^libgettext-ocaml/META$
+^libgettext-ocaml/gettextConfig.ml$
