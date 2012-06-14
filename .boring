@@ -118,3 +118,4 @@
 ^configure$
 ^libgettext-ocaml/META$
 ^libgettext-ocaml/gettextConfig.ml$
+^ocaml-gettext.*\.tar\.gz$
