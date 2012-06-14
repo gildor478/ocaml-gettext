@@ -21,6 +21,7 @@ godi.build("godi-camomile")
 godi.build("godi-ocaml-fileutils")
 godi.build("godi-ounit")
 
-ci.exec("sh", "configure", "--disable-doc", "--enable-test")
+ci.exec("autoconf")
+ci.exec("./configure", "--disable-doc", "--enable-test")
 ci.exec("make", "all")
 ci.exec("make", "test")
