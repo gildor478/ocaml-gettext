@@ -25,7 +25,7 @@ open GettextCategory;;
 open GettextModules;;
 
 let unsafe_format_of_string fmt str = 
-  if true then
+  if false then
     Obj.magic str
   else
     format_of_string fmt
