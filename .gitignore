@@ -1,0 +1,9 @@
+/_build/
+/setup.data
+/setup.log
+/dist/
+/test.byte
+/ConfMakefile
+/configure
+/libgettext-ocaml/META
+/libgettext-ocaml/gettextConfig.ml
