@@ -1,3 +1,6 @@
+v 0.3.6 (Sun, 26 Feb 2017 12:34:34 +0100):
+  * Remove unix.cma linking argument for 4.0{3,4} compatibility
+
 v 0.3.5 (Mon, 04 Aug 2014 23:31:41 +0200):
   * Always use format_of_string to not segfault with OCaml 4.02.
 

@@ -44,7 +44,7 @@ uninstall:
 	cd libgettext-camomile-ocaml && $(MAKE) uninstall
 	cd libgettext-stub-ocaml     && $(MAKE) uninstall
 	cd libgettext-ocaml          && $(MAKE) uninstall
-	
+
 clean:
 	-cd test                      && $(MAKE) clean
 	-cd doc                       && $(MAKE) clean
@@ -71,13 +71,18 @@ distclean: clean
 headache: distclean
 	headache -h .header -c .headache.config `find $(CURDIR)/ -type d -name .svn -prune -false -o -type f`
 
-DIST_DIR=$(PACKAGE_TARNAME)-$(VERSION)
-dist:
-	darcs dist -d $(DIST_DIR)
+VERSION=$(shell sed \
+	-n 's/^v \([[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\).*/\1/p' \
+	CHANGELOG | head -n1)
+deploy:
+	mkdir dist || true
+	admin-gallu-deploy \
+		--package_name ocaml-gettext --package_version "$(VERSION)" \
+		--verbose --forge_upload --forge_group ocaml-gettext
 
 test: all
 	cd test && ./test
 
 -include ConfMakefile
 
-.PHONY: all install uninstall clean distclean dist test
+.PHONY: all install uninstall clean distclean deploy test
