@@ -78,7 +78,8 @@ deploy:
 	mkdir dist || true
 	admin-gallu-deploy \
 		--package_name ocaml-gettext --package_version "$(VERSION)" \
-		--verbose --forge_upload --forge_group ocaml-gettext
+		--verbose --forge_upload --forge_group ocaml-gettext \
+		--autogen
 
 test: all
 	cd test && ./test
