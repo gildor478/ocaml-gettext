@@ -32,7 +32,7 @@ AC_CHECK_PROG(ac_ocaml_$1_opt,$2,$2)
 if test "x$ac_ocaml_$1" = "x" && test "x$ac_ocaml_$1_opt" = "x"; then
   :
   $4
-else 
+else
   if ! test "x$ac_ocaml_$1" = "x"; then
     ac_ocaml_$1_version=`$ac_ocaml_$1 -v | sed -n -e "s|.*version *\(.*\)$|\1|p" `
     versionval=$ac_ocaml_$1_version
@@ -71,7 +71,7 @@ AC_PROG_OCAML_VERSION(ocamlc,ocamlc.opt,[
   if ! test "x$OCAMLVERSION" = "x" && ! test "$versionval" = "$OCAMLVERSION"; then
     AC_MSG_WARN($versionval doesn't match ocaml v. $OCAMLVERSION)
   else
-    OCAMLVERSION=$versionval
+    CAMLVERSION=$versionval
   fi
 ],[$2])
 AC_SUBST(OCAMLC)
@@ -255,7 +255,7 @@ AC_REQUIRE([AC_CHECK_XMLLINT])
 AC_ARG_WITH(docbook-stylesheet-$2,
         AC_HELP_STRING([--with-docbook-stylesheet-$2=file], [Where to find the docbook stylesheet for $2 generation]),
         $1=$withval, $1="$3")
-        
+
 AC_MSG_CHECKING(for $2 XSL)
 if ! test -e "$$1"; then
   AC_MSG_RESULT(no)

@@ -71,9 +71,6 @@ distclean: clean
 headache: distclean
 	headache -h .header -c .headache.config `find $(CURDIR)/ -type d -name .svn -prune -false -o -type f`
 
-VERSION=$(shell sed \
-	-n 's/^v \([[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\).*/\1/p' \
-	CHANGELOG | head -n1)
 deploy:
 	mkdir dist || true
 	admin-gallu-deploy \
