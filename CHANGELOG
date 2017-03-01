@@ -1,3 +1,6 @@
+v 0.3.7 (Wed, 01 Mar 2017 22:55:57 +0100):
+  * Add an extra step to generate configure.
+
 v 0.3.6 (Sun, 26 Feb 2017 12:34:34 +0100):
   * Remove unix.cma linking argument for 4.0{3,4} compatibility
 
