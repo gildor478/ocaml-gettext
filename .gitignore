@@ -7,3 +7,6 @@
 /configure
 /libgettext-ocaml/META
 /libgettext-ocaml/gettextConfig.ml
+/config.log
+/config.status
+/po/fr.po.bak
