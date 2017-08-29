@@ -78,7 +78,6 @@ struct
       }
 
   let string_of_ocaml_string str =
-    prerr_endline str;
     Scanf.sscanf 
       (Printf.sprintf "\"%s\"" str)
       "%S"
