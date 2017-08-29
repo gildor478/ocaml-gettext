@@ -71,17 +71,10 @@ struct
   module Loc = Syntax.Loc
   module Ast = Syntax.Ast
 
-  type untranslated_t = 
-      {
-        str:        string; (* Real string, not OCaml one *)
-        locations:  (string * int) list; (* Location in the file *)
-      }
-
   type t = 
       {
         po_content:   po_content;
         translated:   SetString.t;
-        untranslated: untranslated_t MapString.t;
       }
 
   let string_of_ocaml_string str =
@@ -90,29 +83,6 @@ struct
       (Printf.sprintf "\"%s\"" str)
       "%S"
       (fun s -> s)
-
-  let string_not_translated t ocaml_str = 
-    not (SetString.mem ocaml_str t.translated)
-
-  let add_untranslated t loc ocaml_str = 
-    let cur = 
-      try 
-        MapString.find ocaml_str t.untranslated 
-      with Not_found ->
-        {
-          str = string_of_ocaml_string ocaml_str;
-          locations = [];
-        }
-    in
-    let untranslated =
-      MapString.add 
-        ocaml_str 
-        {cur with 
-             locations = 
-               (Loc.file_name loc, Loc.start_line loc) :: cur.locations}
-        t.untranslated
-    in
-      {t with untranslated = untranslated}
 
 
   let add_translation t loc ocaml_singular plural_opt domain =
@@ -164,15 +134,6 @@ struct
         | Some f -> open_out f
         | None -> stdout
     in
-      MapString.iter
-        (fun _ {str = str; locations = locs} ->
-           List.iter
-             (fun (fn, lineno) ->
-                Printf.eprintf 
-                  "%s:%d String %S not translated\n%!"
-                  fn lineno str)
-             locs)
-        t.untranslated;
       Marshal.to_channel fd t.po_content []
 
   (* Check if the given node belong to the given functions *)
@@ -197,7 +158,6 @@ struct
     val t = 
       {
         po_content   = empty_po;
-        untranslated = MapString.empty;
         translated   = SetString.empty;
       }
 
@@ -233,10 +193,6 @@ struct
         is_like e ["dngettext"; "fdngettext"; "dcngettext"; "fdcngettext"] ->
       (* Add a plural / defined domain string *)
       {< t = add_translation t loc singular (Some plural) (Some domain) >}
-
-    | <:expr@loc<$str:str$>> when
-        string_not_translated t str ->
-      {< t = add_untranslated t loc str >}
 
     | e -> super#expr e
 
