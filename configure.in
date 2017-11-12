@@ -20,7 +20,7 @@ dnl *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307   *
 dnl *  USA                                                                   *
 dnl **************************************************************************
 
-AC_INIT(ocaml-gettext, 0.3.7)
+AC_INIT(ocaml-gettext, 0.3.8)
 
 AC_PROG_INSTALL
 

@@ -164,7 +164,7 @@ let input_mo_untranslated failsafe chn mo_header number =
       with End_of_file ->
         raise (MoInvalidStringOutOfBound(in_channel_length chn,offset_pair))
     in
-    split_plural (Bytes.to_string str)
+    split_plural str
   else
     raise (MoInvalidStringOutOfBound(Int32.to_int mo_header.number_of_strings, number))
 ;;
@@ -183,7 +183,7 @@ let input_mo_translated failsafe chn mo_header number =
           raise (MoInvalidTranslationOutOfBound
                    (in_channel_length chn,offset_pair))
       in
-        split_plural (Bytes.to_string str)
+        split_plural str
     )
   else
     (
