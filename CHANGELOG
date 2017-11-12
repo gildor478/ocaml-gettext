@@ -1,3 +1,6 @@
+v 0.3.8 (Sun, 12 Nov 2017 01:01:00 +0100):
+  * Replace string by bytes, for compability with OCAml 4.06.
+
 v 0.3.7 (Wed, 01 Mar 2017 22:55:57 +0100):
   * Add an extra step to generate configure.
 
