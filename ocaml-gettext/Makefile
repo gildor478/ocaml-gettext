@@ -61,14 +61,9 @@ install: ocaml-xgettext-install
 
 uninstall: ocaml-xgettext-uninstall
 
-ocaml-xgettext: $(BUILDBIN)
-	$(OCAMLC)                                                            \
-           -I +camlp4 dynlink.cma camlp4lib.cma                              \
-          `$(OCAMLFIND) query -r -predicates byte gettext.extract -i-format` \
-          `$(OCAMLFIND) query -r -predicates byte gettext.extract -a-format` \
-          `$(OCAMLFIND) query -r -predicates byte gettext.extract -o-format` \
-           Camlp4Bin.cmo                                                     \
-          -o $@
+ocaml-xgettext: xgettext.ml
+	$(OCAMLC) -I ../libgettext-ocaml -I +compiler-libs \
+	    ocamlcommon.cma gettextBase.cma gettextExtension.cma $< -o $@
 	$(INSTALL_SCRIPT) -t $(BUILDBIN) $@
 
 ocaml-xgettext-install:

@@ -283,7 +283,7 @@ let () =
     {
       action_option               = None;
       extract_command             = "ocaml-xgettext";
-      extract_default_option      = "-I +camlp4 pa_o.cmo";
+      extract_default_option      = "";
       extract_filename_options    = [];
       extract_pot                 = "messages.pot";
       compile_output_file_option  = None;

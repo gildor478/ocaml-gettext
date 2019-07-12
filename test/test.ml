@@ -353,9 +353,7 @@ let compatibility_test tests =
 (*******************************************)
 
 let extract_test tests = 
-  let default_options = 
-    "-I +camlp4 pa_o.cmo"
-  in
+  let default_options = "" in
   let filename_options = 
     MapString.empty
   in
