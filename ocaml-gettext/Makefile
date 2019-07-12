@@ -41,12 +41,12 @@ REQUIRES   = gettext.extension fileutils
 
 ifeq ($(GETTEXT_MODULES),CAMOMILE)
 REQUIRES  += gettext-camomile
-INCLUDES  += -pp 'camlp4o -I +camlp4 pa_macro.cmo -DCAMOMILE'
+INCLUDES  += -pp 'cpp -DCAMOMILE'
 endif
 
 ifeq ($(GETTEXT_MODULES),STUB)
 REQUIRES  += gettext-stub
-INCLUDES  += -pp 'camlp4o -I +camlp4 pa_macro.cmo -DSTUB'
+INCLUDES  += -pp 'cpp -DSTUB'
 endif
 
 include ../TopMakefile
