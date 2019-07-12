@@ -104,7 +104,7 @@ let input_int32_pair_string chn endian =
      (Int32.to_int length,Int32.to_int offset)
    in
    if 0 <= ioffset + ilength && ioffset + ilength < in_channel_length chn then
-     let str = String.make ilength 'X'
+     let str = Bytes.make ilength 'X'
      in
      seek_in chn ioffset;
      really_input chn str 0 ilength;
