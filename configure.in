@@ -85,9 +85,6 @@ AC_CHECK_OCAMLOPT([],[AC_MSG_WARN(Cannot find ocamlopt, byte compilation only)])
 AC_CHECK_OCAMLLEX([],[AC_MSG_ERROR(Cannot find ocamllex.)])
 AC_CHECK_OCAMLYACC([],[AC_MSG_ERROR(Cannot find ocamlyacc.)])
 AC_CHECK_OCAMLFIND([],[AC_MSG_ERROR(Cannot find ocamlfind.)])
-AC_CHECK_CAMLP4([],[AC_MSG_ERROR(Cannot find camlp4.)])
-AC_CHECK_CAMLP4O([],[AC_MSG_ERROR(Cannot find camlp4o.)])
-AC_CHECK_CAMLP4OF([],[AC_MSG_ERROR(Cannot find camlp4of.)])
 AC_CHECK_OCAMLMKLIB([],[AC_MSG_ERROR(Cannot find ocamlmklib.)])
 
 if test "x$BUILD_DOC" = "xyes"; then
