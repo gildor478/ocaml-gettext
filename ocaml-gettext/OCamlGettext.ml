@@ -36,14 +36,15 @@ open GettextCategory;;
 open GettextUtils;;
 open FilePath.DefaultPath;;
 
-IFDEF CAMOMILE THEN
+#ifdef CAMOMILE
 module OcamlGettextRealize = GettextCamomile.Open
-ELSE IFDEF STUB THEN
+#else
+#ifdef STUB
 module OcamlGettextRealize =  GettextStub.Native
-ELSE
+#else
 module OcamlGettextRealize =  GettextDummy.Dummy
-ENDIF
-ENDIF
+#endif
+#endif
 ;;
 
 module OcamlGettext = Gettext.Program
@@ -104,12 +105,12 @@ let string_of_exception exc =
       (s_ "You must specify one action.")
   | InstallUninstallTooManyFilename ->
       (s_ 
-"You cannot specify at the same time a language, a textdomain 
-and provide more than one file to install/uninstall : all files
+"You cannot specify at the same time a language, a textdomain\n\
+and provide more than one file to install/uninstall : all files\n\
 will have the same destination filename.")
   | CompileTooManyFilename ->
       (s_ 
-"You cannot specify a output filename and more than one 
+"You cannot specify a output filename and more than one\n\
 filename : all the compiled file will have the same output filename")
   | _ ->
       Gettext.string_of_exception exc
@@ -197,8 +198,8 @@ let guess_language_textdomain (language_option,textdomain_option) lst =
         in 
         * (((chop_extension str_reduce), (get_extension str_reduce)),fl_mo)*)
         raise (Failure
-"FilePath suffers from a default with the handling of
-chop/get_extension. This bug should disappears with 
+"FilePath suffers from a default with the handling of\n\
+chop/get_extension. This bug should disappears with\n\
 newer version of ocaml-fileutils")
       ) lst
 ;;
@@ -526,12 +527,12 @@ let () =
         t := { !t with input_files = str :: !t.input_files }
     )
     (
-      spf (f_ "%s
-
-Command: ocaml-gettext -action (%s) [options]
-When trying to guess language and textdomain from a 
-MO file, the rules applied are: language.textdomain.mo
-
+      spf (f_ "%s\n\
+\n\
+Command: ocaml-gettext -action (%s) [options]\n\
+When trying to guess language and textdomain from a\n\
+MO file, the rules applied are: language.textdomain.mo\n\
+\n\
 Options:") 
       gettext_copyright
       (String.concat "|" (List.map fst actions))
