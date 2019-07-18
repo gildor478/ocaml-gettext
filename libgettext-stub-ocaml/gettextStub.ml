@@ -98,7 +98,7 @@ module Native : GettextTypes.REALIZE_TYPE =
               (
                 try
                   GettextStubCompat.setlocale GettextStubCompat.LC_ALL language
-                with Failure("setlocale(invalid localization)") as exc ->
+                with Failure _ as exc ->
                   let () = 
                     fail_or_continue t.failsafe exc () 
                   in
