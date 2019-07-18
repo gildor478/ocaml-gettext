@@ -256,7 +256,7 @@ let input_mo_informations failsafe chn mo_header =
       GettextMo_parser.main GettextMo_lexer.token_field_name lexbuf
     with 
       Parsing.Parse_error 
-    | Failure("lexing: empty token") ->
+    | Failure _ ->
         fail_or_continue failsafe 
         (MoInvalidOptions (lexbuf,empty_translation)) 
         []
@@ -272,7 +272,7 @@ let input_mo_informations failsafe chn mo_header =
         GettextMo_lexer.token_field_plural_value lexbuf 
       with 
         Parsing.Parse_error 
-      | Failure("lexing: empty token") ->
+      | Failure _ ->
           fail_or_continue 
             failsafe 
             (MoInvalidPlurals(lexbuf,field_plural_forms))
@@ -293,7 +293,7 @@ let input_mo_informations failsafe chn mo_header =
         GettextMo_lexer.token_field_content_type lexbuf
       with      
         Parsing.Parse_error 
-      | Failure("lexing: empty token") ->
+      | Failure _ ->
           fail_or_continue failsafe
           (MoInvalidContentType(lexbuf,field_content_type))
           gettext_content
