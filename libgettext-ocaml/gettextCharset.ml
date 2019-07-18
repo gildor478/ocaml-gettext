@@ -45,7 +45,7 @@ module type CHARSET_TYPE =
 module Dummy : CHARSET_TYPE =
   struct
     type encoding = string
-    type u = ()
+    type u = unit
 
     let create t in_enc out_enc = ()
 
