@@ -63,19 +63,13 @@ type t = {
   translated:   SetString.t;
 }
 
-let string_of_ocaml_string str =
-  Scanf.sscanf
-    (Printf.sprintf "\"%s\"" str)
-    "%S"
-    (fun s -> s)
-
 let translations = ref { po_content = empty_po; translated = SetString.empty }
 
 let default_textdomain = ref None
 
 let current_file = ref ""
 
-let add_translation loc ocaml_singular plural_opt domain =
+let add_translation loc singular plural_opt domain =
   let t = !translations in
 
   let filepos =
@@ -85,19 +79,13 @@ let add_translation loc ocaml_singular plural_opt domain =
                                       | fname -> fname in
     fname, start.Lexing.pos_lnum
   in
-  let singular =
-    string_of_ocaml_string ocaml_singular
-  in
   let translated =
-    SetString.add ocaml_singular t.translated
+    SetString.add singular t.translated
   in
   let translated, translation =
     match plural_opt with
-    | Some ocaml_plural ->
-       let plural =
-         string_of_ocaml_string ocaml_plural
-       in
-       SetString.add ocaml_plural translated,
+    | Some plural ->
+       SetString.add plural translated,
        {
          po_comment_special = [];
          po_comment_filepos = [filepos];
