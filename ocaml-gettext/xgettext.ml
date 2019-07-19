@@ -218,9 +218,13 @@ let ast_iterator =
 
 let go fn =
   current_file := fn;
-  let lexbuf = Lexing.from_channel (open_in fn) in
-  let structure = Parse.implementation lexbuf in
-  ast_iterator.Ast_iterator.structure ast_iterator structure
+  try
+    let lexbuf = Lexing.from_channel (open_in fn) in
+    let structure = Parse.implementation lexbuf in
+    ast_iterator.Ast_iterator.structure ast_iterator structure
+  with
+    exn ->
+     failwith (fn ^ ": " ^ Printexc.to_string exn)
 
 let () =
   (* XXX Add -default-textdomain option which sets default_textdomain. *)
