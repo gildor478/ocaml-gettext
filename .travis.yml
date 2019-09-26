@@ -9,15 +9,15 @@ matrix:
   include:
     - name: "gettext: linux"
       os: linux
-      env: OCAML_VERSION=4.08 PACKAGE="gettext"
+      env: OCAML_VERSION=4.08 PACKAGE="gettext" PRE_INSTALL_HOOK="./autogen.sh"
 
     - name: "gettext: reverse dependencies with linux"
       os: linux
-      env: OCAML_VERSION=4.08 PACKAGE="gettext" REVDEPS="true"
+      env: OCAML_VERSION=4.08 PACKAGE="gettext" REVDEPS="true" PRE_INSTALL_HOOK="./autogen.sh"
 
     - name: "gettext: MacOSX"
       os: osx
-      env: OCAML_VERSION=4.08 PACKAGE="gettext"
+      env: OCAML_VERSION=4.08 PACKAGE="gettext" PRE_INSTALL_HOOK="./autogen.sh"
       cache:
         directories:
           - $HOME/Library/Caches/Homebrew
