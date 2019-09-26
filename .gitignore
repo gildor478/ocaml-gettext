@@ -21,6 +21,8 @@
 /libgettext-ocaml/gettextConfig.ml
 /libgettext-ocaml/gettextMo_parser.ml
 /libgettext-ocaml/gettextPo_parser.mli
+/libgettext-ocaml/gettextFormat_parser.mli
+/libgettext-ocaml/gettextMo_parser.mli
 /ocaml-gettext/ocaml-gettext
 /ocaml-gettext/ocaml-xgettext
 /po/*.mo
@@ -28,3 +30,6 @@
 /setup.data
 /setup.log
 /test.byte
+/test/test
+/test/tests/
+
