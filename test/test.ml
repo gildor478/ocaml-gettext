@@ -824,7 +824,7 @@ let bad_setlocale tests =
 let compile_ocaml _ = 
   "Compile OCaml code" >:::
   (List.map 
-     (fun (fn, exp_return_code, exp_out, exp_err) ->
+     (fun (fn, exp_return_code, exp_err) ->
         fn >::
         (fun () ->
            let command, return_code, out, err = 
@@ -834,45 +834,27 @@ let compile_ocaml _ =
            in
              FileUtil.rm (List.map (FilePath.replace_extension fn) ["cmo"; "cmi"]);
              FileUtil.rm (List.map (FilePath.add_extension "TestGettext") ["cmo"; "cmi"]);
-             assert_equal 
-               ~msg:("error output of "^command)
-               ~printer:(Printf.sprintf "%S")
-               exp_err
-               err;
-             assert_equal 
-               ~msg:("standard output of "^command)
-               ~printer:(Printf.sprintf "%S")
-               exp_out
-               out;
+             assert_bool
+               (Printf.sprintf "error output of %S:\n%s" command err)
+               (BatString.exists err exp_err);
              assert_equal 
                ~msg:("return code of "^command)
                ~printer:string_of_int
                exp_return_code
                return_code))
      [
-       "unsound_warning.ml", 0, "", "";
-       "valid_format.ml", 0, "", "";
-       "invalid_format1.ml", 2, "",
-       "File \"invalid_format1.ml\", line 5, characters 21-22:\n\
-        Error: This expression has type int but an expression was expected of type\n\
-       \         int32\n";
-       "invalid_format2.ml", 2, "", 
-       "File \"invalid_format2.ml\", line 5, characters 21-22:\n\
-        Error: This expression has type int but an expression was expected of type\n\
-       \         int64\n";
-       "invalid_format3.ml", 2, "",
-       "File \"invalid_format3.ml\", line 5, characters 20-21:\n\
-        Error: This expression has type int but an expression was expected of type\n\
-       \         string\n";
-       "invalid_format4.ml", 2, "",
-       "File \"invalid_format4.ml\", line 5, characters 20-21:\n\
-        Error: This expression has type int but an expression was expected of type\n\
-       \         bool\n";
-       "invalid_format5.ml", 2, "",
-       "File \"invalid_format5.ml\", line 5, characters 29-45:\n\
-        Error: This expression has type (int64 -> 'a, 'b, 'c, 'd, 'd, 'a) format6\n\
-       \       but an expression was expected of type\n\
-       \         (int -> 'e, 'f, 'g, 'g, 'g, 'e) format6\n";
+       "unsound_warning.ml", 0, "";
+       "valid_format.ml", 0, "";
+       "invalid_format1.ml", 2,
+       "File \"invalid_format1.ml\", line 5, characters 21-22:";
+       "invalid_format2.ml", 2,
+       "File \"invalid_format2.ml\", line 5, characters 21-22:";
+       "invalid_format3.ml", 2,
+       "File \"invalid_format3.ml\", line 5, characters 20-21:";
+       "invalid_format4.ml", 2,
+       "File \"invalid_format4.ml\", line 5, characters 20-21:";
+       "invalid_format5.ml", 2,
+       "File \"invalid_format5.ml\", line 5, characters 29-45:";
      ])
 ;;
 

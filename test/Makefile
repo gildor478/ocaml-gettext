@@ -20,7 +20,7 @@
 #  USA                                                                   #
 ##########################################################################
 
-REQUIRES   = fileutils gettext.extension gettext-camomile gettext-stub
+REQUIRES   = batteries fileutils gettext.extension gettext-camomile gettext-stub
 TESTDIR    = tests
 CMO        = common.cmo 
 ifeq ($(BUILD_BENCH),yes)

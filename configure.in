@@ -97,6 +97,7 @@ if test "x$BUILD_DOC" = "xyes"; then
 fi
 
 OCAMLFIND_CHECK_MODULE(fileutils,[],[AC_MSG_ERROR(Cannot find ocaml-fileutils)])
+OCAMLFIND_CHECK_MODULE(batteries,[],[AC_MSG_ERROR(Cannot find batteries)])
 
 OCAMLFIND_CHECK_MODULE(camomile,[],
 [
