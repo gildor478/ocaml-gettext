@@ -1,0 +1,23 @@
+language: c
+sudo: required
+install: test -e .travis.opam.sh || wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-opam.sh
+script: bash -ex .travis-opam.sh
+env:
+  global:
+    - OUNIT_CI=true
+matrix:
+  include:
+    - name: "gettext: linux"
+      os: linux
+      env: OCAML_VERSION=4.08 PACKAGE="gettext"
+
+    - name: "gettext: reverse dependencies with linux"
+      os: linux
+      env: OCAML_VERSION=4.08 PACKAGE="gettext" REVDEPS="true"
+
+    - name: "gettext: MacOSX"
+      os: osx
+      env: OCAML_VERSION=4.08 PACKAGE="gettext"
+      cache:
+        directories:
+          - $HOME/Library/Caches/Homebrew
