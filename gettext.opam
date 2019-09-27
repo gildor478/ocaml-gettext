@@ -20,6 +20,7 @@ build: [
     "--includedir=%{lib}%/gettext/include"
     "--datarootdir=%{lib}%/gettext/share"
   ]
+  ["./configure" "--enable-test"] {with-test}
   [make "all"]
   [make "test"] {with-test}
 ]
@@ -30,7 +31,13 @@ remove: [
   ["ocamlfind" "remove" "gettext"]
 ]
 depends: [
-  "ocaml" "ocamlfind" "ounit" "fileutils" "camomile" "camlp4" "base-bytes" "batteries"
+  "ocaml"
+  "ocamlfind" {build}
+  "ounit"
+  "fileutils"
+  "camomile"
+  "base-bytes"
+  "batteries"
 ]
 install: [make "install"]
 synopsis:
