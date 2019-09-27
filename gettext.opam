@@ -20,8 +20,8 @@ build: [
     "--includedir=%{lib}%/gettext/include"
     "--datarootdir=%{lib}%/gettext/share"
   ]
-  [make all]
-  [make test] {with-test}
+  [make "all"]
+  [make "test"] {with-test}
 ]
 remove: [
   ["rm" "-rf" "%{lib}%/gettext/share"]
