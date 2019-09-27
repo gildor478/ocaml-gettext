@@ -1,0 +1,6 @@
+(library
+  (name gettextStub)
+  (public_name gettext-stub)
+	(c_names gettextStubCompat_stubs)
+  (wrapped false)
+  (libraries gettext.base gettext.extension))

@@ -20,58 +20,43 @@
 #  USA                                                                   #
 ##########################################################################
 
-default: test
+default: build test
 
-all:
-	cd libgettext-ocaml          && $(MAKE) all
-	cd libgettext-stub-ocaml     && $(MAKE) all
-	cd libgettext-camomile-ocaml && $(MAKE) all
-	cd ocaml-gettext             && $(MAKE) all
-	cd po                        && $(MAKE) all
-	cd doc                       && $(MAKE) all
-	cd test                      && $(MAKE) all
+GENERATED_FILES=src/lib/gettext/base/gettextConfigGen.ml
+$(GENERATED_FILES): configure.ml
+	ocaml configure.ml
 
-install:
-	cd libgettext-ocaml          && $(MAKE) install
-	cd libgettext-stub-ocaml     && $(MAKE) install
-	cd libgettext-camomile-ocaml && $(MAKE) install
-	cd ocaml-gettext             && $(MAKE) install
-	cd po                        && $(MAKE) install
-	cd doc                       && $(MAKE) install
+build: $(GENERATED_FILES)
+	dune build @install
 
-uninstall:
-	cd doc                       && $(MAKE) uninstall
-	cd po                        && $(MAKE) uninstall
-	cd ocaml-gettext             && $(MAKE) uninstall
-	cd libgettext-camomile-ocaml && $(MAKE) uninstall
-	cd libgettext-stub-ocaml     && $(MAKE) uninstall
-	cd libgettext-ocaml          && $(MAKE) uninstall
+doc: $(GENERATED_FILES)
+	dune build @doc
+
+test: $(GENERATED_FILES)
+	dune runtest
+
+all: $(GENERATED_FILES)
+	dune build @all
+	dune runtest
+
+install: build
+	dune install
+
+uninstall: all
+	dune uninstall
 
 clean:
-	-cd test                      && $(MAKE) clean
-	-cd doc                       && $(MAKE) clean
-	-cd po                        && $(MAKE) clean
-	-cd examples                  && $(MAKE) clean
-	-cd ocaml-gettext             && $(MAKE) clean
-	-cd libgettext-camomile-ocaml && $(MAKE) clean
-	-cd libgettext-stub-ocaml     && $(MAKE) clean
-	-cd libgettext-ocaml          && $(MAKE) clean
-	-$(RM) -r $(TMPBUILDDIR)
+	dune clean
 
-distclean: clean
-	-cd test                      && $(MAKE) distclean
-	-cd doc                       && $(MAKE) distclean
-	-cd po                        && $(MAKE) distclean
-	-cd examples                  && $(MAKE) distclean
-	-cd ocaml-gettext             && $(MAKE) distclean
-	-cd libgettext-camomile-ocaml && $(MAKE) distclean
-	-cd libgettext-stub-ocaml     && $(MAKE) distclean
-	-cd libgettext-ocaml          && $(MAKE) distclean
-	-$(RM) config.* ConfMakefile
-	-$(RM) -r autom4te.cache config.log config.cache config.status
+bench:
+	dune exec test/bench/bench.exe
+
+.PHONY: build doc test all uninstall clean install bench
 
 headache: distclean
-	headache -h .header -c .headache.config `find $(CURDIR)/ -type d -name .svn -prune -false -o -type f`
+	headache -h .header \
+		-c .headache.config \
+		`find $(CURDIR)/ -type d -name .svn -prune -false -o -type f`
 
 deploy:
 	mkdir dist || true
@@ -80,9 +65,4 @@ deploy:
 		--verbose --forge_upload --forge_group ocaml-gettext \
 		--autogen
 
-test: all
-	cd test && ./test
-
--include ConfMakefile
-
-.PHONY: all install uninstall clean distclean deploy test
+.PHONY: deploy

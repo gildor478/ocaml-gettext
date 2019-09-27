@@ -20,14 +20,10 @@ depends: [
   "ounit" {with-test}
   "fileutils" {with-test}
   "base-bytes"
+  "gettext" {= version}
 ]
-synopsis: "Internationalization and localization library (i18n and l10n)"
+synopsis:
+"Internationalization and localization using C gettext library (i18n and l10n)"
 description:"""
-This library enables string translation in OCaml. The API is based on GNU
-gettext. It comes with a tool to extract strings which need to be translated
-from OCaml source files.
-
-This enables OCaml program to output string in the native language of
-the user, if a corresponding translation file of the English strings is
-provided.
+See gettext package description.
 """

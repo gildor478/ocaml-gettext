@@ -33,6 +33,7 @@ type tests = {
   ocaml_xgettext : string;
   ocaml_gettext  : string;
   test_dir       : string;
+  install_dir    : string;
 }
 ;;
 
@@ -42,7 +43,8 @@ let parse_arg () =
     search_path    = []; 
     ocaml_xgettext = make_filename [ parent_dir ; "_build" ; "bin" ; "ocaml-xgettext"];
     ocaml_gettext  = make_filename [ parent_dir ; "_build" ; "bin" ; "ocaml-gettext"];
-    test_dir       = make_filename [ current_dir ; "tests" ];
+    test_dir       = make_filename [ current_dir ; "testdata" ];
+    install_dir    = make_filename [ current_dir ; "testinstall" ];
   }
   in
   Arg.parse ( Arg.align [
@@ -82,7 +84,7 @@ let parse_arg () =
       ,"dir Specify the temporary dir for testing files."
     );
   ])
-  (fun str -> ())
+  (fun _str -> ())
   ("Test utility for ocaml-gettext v"^(GettextConfig.version)^" by Sylvain Le Gall\n"^
    "Copyright (C) 2004-2008 Sylvain Le Gall <sylvain@le-gall.net>\n"^
    "Licensed under LGPL v2.1 with OCaml exception.");
@@ -205,7 +207,7 @@ let load_mo_file tests f_test_mo fl_mo =
 (* Test of Printf format checking *)
 (**********************************)
 
-let format_test tests =
+let format_test _tests =
   let format_test_one (trans_src,trans_dst) =
     let lst_str_equal lst1 lst2 =
       try
@@ -272,17 +274,12 @@ let split_plural_test tests =
 (*************************)
 
 let po_test tests = 
-  let po_test_one f_test_mo fl_po = 
-    let fl_mo = 
-      concat 
-        tests.test_dir 
-        (replace_extension fl_po "mo")
-    in
+  let po_test_one f_test_mo fl_po =
+    let fl_mo = concat tests.test_dir (replace_extension fl_po "mo") in
+    let fl_po = concat tests.test_dir fl_po in
       (Printf.sprintf "Load and compile %s" fl_po) >:: 
         (fun () ->
-           let chn = 
-             open_in fl_po
-           in
+           let chn = open_in fl_po in
              ignore (GettextPo.input_po chn);
              close_in chn;
              GettextCompile.compile fl_po fl_mo;
@@ -291,31 +288,31 @@ let po_test tests =
     "PO processing test" >:::
       (List.map (po_test_one ignore)
          [
-           "test1.po"; 
-           "test2.po"; 
-           "test3.po"; 
+           "test1.po";
+           "test2.po";
+           "test3.po";
            "test4.po";
            "test11.po";
          ])
     @
     [
-      po_test_one 
+      po_test_one
         (fun fl_mo ->
            let (), _ = 
              GettextMo.fold_mo
-               RaiseException 
+               RaiseException
                (fun trslt () ->
-                  match trslt with 
-                    | Singular(id, "") 
-                    | Plural(id, _, []) 
+                  match trslt with
+                    | Singular(id, "")
+                    | Plural(id, _, [])
                     | Plural(id, _, [""]) ->
                         assert_failure
-                          (Printf.sprintf 
+                          (Printf.sprintf
                              "%s contains an empty translation for %s"
                              fl_mo
                              id)
                     | _ ->
-                        ()) 
+                        ())
                  ()
                  fl_mo
            in 
@@ -358,9 +355,8 @@ let extract_test tests =
     MapString.empty
   in
   let extract_test_one (fl_ml, contents) = 
-    let fl_pot = 
-      concat tests.test_dir (replace_extension fl_ml "pot")
-    in
+    let fl_pot = concat tests.test_dir (replace_extension fl_ml "pot") in
+    let fl_ml = concat tests.test_dir fl_ml in
     fl_ml >:::
       [ 
         "Extracting" >::
@@ -425,12 +421,10 @@ let install_test tests =
   let install_test_one (language, category, textdomain, fl_mo, fl_dsts) =  
     fl_mo >::
       (fun () ->
-         let fl_dst = 
-           make_filename fl_dsts
-         in
+         let fl_dst = make_filename fl_dsts in
            GettextCompile.install 
              true 
-             tests.test_dir 
+             tests.install_dir 
              language 
              category 
              textdomain 
@@ -441,9 +435,8 @@ let install_test tests =
   in
 
   let install_fail_test_one (fl_mo, exc) =
-    let  error = 
-      Printexc.to_string exc
-    in
+    let fl_mo = concat tests.test_dir fl_mo in
+    let  error = Printexc.to_string exc in
       (Printf.sprintf "%s (%s)" fl_mo error) >::
         (fun () ->
            assert_raises
@@ -454,7 +447,7 @@ let install_test tests =
              (fun () ->
                 GettextCompile.install
                   true 
-                  tests.test_dir 
+                  tests.install_dir 
                   "fr" 
                   LC_MESSAGES 
                   "gettext-fail"
@@ -472,7 +465,7 @@ let install_test tests =
               "--install-language"; language;
               "--install-category"; category;
               "--install-textdomain"; textdomain;
-              "--install-destdir"; tests.test_dir;
+              "--install-destdir"; tests.install_dir;
               fl_mo
             ]
         in
@@ -503,16 +496,16 @@ let install_test tests =
       (List.map install_test_one 
          [
            "fr",LC_MESSAGES, "gettext-test1", concat tests.test_dir "test1.mo", 
-           [tests.test_dir; "fr"; "LC_MESSAGES"; "gettext-test1.mo"];
+           [tests.install_dir; "fr"; "LC_MESSAGES"; "gettext-test1.mo"];
 
            "fr_FR",LC_MESSAGES, "gettext-test2", concat tests.test_dir "test2.mo", 
-           [tests.test_dir; "fr_FR"; "LC_MESSAGES"; "gettext-test2.mo"];
+           [tests.install_dir; "fr_FR"; "LC_MESSAGES"; "gettext-test2.mo"];
 
            "fr",LC_TIME, "gettext-test3", concat tests.test_dir "test3.mo", 
-           [tests.test_dir; "fr"; "LC_TIME"; "gettext-test3.mo"];
+           [tests.install_dir; "fr"; "LC_TIME"; "gettext-test3.mo"];
 
            "fr_FR@euro",LC_MESSAGES, "gettext-test4", concat tests.test_dir "test4.mo",
-           [tests.test_dir; "fr_FR@euro"; "LC_MESSAGES"; "gettext-test4.mo"];
+           [tests.install_dir; "fr_FR@euro"; "LC_MESSAGES"; "gettext-test4.mo"];
          ]) @
       (List.map install_fail_test_one 
          [
@@ -533,9 +526,9 @@ let install_test tests =
          ]) @
       (List.map install_warning_test_one
          [
-           "fr", "LC_MESSAGES", "test10", "test10.mo", 
+           "fr", "LC_MESSAGES", "test10", concat tests.test_dir "test10.mo",
            "Error while processing parsing of plural at line 1 character 10: \" nplurals=INTEGER; plural=EXPRESSION;\".\n",
-           [tests.test_dir; "fr"; "LC_MESSAGES"; "test10.mo"];
+           [tests.install_dir; "fr"; "LC_MESSAGES"; "test10.mo"];
          ])
 ;;
 
@@ -551,30 +544,23 @@ let merge_test tests =
           ( fun () ->
             try
               (* Copying the file to the good place *)
-              let fl_po_cp = 
-                concat tests.test_dir fl_po
-              in
-              let () = 
-                cp [fl_po] fl_po_cp
-              in
-              let fl_backup = 
-                add_extension fl_po_cp backup_ext
-              in
-              GettextCompile.merge fl_pot [fl_po_cp] backup_ext;
+              let fl_backup = add_extension fl_po backup_ext in
+              cp [fl_po] fl_pot;
+              GettextCompile.merge fl_pot [fl_po] backup_ext;
               (
-                match cmp fl_po fl_po_cp with
-                  Some -1 -> 
-                    assert_failure (fl_po^" or "^fl_po_cp^" doesn't exist")
-                | Some x ->
-                    assert_failure (fl_po^" differs from "^fl_po_cp)
+                match cmp fl_po fl_po with
+                  Some -1 ->
+                    assert_failure (fl_po^" or "^fl_po^" doesn't exist")
+                | Some _ ->
+                    assert_failure (fl_po^" differs from "^fl_po)
                 | None ->
                     ()
               );
               (
                 match cmp fl_po fl_backup with
-                  Some -1 -> 
+                  Some -1 ->
                     assert_failure (fl_po^" or "^fl_backup^" doesn't exist")
-                | Some x ->
+                | Some _ ->
                     assert_failure (fl_po^" differs from "^fl_backup)
                 | None ->
                     ()
@@ -586,14 +572,21 @@ let merge_test tests =
       ]
   in
   "POT/PO file merge test" >:::
-    List.map merge_one [ (concat tests.test_dir "test4.pot","test4.po","bak") ]
+    List.map merge_one
+    [
+      (
+        concat tests.test_dir "test4.pot",
+        concat tests.test_dir "test4.po",
+        "bak"
+      )
+    ]
 ;;
 
 (**********************************)
 (* Test of Gettext implementation *)
 (**********************************)
 
-let implementation_test tests =
+let implementation_test _tests =
   (* Generate a test case of simple load of a MO file using an implementation *)
   let test_load parameters_lst (realize_str,realize) = 
     let test_load_one realize parameters =
@@ -740,18 +733,13 @@ let implementation_test tests =
 
 let po_process_test tests =
   let copy_merge_compare fn_po =
-    let src_po =
-      make_filename [current_dir; fn_po]
-    in
-    let tgt_po =
-      make_filename [tests.test_dir; fn_po]
-    in
-      cp [src_po] tgt_po;
+    let src_po = make_filename [current_dir; fn_po] in
+    let tgt_po = make_filename [current_dir; fn_po] in
       GettextCompile.merge tgt_po [tgt_po] "bak";
       match cmp tgt_po src_po with
         | Some -1 -> 
             assert_failure (tgt_po^" or "^src_po^" doesn't exist")
-        | Some x ->
+        | Some _ ->
             assert_failure (tgt_po^" differs from "^src_po)
         | None ->
             ()
@@ -761,17 +749,17 @@ let po_process_test tests =
     "multiline-comment.po" >:: 
     (
       fun () ->
-        copy_merge_compare "multiline-comment.po"
+        copy_merge_compare (concat tests.test_dir "multiline-comment.po")
     );
     "utf8-fr.po" >::
     (
       fun () ->
-        copy_merge_compare "utf8-fr.po"
+        copy_merge_compare (concat tests.test_dir "utf8-fr.po")
     );
     "utf8-ja.po" >::
     (
       fun () ->
-        copy_merge_compare "utf8-ja.po"
+        copy_merge_compare (concat tests.test_dir "utf8-ja.po")
     );
   ]
 ;;
@@ -806,7 +794,7 @@ let run_ocaml_gettext tests =
 (* returns NULL                                 *)
 (************************************************)
 
-let bad_setlocale tests =
+let bad_setlocale _tests =
   "Call setlocale with bad locale" >:::
   [
     "setlocale with bad locale" >::
@@ -821,23 +809,28 @@ let bad_setlocale tests =
 (* Try to compile *)
 (******************)
 
-let compile_ocaml _ = 
+let compile_ocaml tests =
   "Compile OCaml code" >:::
   (List.map 
-     (fun (fn, exp_return_code, exp_err) ->
-        fn >::
+     (fun (bn, exp_return_code, exp_err) ->
+        bn >::
         (fun () ->
-           let command, return_code, out, err = 
+           let command, return_code, _out, err =
              run_and_read 
-               "ocamlc" 
-               ["-c"; "-I"; "../libgettext-ocaml/"; "-I"; "../libgettext-stub-ocaml/"; "TestGettext.ml"; fn]
+               "ocamlc"
+               ["-c";
+                "-I"; "../src/lib/gettext/base/.gettextBase.objs/byte";
+                "-I"; "../src/lib/gettext-stub/.gettextStub.objs/byte";
+                "-I"; tests.test_dir;
+                Filename.concat tests.test_dir "TestGettext.ml";
+                Filename.concat tests.test_dir bn]
            in
-             FileUtil.rm (List.map (FilePath.replace_extension fn) ["cmo"; "cmi"]);
+             FileUtil.rm (List.map (FilePath.replace_extension bn) ["cmo"; "cmi"]);
              FileUtil.rm (List.map (FilePath.add_extension "TestGettext") ["cmo"; "cmi"]);
              assert_bool
                (Printf.sprintf "error output of %S:\n%s" command err)
                (BatString.exists err exp_err);
-             assert_equal 
+             assert_equal
                ~msg:("return code of "^command)
                ~printer:string_of_int
                exp_return_code
@@ -845,16 +838,11 @@ let compile_ocaml _ =
      [
        "unsound_warning.ml", 0, "";
        "valid_format.ml", 0, "";
-       "invalid_format1.ml", 2,
-       "File \"invalid_format1.ml\", line 5, characters 21-22:";
-       "invalid_format2.ml", 2,
-       "File \"invalid_format2.ml\", line 5, characters 21-22:";
-       "invalid_format3.ml", 2,
-       "File \"invalid_format3.ml\", line 5, characters 20-21:";
-       "invalid_format4.ml", 2,
-       "File \"invalid_format4.ml\", line 5, characters 20-21:";
-       "invalid_format5.ml", 2,
-       "File \"invalid_format5.ml\", line 5, characters 29-45:";
+       "invalid_format1.ml", 2, "line 5, characters 21-22:";
+       "invalid_format2.ml", 2, "line 5, characters 21-22:";
+       "invalid_format3.ml", 2, "line 5, characters 20-21:";
+       "invalid_format4.ml", 2, "line 5, characters 20-21:";
+       "invalid_format5.ml", 2, "line 5, characters 29-45:";
      ])
 ;;
 
