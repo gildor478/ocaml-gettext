@@ -30,7 +30,7 @@ remove: [
   ["ocamlfind" "remove" "gettext"]
 ]
 depends: [
-  "ocaml" "ocamlfind" "ounit" "fileutils" "camomile" "camlp4" "base-bytes"
+  "ocaml" "ocamlfind" "ounit" "fileutils" "camomile" "camlp4" "base-bytes" "batteries"
 ]
 install: [make "install"]
 synopsis:
