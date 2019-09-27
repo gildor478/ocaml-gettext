@@ -5,6 +5,9 @@ script: bash -ex .travis-opam.sh
 env:
   global:
     - OUNIT_CI=true
+addons:
+  homebrew:
+    packages: gettext
 matrix:
   include:
     - name: "gettext: linux"
