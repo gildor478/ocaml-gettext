@@ -8,6 +8,7 @@ env:
 addons:
   homebrew:
     packages: gettext
+    update: true
 matrix:
   include:
     - name: "gettext: linux"
