@@ -1,11 +1,11 @@
 (ocamllex
-  (modules gettextFormat_lexer gettextMo_lexer))
+ (modules gettextFormat_lexer gettextMo_lexer))
 
 (ocamlyacc
-  (modules gettextFormat_parser gettextMo_parser))
+ (modules gettextFormat_parser gettextMo_parser))
 
 (library
-  (name gettextBase)
-  (wrapped false)
-  (public_name gettext.base)
-  (libraries fileutils))
+ (name gettextBase)
+ (wrapped false)
+ (public_name gettext.base)
+ (libraries fileutils))

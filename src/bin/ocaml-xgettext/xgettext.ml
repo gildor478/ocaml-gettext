@@ -57,10 +57,7 @@ open GettextPo
 open Parsetree
 open Longident
 
-type t = {
-  po_content:   po_content;
-  translated:   SetString.t;
-}
+type t = { po_content : po_content; translated : SetString.t }
 
 let translations = ref { po_content = empty_po; translated = SetString.empty }
 
@@ -70,138 +67,125 @@ let current_file = ref ""
 
 let add_translation loc singular plural_opt domain =
   let t = !translations in
-
   let filepos =
     let start = loc.Location.loc_start in
     let fname =
-      match start.Lexing.pos_fname with "" -> !current_file
-                                      | fname -> fname in
-    fname, start.Lexing.pos_lnum
+      match start.Lexing.pos_fname with "" -> !current_file | fname -> fname
+    in
+    (fname, start.Lexing.pos_lnum)
   in
-  let translated =
-    SetString.add singular t.translated
-  in
+  let translated = SetString.add singular t.translated in
   let translated, translation =
     match plural_opt with
     | Some plural ->
-       SetString.add plural translated,
-       {
-         po_comment_special = [];
-         po_comment_filepos = [filepos];
-         po_comment_translation = PoPlural([singular],[plural],[[""];[""]]);
-       }
+        ( SetString.add plural translated,
+          {
+            po_comment_special = [];
+            po_comment_filepos = [ filepos ];
+            po_comment_translation =
+              PoPlural ([ singular ], [ plural ], [ [ "" ]; [ "" ] ]);
+          } )
     | None ->
-       translated,
-       {
-         po_comment_special = [];
-         po_comment_filepos = [filepos];
-         po_comment_translation = PoSingular([singular],[""]);
-       }
+        ( translated,
+          {
+            po_comment_special = [];
+            po_comment_filepos = [ filepos ];
+            po_comment_translation = PoSingular ([ singular ], [ "" ]);
+          } )
   in
   let po_content =
-    match domain, !default_textdomain with
+    match (domain, !default_textdomain) with
     | Some domain, _ ->
-       add_po_translation_domain domain t.po_content translation
+        add_po_translation_domain domain t.po_content translation
     | None, Some domain ->
-       add_po_translation_domain domain t.po_content translation
-    | None, None ->
-       add_po_translation_no_domain t.po_content translation
+        add_po_translation_domain domain t.po_content translation
+    | None, None -> add_po_translation_no_domain t.po_content translation
   in
-
   translations := { po_content; translated }
 
 let output_translations ?output_file t =
-  let fd =
-    match output_file with
-    | Some f -> open_out f
-    | None -> stdout
-  in
+  let fd = match output_file with Some f -> open_out f | None -> stdout in
   Marshal.to_channel fd t.po_content []
 
 let rec is_like lid = function
   | [] -> false
-  | func :: functions ->
-     match lid with
-     | Lident f
-     | Ldot (_, f) when f = func -> true
-     | _ -> is_like lid functions
+  | func :: functions -> (
+      match lid with
+      | (Lident f | Ldot (_, f)) when f = func -> true
+      | _ -> is_like lid functions )
 
 let visit_expr (iterator : Ast_iterator.iterator) expr =
   let loc = expr.pexp_loc in
   match expr.pexp_desc with
-  | Pexp_apply (
-      { pexp_desc = Pexp_ident ({ Asttypes.txt = lid; _ }); _},
-      (Asttypes.Nolabel,
-       { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _}) ::
-       _)
-      when is_like lid ["s_"; "f_"] ->
-     (* Add a singular / default domain string *)
-     add_translation loc singular None None
-
-  | Pexp_apply (
-      { pexp_desc = Pexp_ident ({ Asttypes.txt = lid; _}); _},
-      (Asttypes.Nolabel,
-       { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _}) ::
-      (Asttypes.Nolabel,
-       { pexp_desc = Pexp_constant (Pconst_string (plural, _)); _}) ::
-       _)
-       when is_like lid ["sn_"; "fn_"] ->
+  | Pexp_apply
+      ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
+        ( Asttypes.Nolabel,
+          { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ } )
+        :: _ )
+    when is_like lid [ "s_"; "f_" ] ->
+      (* Add a singular / default domain string *)
+      add_translation loc singular None None
+  | Pexp_apply
+      ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
+        ( Asttypes.Nolabel,
+          { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ } )
+        :: ( Asttypes.Nolabel,
+             { pexp_desc = Pexp_constant (Pconst_string (plural, _)); _ } )
+           :: _ )
+    when is_like lid [ "sn_"; "fn_" ] ->
       (* Add a plural / default domain string *)
-     add_translation loc singular (Some plural) None
+      add_translation loc singular (Some plural) None
+  | Pexp_apply
+      ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
+        _
+        :: ( Asttypes.Nolabel,
+             { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ } )
+           :: _ )
+    when is_like lid [ "gettext"; "fgettext" ] ->
+      (* Add a singular / default domain string *)
+      add_translation loc singular None None
+  | Pexp_apply
+      ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
+        _
+        :: ( Asttypes.Nolabel,
+             { pexp_desc = Pexp_constant (Pconst_string (domain, _)); _ } )
+           :: ( Asttypes.Nolabel,
+                { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ }
+              )
+              :: _ )
+    when is_like lid [ "dgettext"; "fdgettext"; "dcgettext"; "fdcgettext" ] ->
+      (* Add a singular / defined domain string *)
+      add_translation loc singular None (Some domain)
+  | Pexp_apply
+      ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
+        _
+        :: ( Asttypes.Nolabel,
+             { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ } )
+           :: ( Asttypes.Nolabel,
+                { pexp_desc = Pexp_constant (Pconst_string (plural, _)); _ } )
+              :: _ )
+    when is_like lid [ "ngettext"; "fngettext" ] ->
+      (* Add a plural / default domain string *)
+      add_translation loc singular (Some plural) None
+  | Pexp_apply
+      ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
+        _
+        :: ( Asttypes.Nolabel,
+             { pexp_desc = Pexp_constant (Pconst_string (domain, _)); _ } )
+           :: ( Asttypes.Nolabel,
+                { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ }
+              )
+              :: ( Asttypes.Nolabel,
+                   { pexp_desc = Pexp_constant (Pconst_string (plural, _)); _ }
+                 )
+                 :: _ )
+    when is_like lid [ "dngettext"; "fdngettext"; "dcngettext"; "fdcngettext" ]
+    ->
+      (* Add a plural / defined domain string *)
+      add_translation loc singular (Some plural) (Some domain)
+  | _ -> Ast_iterator.default_iterator.expr iterator expr
 
-  | Pexp_apply (
-      { pexp_desc = Pexp_ident ({ Asttypes.txt = lid; _}); _},
-      (_ ::
-       (Asttypes.Nolabel,
-        { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _}) ::
-       _))
-       when is_like lid ["gettext"; "fgettext"] ->
-     (* Add a singular / default domain string *)
-     add_translation loc singular None None
-
-  | Pexp_apply (
-      { pexp_desc = Pexp_ident ({ Asttypes.txt = lid; _}); _},
-      (_ ::
-       (Asttypes.Nolabel,
-        { pexp_desc = Pexp_constant (Pconst_string (domain, _)); _}) ::
-       (Asttypes.Nolabel,
-        { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _}) ::
-       _))
-       when is_like lid ["dgettext"; "fdgettext"; "dcgettext"; "fdcgettext"] ->
-     (* Add a singular / defined domain string *)
-     add_translation loc singular None (Some domain)
-
-  | Pexp_apply (
-      { pexp_desc = Pexp_ident ({ Asttypes.txt = lid; _}); _},
-      (_ ::
-       (Asttypes.Nolabel,
-        { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _}) ::
-       (Asttypes.Nolabel,
-        { pexp_desc = Pexp_constant (Pconst_string (plural, _)); _}) ::
-       _))
-       when is_like lid ["ngettext"; "fngettext"] ->
-     (* Add a plural / default domain string *)
-     add_translation loc singular (Some plural) None
-
-  | Pexp_apply (
-      { pexp_desc = Pexp_ident ({ Asttypes.txt = lid; _}); _},
-      (_ ::
-       (Asttypes.Nolabel,
-        { pexp_desc = Pexp_constant (Pconst_string (domain, _)); _}) ::
-       (Asttypes.Nolabel,
-        { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _}) ::
-       (Asttypes.Nolabel,
-        { pexp_desc = Pexp_constant (Pconst_string (plural, _)); _}) ::
-       _))
-       when is_like lid ["dngettext"; "fdngettext"; "dcngettext"; "fdcngettext"] ->
-     (* Add a plural / defined domain string *)
-     add_translation loc singular (Some plural) (Some domain)
-
-  | _ ->
-     Ast_iterator.default_iterator.expr iterator expr
-
-let ast_iterator =
-  { Ast_iterator.default_iterator with expr = visit_expr }
+let ast_iterator = { Ast_iterator.default_iterator with expr = visit_expr }
 
 let go fn =
   current_file := fn;
@@ -209,9 +193,7 @@ let go fn =
     let lexbuf = Lexing.from_channel (open_in fn) in
     let structure = Parse.implementation lexbuf in
     ast_iterator.Ast_iterator.structure ast_iterator structure
-  with
-    exn ->
-     failwith (fn ^ ": " ^ Printexc.to_string exn)
+  with exn -> failwith (fn ^ ": " ^ Printexc.to_string exn)
 
 let () =
   (* XXX Add -default-textdomain option which sets default_textdomain. *)

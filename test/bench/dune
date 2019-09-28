@@ -1,3 +1,3 @@
 (executable
-  (name bench)
-  (libraries benchmark common))
+ (name bench)
+ (libraries benchmark common))

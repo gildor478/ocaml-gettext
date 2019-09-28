@@ -20,113 +20,72 @@
 (*  USA                                                                   *)
 (**************************************************************************)
 
-open GettextTypes;;
-open GettextCategory;;
-open GettextModules;;
+open GettextTypes
+open GettextCategory
+open GettextModules
 
-let unsafe_format_of_string fmt str = 
-  if false then
-    Obj.magic str
-  else
-    format_of_string fmt
-;;
+let unsafe_format_of_string fmt str =
+  if false then Obj.magic str else format_of_string fmt
 
 let bindtextdomain textdomain dir t =
-  upgrade_textdomain t textdomain (None,Some dir)
-;;
-  
+  upgrade_textdomain t textdomain (None, Some dir)
+
 let bind_textdomain_codeset textdomain codeset t =
-  upgrade_textdomain t textdomain (Some codeset,None)
-;;
+  upgrade_textdomain t textdomain (Some codeset, None)
 
-let textdomain default t = 
-  { t with default = default }
-;;
+let textdomain default t = { t with default }
 
-let get_textdomain t = 
-  t.default
-;;
+let get_textdomain t = t.default
 
-let gettext t' str =
-  t' false None str None LC_MESSAGES
-;;
+let gettext t' str = t' false None str None LC_MESSAGES
 
 let fgettext t' fmt =
-  unsafe_format_of_string 
-    fmt
+  unsafe_format_of_string fmt
     (t' true None (string_of_format fmt) None LC_MESSAGES)
-;;
-  
+
 let dgettext t' textdomain str =
   t' false (Some textdomain) str None LC_MESSAGES
-;;
 
 let fdgettext t' textdomain fmt =
-  unsafe_format_of_string 
-    fmt
+  unsafe_format_of_string fmt
     (t' true (Some textdomain) (string_of_format fmt) None LC_MESSAGES)
-;;
-  
-let dcgettext t' textdomain str category = 
+
+let dcgettext t' textdomain str category =
   t' false (Some textdomain) str None category
-;;
 
 let fdcgettext t' textdomain fmt category =
-  unsafe_format_of_string 
-    fmt
+  unsafe_format_of_string fmt
     (t' true (Some textdomain) (string_of_format fmt) None category)
-;;
-  
+
 let ngettext t' str str_plural n =
-  t' false None str (Some(str_plural,n)) LC_MESSAGES
-;;
+  t' false None str (Some (str_plural, n)) LC_MESSAGES
 
 let fngettext t' fmt fmt_plural n =
   if true then
-    unsafe_format_of_string 
-      fmt
-      (t' 
-         true 
-         None 
-         (string_of_format fmt) 
-         (Some (string_of_format fmt_plural, n) )
+    unsafe_format_of_string fmt
+      (t' true None (string_of_format fmt)
+         (Some (string_of_format fmt_plural, n))
          LC_MESSAGES)
-  else
-    fmt_plural
-;;
-  
+  else fmt_plural
+
 let dngettext t' textdomain str str_plural n =
-  t' false (Some textdomain) str (Some (str_plural,n)) LC_MESSAGES
-;;
+  t' false (Some textdomain) str (Some (str_plural, n)) LC_MESSAGES
 
 let fdngettext t' textdomain fmt fmt_plural n =
   if true then
-    unsafe_format_of_string 
-      fmt
-      (t' 
-         true 
-         (Some textdomain)
-         (string_of_format fmt) 
-         (Some (string_of_format fmt_plural,n))
+    unsafe_format_of_string fmt
+      (t' true (Some textdomain) (string_of_format fmt)
+         (Some (string_of_format fmt_plural, n))
          LC_MESSAGES)
-  else 
-    fmt_plural
-;;
+  else fmt_plural
 
-let dcngettext t' textdomain str str_plural n category = 
-  t' false (Some textdomain) str (Some(str_plural,n)) category
-;;
-  
+let dcngettext t' textdomain str str_plural n category =
+  t' false (Some textdomain) str (Some (str_plural, n)) category
+
 let fdcngettext t' textdomain fmt fmt_plural n category =
   if true then
-    unsafe_format_of_string 
-      fmt
-      (t' 
-         true 
-         (Some textdomain)
-         (string_of_format fmt)
-         (Some (string_of_format fmt_plural,n))
+    unsafe_format_of_string fmt
+      (t' true (Some textdomain) (string_of_format fmt)
+         (Some (string_of_format fmt_plural, n))
          category)
-  else
-    fmt_plural 
-;;
+  else fmt_plural

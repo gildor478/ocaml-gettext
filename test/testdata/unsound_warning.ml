@@ -1,6 +1,5 @@
-open TestGettext;;
+open TestGettext
 
-let () = 
-  Printf.eprintf (f_"%s\n") "abce";
+let () =
+  Printf.eprintf (f_ "%s\n") "abce";
   ()
-;;

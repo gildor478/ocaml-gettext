@@ -21,16 +21,17 @@
 (**************************************************************************)
 
 (* Create the module Gettext, using the textdomain "mydomain" *)
-module Gettext = Gettext.Program
-(
-  struct
-    let textdomain   = "mydomain"
-    let codeset      = None
-    let dir          = None
-    let dependencies = Library.init @ Gui.init
-  end
-)
-(* I do prefer fully ocaml implementation, so choose the 
+module Gettext =
+  Gettext.Program
+    (struct
+      let textdomain = "mydomain"
+
+      let codeset = None
+
+      let dir = None
+
+      let dependencies = Library.init @ Gui.init
+    end)
+    (* I do prefer fully ocaml implementation, so choose the 
    GettextCamomile module *)
-(GettextCamomile.Map)
-;;
+    (GettextCamomile.Map)

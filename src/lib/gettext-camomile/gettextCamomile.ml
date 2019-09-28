@@ -20,92 +20,82 @@
 (*  USA                                                                   *)
 (**************************************************************************)
 
-
-open CamomileLibraryDefault.Camomile;;
-open GettextTypes;;
+open CamomileLibraryDefault.Camomile
+open GettextTypes
 
 (** Error reported when something goes wrong during Camomile initialization.
   *)
 exception GettextCamomileCreate of string * exn
-;;
 
 (** Error reported when something goes wrong during Camomile operation.
   *)
 exception GettextCamomileRecode of string * exn
-;;
 
 (** Charset module, that is derived directly from the camomile library. *)
-module Charset : GettextCharset.CHARSET_TYPE =
-  struct
-    (**/**)
-    type encoding = string
-    type u = {
-      failsafe : failsafe;
-      in_enc   : CharEncoding.t;
-      out_enc  : CharEncoding.t;
-    }
+module Charset : GettextCharset.CHARSET_TYPE = struct
+  (**/**)
 
-    let create t in_enc out_enc = 
-      try
+  type encoding = string
+
+  type u = {
+    failsafe : failsafe;
+    in_enc : CharEncoding.t;
+    out_enc : CharEncoding.t;
+  }
+
+  let create t in_enc out_enc =
+    try
+      {
+        failsafe = t.GettextTypes.failsafe;
+        in_enc = CharEncoding.of_name in_enc;
+        out_enc = CharEncoding.of_name out_enc;
+      }
+    with e ->
+      GettextUtils.fail_or_continue t.GettextTypes.failsafe
+        (GettextCamomileCreate
+           ( Printf.sprintf "Cannot create conversion from %s to %s" in_enc
+               out_enc,
+             e ))
         {
           failsafe = t.GettextTypes.failsafe;
-          in_enc   = CharEncoding.of_name in_enc;
-          out_enc  = CharEncoding.of_name out_enc;
+          in_enc = CharEncoding.of_name "ISO-8859-1";
+          out_enc = CharEncoding.of_name "ISO-8859-1";
         }
-      with e ->
-        GettextUtils.fail_or_continue 
-          t.GettextTypes.failsafe
-          (GettextCamomileCreate(
-            Printf.sprintf 
-              "Cannot create conversion from %s to %s" 
-              in_enc 
-              out_enc,
-            e))
-          {
-            failsafe = t.GettextTypes.failsafe;
-            in_enc   = CharEncoding.of_name "ISO-8859-1";
-            out_enc  = CharEncoding.of_name "ISO-8859-1";
-          }
 
-    let recode u str = 
-      try
-        CharEncoding.recode_string ~in_enc:u.in_enc ~out_enc:u.out_enc str
-      with e ->
-        GettextUtils.fail_or_continue 
-          u.failsafe
-          (GettextCamomileCreate(
-            Printf.sprintf 
-              "Cannot create convert string %s from %s to %s" 
-              str
-              (CharEncoding.name_of u.in_enc)
-              (CharEncoding.name_of u.out_enc),
-            e))
-          str
-  end
-;;
+  let recode u str =
+    try CharEncoding.recode_string ~in_enc:u.in_enc ~out_enc:u.out_enc str
+    with e ->
+      GettextUtils.fail_or_continue u.failsafe
+        (GettextCamomileCreate
+           ( Printf.sprintf "Cannot create convert string %s from %s to %s" str
+               (CharEncoding.name_of u.in_enc)
+               (CharEncoding.name_of u.out_enc),
+             e ))
+        str
+end
 
 (** Implementation based on a Map storage for string. *)
 module Map : GettextTypes.REALIZE_TYPE =
-  GettextRealize.Generic 
-  (GettextTranslate.Map)     (* Map translation *)
-  (Charset)                  (* Camomile charset *)
-  (GettextLocale.Posix)      (* POSIX locale *)
-;;
- 
+  GettextRealize.Generic (GettextTranslate.Map) (* Map translation *) (Charset)
+    (* Camomile charset *)
+    (GettextLocale.Posix)
+
 (** Implementation based on a Hashtbl storage for string. *)
 module Hashtbl : GettextTypes.REALIZE_TYPE =
-  GettextRealize.Generic 
-  (GettextTranslate.Hashtbl) (* Hashtbl translation *)
-  (Charset)                  (* Camomile charset *)
-  (GettextLocale.Posix)      (* POSIX locale *)
-;;
- 
-(** Low memory and fast initialization implementation, files are opened only when needed. 
+  GettextRealize.Generic
+    (GettextTranslate.Hashtbl)
+    (* Hashtbl translation *)
+    (Charset)
+    (* Camomile charset *)
+    (GettextLocale.Posix)
+
+(** Low memory and fast initialization implementation, files are opened only
+    when needed.
  *)
 module Open : GettextTypes.REALIZE_TYPE =
-  GettextRealize.Generic 
-  (GettextTranslate.Open)    (* Open translation *)
-  (Charset)                  (* Camomile charset *)
-  (GettextLocale.Posix)      (* POSIX locale *)
-;;
-  
+  GettextRealize.Generic
+    (GettextTranslate.Open)
+    (* Open translation *)
+    (Charset)
+    (* Camomile charset *)
+    (GettextLocale.Posix)

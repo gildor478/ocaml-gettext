@@ -67,7 +67,7 @@
 %type < (string * string) list > main
 %start main
 
-%type < int * ( int -> int ) > plural_forms 
+%type < int * ( int -> int ) > plural_forms
 %start plural_forms
 
 %type < string * string > content_type
@@ -81,10 +81,10 @@ main:
 
 lines:
   lines line   { $2 :: $1 }
-| line         { [$1] } 
+| line         { [$1] }
 ;
 
-line: 
+line:
   FIELD_NAME   { let (a,b) = $1 in (a, b) }
 | CONTENT_TYPE { ("Content-Type", $1) }
 | PLURAL_FORMS { ("Plural-Forms", $1) }

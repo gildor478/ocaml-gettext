@@ -34,7 +34,7 @@ token = parse
 | eof         { EOF }
 | _           { token lexbuf }
 and
-format_char = parse 
+format_char = parse
   "d"  as fc
 | "i"  as fc
 | "n"  as fc
@@ -75,6 +75,6 @@ format_char = parse
 | "Lo" as fc
 | "a"  as fc
 | "t"  as fc  { FORMAT_CHAR fc }
-| "!"    
+| "!"
 | "%"         { token lexbuf }
 

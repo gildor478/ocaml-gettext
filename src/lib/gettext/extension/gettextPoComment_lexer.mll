@@ -31,7 +31,7 @@ comment_filepos = parse
 | [' ''\t''\r']              { comment_filepos lexbuf }
 | ':'                        { COLON }
 | ['0'-'9']+ as nbr          { LINE (int_of_string nbr) }
-| ([^' ''\t''\r''\n''"'':''0'-'9''['']''#'][^' ''\t''\r''\n''"'':''['']''#']*) as str 
+| ([^' ''\t''\r''\n''"'':''0'-'9''['']''#'][^' ''\t''\r''\n''"'':''['']''#']*) as str
                              { FILENAME(str) }
 | eof                        { COMMENT_EOF }
 and

@@ -1,5 +1,5 @@
 (executable
-  (name OCamlGettext)
-  (public_name ocaml-gettext)
-  (package gettext)
-  (libraries gettext.base gettext.extension fileutils))
+ (name OCamlGettext)
+ (public_name ocaml-gettext)
+ (package gettext)
+ (libraries gettext.base gettext.extension fileutils))

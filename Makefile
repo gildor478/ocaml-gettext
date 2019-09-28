@@ -66,3 +66,6 @@ deploy:
 		--autogen
 
 .PHONY: deploy
+
+eol:
+	find ./ -name _build -prune -false -or -name "*.ml" | xargs grep -r -e "  *$$"

@@ -20,35 +20,33 @@
 (*  USA                                                                   *)
 (**************************************************************************)
 
-(** Signature of module for charset conversion 
+(** Signature of module for charset conversion
     @author Sylvain Le Gall
   *)
 
-open GettextTypes;;
+open GettextTypes
 
-module type CHARSET_TYPE = 
-  sig
-    type encoding = string
-    type u
-    
-    (** create in_enc out_enc : create a new charset converter from charset 
+module type CHARSET_TYPE = sig
+  type encoding = string
+
+  type u
+
+  val create : t -> encoding -> encoding -> u
+  (** create in_enc out_enc : create a new charset converter from charset
         in_enc to out_enc.
     *)
-    val create : t -> encoding -> encoding -> u
 
-    (** recode str enc : return a transcoded string according to enc.
+  val recode : u -> string -> string
+  (** recode str enc : return a transcoded string according to enc.
     *)
-    val recode : u -> string  -> string
-  end
-;;
+end
 
-module Dummy : CHARSET_TYPE =
-  struct
-    type encoding = string
-    type u = unit
+module Dummy : CHARSET_TYPE = struct
+  type encoding = string
 
-    let create _t _in_enc _out_enc = ()
+  type u = unit
 
-    let recode () str = str
-  end
-;;
+  let create _t _in_enc _out_enc = ()
+
+  let recode () str = str
+end

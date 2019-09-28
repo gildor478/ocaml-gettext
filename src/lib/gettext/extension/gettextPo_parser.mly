@@ -35,14 +35,14 @@ let check_string_format _ref str =
 ;;
 
 let rec add_comment comments po_commented_translation =
-  match comments with 
+  match comments with
   | CommentFilePos e :: comments_tl ->
-      add_comment 
+      add_comment
         comments_tl
         {
           po_commented_translation with
-            po_comment_filepos = 
-              List.append 
+            po_comment_filepos =
+              List.append
                 e
                 po_commented_translation.po_comment_filepos
         }
@@ -51,8 +51,8 @@ let rec add_comment comments po_commented_translation =
         comments_tl
         {
           po_commented_translation with
-            po_comment_special = 
-              List.append 
+            po_comment_special =
+              List.append
                 e
                 po_commented_translation.po_comment_special
         }
@@ -61,9 +61,9 @@ let rec add_comment comments po_commented_translation =
 ;;
 
 let check_plural id id_plural lst =
-  let check_plural_one index lst = 
+  let check_plural_one index lst =
     List.rev (
-      snd ( 
+      snd (
         List.fold_left ( fun (index,lst) (cur_index,cur_elem) ->
           if index + 1 = cur_index then
             (cur_index, (check_string_format id cur_elem) :: lst)
@@ -76,16 +76,16 @@ let check_plural id id_plural lst =
   {
     po_comment_special = [];
     po_comment_filepos = [];
-    po_comment_translation = 
+    po_comment_translation =
       PoPlural(id, (check_string_format id id_plural), (check_plural_one (-1) lst));
   }
 ;;
-  
+
 let check_singular id str =
   {
     po_comment_special = [];
     po_comment_filepos = [];
-    po_comment_translation = 
+    po_comment_translation =
       PoSingular(id, check_string_format id str)
   }
 ;;
@@ -105,12 +105,12 @@ let check_singular id str =
 %token <string> COMMENT_SPECIAL
 
 %type <GettextTypes.po_content> msgfmt
-%start msgfmt 
+%start msgfmt
 
 %%
 
 msgfmt:
-  msgfmt domain         { let (d,l) = $2 in List.fold_left (add_po_translation_domain d) $1 l } 
+  msgfmt domain         { let (d,l) = $2 in List.fold_left (add_po_translation_domain d) $1 l }
 | domain                { let (d,l) = $1 in List.fold_left (add_po_translation_domain d) empty_po l }
 | msgfmt message_list   { List.fold_left add_po_translation_no_domain $1 $2 }
 | message_list          { List.fold_left add_po_translation_no_domain empty_po $1 }
@@ -118,7 +118,7 @@ msgfmt:
 ;
 
 comment:
-| COMMENT_FILEPOS 
+| COMMENT_FILEPOS
   {
     let lexbuf =
       Lexing.from_string $1
@@ -130,8 +130,8 @@ comment:
     in
       CommentFilePos lst
   }
-| COMMENT_SPECIAL 
-  {   
+| COMMENT_SPECIAL
+  {
     let lexbuf =
       Lexing.from_string $1
     in
@@ -160,13 +160,13 @@ message_list:
 ;
 
 message:
-  comment_list MSGID string_list MSGSTR string_list               
-    { add_comment $1 (check_singular  (List.rev $3) (List.rev $5)) } 
-| MSGID string_list MSGSTR string_list               
-    { (check_singular (List.rev $2) (List.rev $4)) } 
-| comment_list MSGID string_list msgid_pluralform pluralform_list 
+  comment_list MSGID string_list MSGSTR string_list
+    { add_comment $1 (check_singular  (List.rev $3) (List.rev $5)) }
+| MSGID string_list MSGSTR string_list
+    { (check_singular (List.rev $2) (List.rev $4)) }
+| comment_list MSGID string_list msgid_pluralform pluralform_list
     { add_comment $1 (check_plural (List.rev $3) $4 (List.rev $5)) }
-| MSGID string_list msgid_pluralform pluralform_list 
+| MSGID string_list msgid_pluralform pluralform_list
     { (check_plural (List.rev $2) $3 (List.rev $4)) }
 ;
 

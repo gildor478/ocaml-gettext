@@ -87,7 +87,7 @@ CAMLprim value gettextStubCompat_dgettext(
   CAMLreturn(
       copy_string(
         dgettext(
-          String_val(v_domainname), 
+          String_val(v_domainname),
           String_val(v_msgid))));
 }
 
@@ -100,8 +100,8 @@ CAMLprim value gettextStubCompat_dcgettext(
   CAMLreturn(
       copy_string(
         dcgettext(
-          String_val(v_domainname), 
-          String_val(v_msgid), 
+          String_val(v_domainname),
+          String_val(v_msgid),
           ml2c_lc(v_category))));
 }
 
@@ -114,8 +114,8 @@ CAMLprim value gettextStubCompat_ngettext(
   CAMLreturn(
       copy_string(
         ngettext(
-          String_val(v_msgid1), 
-          String_val(v_msgid2), 
+          String_val(v_msgid1),
+          String_val(v_msgid2),
           Long_val(v_n))));
 }
 
@@ -129,9 +129,9 @@ CAMLprim value gettextStubCompat_dngettext(
   CAMLreturn(
       copy_string(
         dngettext(
-          String_val(v_domainname), 
-          String_val(v_msgid1), 
-          String_val(v_msgid2), 
+          String_val(v_domainname),
+          String_val(v_msgid1),
+          String_val(v_msgid2),
           Long_val(v_n))));
 }
 
@@ -147,16 +147,16 @@ CAMLprim value gettextStubCompat_dcngettext(
 
   CAMLparam5(v_domainname, v_msgid1, v_msgid2, v_n, v_category);
   res = dcngettext(
-      String_val(v_domainname), 
-      String_val(v_msgid1), 
-      String_val(v_msgid2), 
-      Long_val(v_n), 
+      String_val(v_domainname),
+      String_val(v_msgid1),
+      String_val(v_msgid2),
+      Long_val(v_n),
       ml2c_lc(v_category));
 
-  if (res == NULL) 
-  { 
-    caml_failwith("NULL string not expected at "STRINGIFY(__LINE__)" in "__FILE__); 
-  }; 
+  if (res == NULL) {
+    caml_failwith(
+        "NULL string not expected at "STRINGIFY(__LINE__)" in "__FILE__);
+  };
 
   CAMLreturn(copy_string(res));
 }
@@ -182,7 +182,7 @@ CAMLprim value gettextStubCompat_bindtextdomain(
   CAMLreturn(
       return_string_option (
         bindtextdomain(
-          String_val(v_domainname), 
+          String_val(v_domainname),
           String_val(v_dirname))));
 }
 

@@ -29,10 +29,10 @@
     This module defines all the function required to use gettext. The primary
     design is to use applicative function. The "side effect" of such a choice is
     that you must defines, before using any function, all the text domains,
-    codeset et al. When building a library, you should give access to 
+    codeset et al. When building a library, you should give access to
     [Library.init] (by defining a [gettext_init = YouLibrary.init]). This is
     required to enable string translation in the library and programs that uses
-    the library. The only function missing here is the [realize] function. This 
+    the library. The only function missing here is the [realize] function. This
     function is defined in a real implementation library :
     {ul
       {- {!GettextDummy}}
@@ -43,81 +43,73 @@
 
 (** {1 Exception} *)
 
+val string_of_exception : exn -> string
 (** Return the string representation of a ocaml-gettext exception.
   *)
-val string_of_exception: exn -> string
-;;
 
 (** {1 High level interfaces} *)
 
-(** Value of the dependencies for the initialization of the library 
+val init : GettextTypes.dependencies
+(** Value of the dependencies for the initialization of the library
     Gettext (for translating exception and help message)
 *)
-val init: GettextTypes.dependencies
-;;
 
 (** Module to handle typical library requirement *)
-module Library :
-  functor (Init: GettextTypes.INIT_TYPE) ->
-  sig
-    
-    (** Definition of all variables required by ocaml-gettext to use this module 
+module Library (Init : GettextTypes.INIT_TYPE) : sig
+  val init : GettextTypes.dependencies
+  (** Definition of all variables required by ocaml-gettext to use this module
         (includes all the dependencies of the library, as defined in
         {!GettextTypes.Init}).
      *)
-    val init: GettextTypes.dependencies
-    
-    (** Translate a singular string.
+
+  val s_ : string -> string
+  (** Translate a singular string.
      *)
-    val s_: string -> string 
-    
-    (** Translate a [Printf] singular argument.
+
+  val f_ : ('a, 'b, 'c, 'c, 'c, 'd) format6 -> ('a, 'b, 'c, 'c, 'c, 'd) format6
+  (** Translate a [Printf] singular argument.
      *)
-    val f_: ('a, 'b, 'c, 'c, 'c, 'd) format6 -> 
-      ('a, 'b, 'c, 'c, 'c, 'd) format6
-    
-    (** Translate a plural string.
+
+  val sn_ : string -> string -> int -> string
+  (** Translate a plural string.
      *)
-    val sn_: string -> string -> int -> string
-    
-    (** Translate a [Printf] plural argument.
+
+  val fn_ :
+    ('a, 'b, 'c, 'c, 'c, 'd) format6 ->
+    ('a, 'b, 'c, 'c, 'c, 'd) format6 ->
+    int ->
+    ('a, 'b, 'c, 'c, 'c, 'd) format6
+  (** Translate a [Printf] plural argument.
      *)
-    val fn_: ('a, 'b, 'c, 'c, 'c, 'd) format6 -> 
-      ('a, 'b, 'c, 'c, 'c, 'd) format6  -> 
-      int -> 
-      ('a, 'b, 'c, 'c, 'c, 'd) format6 
-  end
-;;    
+end
 
 (** Module to handle typical program requirement *)
-module Program :
-  functor (Init: GettextTypes.INIT_TYPE) ->
-  functor (Realize: GettextTypes.REALIZE_TYPE) ->
-  sig
-    (** The first element is a [Arg] argument list. The second element
+module Program
+    (Init : GettextTypes.INIT_TYPE)
+    (Realize : GettextTypes.REALIZE_TYPE) : sig
+  val init : (Arg.key * Arg.spec * Arg.doc) list * string
+  (** The first element is a [Arg] argument list. The second element
         contains some information about the gettext library (version,
         build date and author).
       *)
-    val init: (Arg.key * Arg.spec * Arg.doc) list * string 
 
-    (** Seed {Library.s_}
+  val s_ : string -> string
+  (** Seed {Library.s_}
      *)
-    val s_: string -> string 
-    
-    (** Seed {Library.f_}
+
+  val f_ : ('a, 'b, 'c, 'c, 'c, 'd) format6 -> ('a, 'b, 'c, 'c, 'c, 'd) format6
+  (** Seed {Library.f_}
      *)
-    val f_: ('a, 'b, 'c, 'c, 'c, 'd) format6 -> 
-      ('a, 'b, 'c, 'c, 'c, 'd) format6
-    
-    (** Seed {Library.sn_}
+
+  val sn_ : string -> string -> int -> string
+  (** Seed {Library.sn_}
      *)
-    val sn_: string -> string -> int -> string
-    
-    (** Seed {Library.fn_}
+
+  val fn_ :
+    ('a, 'b, 'c, 'c, 'c, 'd) format6 ->
+    ('a, 'b, 'c, 'c, 'c, 'd) format6 ->
+    int ->
+    ('a, 'b, 'c, 'c, 'c, 'd) format6
+  (** Seed {Library.fn_}
      *)
-    val fn_: ('a, 'b, 'c, 'c, 'c, 'd) format6 -> 
-      ('a, 'b, 'c, 'c, 'c, 'd) format6  -> 
-      int -> 
-      ('a, 'b, 'c, 'c, 'c, 'd) format6 
-  end
-;;
+end

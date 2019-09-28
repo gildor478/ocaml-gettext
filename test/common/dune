@@ -1,3 +1,3 @@
 (library
-  (name common)
-  (libraries gettext.base gettext-camomile gettext-stub))
+ (name common)
+ (libraries gettext.base gettext-camomile gettext-stub))

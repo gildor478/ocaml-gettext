@@ -23,13 +23,13 @@
 let default_dir = GettextConfigGen.default_localedir
 
 let default_path =
-  GettextConfigGen.localedir :: [ GettextConfigGen.default_localedir ]
+  [ GettextConfigGen.localedir; GettextConfigGen.default_localedir ]
 
 let default_codeset = ""
 
 let copyright =
-   "ocaml-gettext v"^GettextConfigGen.version^"\n"
-  ^"Copyright (C) 2003-2008 Sylvain Le Gall <sylvain@le-gall.net>\n"
-  ^"Licenced under LGPL v2.1 with Ocaml exception"
+  "ocaml-gettext v" ^ GettextConfigGen.version ^ "\n"
+  ^ "Copyright (C) 2003-2008 Sylvain Le Gall <sylvain@le-gall.net>\n"
+  ^ "Licenced under LGPL v2.1 with Ocaml exception"
 
 let version = GettextConfigGen.version

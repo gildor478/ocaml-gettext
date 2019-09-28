@@ -24,20 +24,12 @@
     @author Sylvain Le Gall
  *)
 
-open GettextTypes;;
+open GettextTypes
 
-module Generic : REALIZE_TYPE =
-  struct
-    let realize _t = 
-      fun _printf_format _opt str plural_form _category ->
-        match plural_form with
-          Some(str_plural,n) ->
-            if GettextMo.germanic_plural n = 0 then
-              str
-            else
-              str_plural
-        | None ->
-            str
-  end 
-;;
-      
+module Generic : REALIZE_TYPE = struct
+  let realize _t _printf_format _opt str plural_form _category =
+    match plural_form with
+    | Some (str_plural, n) ->
+        if GettextMo.germanic_plural n = 0 then str else str_plural
+    | None -> str
+end

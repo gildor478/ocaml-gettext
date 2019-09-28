@@ -1,6 +1,4 @@
-open TestGettext;;
-open Printf;;
+open TestGettext
+open Printf
 
-let () = 
-  eprintf (fn_ "%d category" "%Ld categories" 1) 1
-;;
+let () = eprintf (fn_ "%d category" "%Ld categories" 1) 1

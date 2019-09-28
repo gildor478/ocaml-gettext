@@ -1,4 +1,4 @@
 (library
-  (name gettext)
-	(wrapped false)
-  (public_name gettext))
+ (name gettext)
+ (wrapped false)
+ (public_name gettext))

@@ -24,7 +24,7 @@
 
 %}
 
-%token <string> FORMAT_CHAR 
+%token <string> FORMAT_CHAR
 %token EOF
 
 %type < string list > main
@@ -36,7 +36,7 @@ main:
   format_char EOF { List.rev $1 }
 ;
 
-format_char: 
+format_char:
   format_char FORMAT_CHAR { $2 :: $1 }
 |                         { [] }
 ;

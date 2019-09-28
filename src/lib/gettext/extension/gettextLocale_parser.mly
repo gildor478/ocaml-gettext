@@ -23,7 +23,7 @@
 %{
 
 open GettextLocale_types;;
- 
+
 %}
 
 %token UNDERSCORE

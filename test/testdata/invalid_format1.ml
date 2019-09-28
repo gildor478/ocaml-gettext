@@ -1,6 +1,4 @@
-open TestGettext;;
-open Printf;;
+open TestGettext
+open Printf
 
-let () = 
-  eprintf (f_ "%ld") 2
-;;
+let () = eprintf (f_ "%ld") 2
