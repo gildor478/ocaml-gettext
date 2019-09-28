@@ -35,10 +35,10 @@ let realize_data =
 let () =
   let tests = parse_arg () in
   let all_test =
-    "gettext-camomile"
+    "test-camomile"
     >::: [
       implementation_test tests realize_data;
     ]
   in
   mkdir ~parent:true tests.test_dir;
-  ignore(run_test_tt all_test)
+  ignore(run_test_tt_main all_test)

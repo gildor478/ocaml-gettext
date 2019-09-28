@@ -92,7 +92,7 @@ let compile_ocaml tests =
 let () =
   let tests = parse_arg () in
   let all_test =
-    "Test ocaml-gettext"
+    "test-stub"
     >::: [
       bad_setlocale;
       compile_ocaml tests;
@@ -100,4 +100,4 @@ let () =
     ]
   in
   mkdir ~parent:true tests.test_dir;
-  ignore(run_test_tt all_test)
+  ignore(run_test_tt_main all_test)

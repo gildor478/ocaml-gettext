@@ -398,7 +398,7 @@ let run_ocaml_gettext tests =
 (* Main test routine *)
 (*********************)
 
-let () = 
+let () =
   let tests = parse_arg () in
   let all_test =
     "Test ocaml-gettext"
@@ -414,6 +414,5 @@ let () =
            run_ocaml_gettext tests;
          ]
   in
-  print_env "tests";
   mkdir ~parent:true tests.test_dir;
-  ignore(run_test_tt all_test)
+  ignore(run_test_tt_main all_test)
