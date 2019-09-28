@@ -18,10 +18,10 @@ depends: [
   "ocaml"
   "dune" {>= "1.11.0"}
   "camomile"
-  "ounit" {with-test}
-  "fileutils" {with-test}
   "base-bytes"
   "gettext" {= version}
+  "ounit" {with-test}
+  "fileutils" {with-test}
 ]
 synopsis:
 "Internationalization and localization library using camomile (i18n and l10n)"

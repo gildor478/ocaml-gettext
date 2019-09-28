@@ -18,7 +18,7 @@ depends: [
   "ocaml"
   "dune" {>= "1.11.0"}
   "ounit" {with-test}
-  "fileutils" {with-test}
+  "fileutils"
   "base-bytes"
 ]
 synopsis: "Internationalization and localization library (i18n and l10n)"

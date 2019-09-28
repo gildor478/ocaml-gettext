@@ -17,10 +17,10 @@ build: [
 depends: [
   "ocaml"
   "dune" {>= "1.11.0"}
-  "ounit" {with-test}
-  "fileutils" {with-test}
   "base-bytes"
   "gettext" {= version}
+  "ounit" {with-test}
+  "fileutils" {with-test}
 ]
 synopsis:
 "Internationalization and localization using C gettext library (i18n and l10n)"

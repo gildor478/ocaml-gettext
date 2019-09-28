@@ -4,7 +4,7 @@ install: test -e .travis.opam.sh || wget https://raw.githubusercontent.com/ocaml
 script: bash -ex .travis-opam.sh
 env:
   global:
-    - OUNIT_CI=true PINS="gettext.0.4.0:. gettext-stub.0.4.0:. gettext-camomile.0.4.0:.:
+    - OUNIT_CI=true PINS="gettext.0.4.0:. gettext-stub.0.4.0:. gettext-camomile.0.4.0:."
 addons:
   homebrew:
     packages: gettext
