@@ -26,6 +26,16 @@ open GettextTypes
 
 type benchs = { verbose : bool; search_path : string list; time : int }
 
+(* Different implementation of realize. *)
+let realize_data =
+  [
+    ("Camomile.Map", GettextCamomile.Map.realize);
+    ("Camomile.Hashtbl", GettextCamomile.Hashtbl.realize);
+    ("Camomile.Open", GettextCamomile.Open.realize);
+    ("Stub.Native", GettextStub.Native.realize);
+    ("Stub.Preload", GettextStub.Preload.realize);
+  ]
+
 let parse_arg () =
   let benchs = ref { verbose = false; search_path = []; time = 1 } in
   Arg.parse

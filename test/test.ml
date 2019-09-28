@@ -27,112 +27,11 @@ open GettextTypes
 open GettextCategory
 open Common
 
-type tests = {
-  verbose : bool;
-  search_path : string list;
-  ocaml_xgettext : string;
-  ocaml_gettext : string;
-  test_dir : string;
-  install_dir : string;
-}
-
-let parse_arg () =
-  let tests =
-    ref
-      {
-        verbose = false;
-        search_path = [];
-        ocaml_xgettext =
-          make_filename [ parent_dir; "_build"; "bin"; "ocaml-xgettext" ];
-        ocaml_gettext =
-          make_filename [ parent_dir; "_build"; "bin"; "ocaml-gettext" ];
-        test_dir = make_filename [ current_dir; "testdata" ];
-        install_dir = make_filename [ current_dir; "testinstall" ];
-      }
-  in
-  Arg.parse
-    (Arg.align
-       [
-         ( "--search",
-           Arg.String
-             (fun dir ->
-               tests := { !tests with search_path = dir :: !tests.search_path }),
-           "dir Search the specified directory for MO file." );
-         ( "--verbose",
-           Arg.Unit (fun () -> tests := { !tests with verbose = true }),
-           "Processs with a lot of message." );
-         ( "--ocaml-xgettext",
-           Arg.String (fun s -> tests := { !tests with ocaml_xgettext = s }),
-           "cmd Specify the ocaml-xgettext executable." );
-         ( "--ocaml-gettext",
-           Arg.String (fun s -> tests := { !tests with ocaml_gettext = s }),
-           "cmd Specify the ocaml-gettext executable." );
-         ( "--test-dir",
-           Arg.String (fun s -> tests := { !tests with test_dir = s }),
-           "dir Specify the temporary dir for testing files." );
-       ])
-    (fun _str -> ())
-    ( "Test utility for ocaml-gettext v" ^ GettextConfig.version
-    ^ " by Sylvain Le Gall\n"
-    ^ "Copyright (C) 2004-2008 Sylvain Le Gall <sylvain@le-gall.net>\n"
-    ^ "Licensed under LGPL v2.1 with OCaml exception." );
-  !tests
-
 let print_debug tests str =
   if tests.verbose then (
     print_string str;
     print_newline () )
   else ()
-
-let run_and_read prog ?(env = [||]) cli =
-  (* Temporary file to retain data from command *)
-  let fn_out, chn_out = Filename.open_temp_file "ocaml-gettext-out" ".txt" in
-  let fn_err, chn_err = Filename.open_temp_file "ocaml-gettext-err" ".txt" in
-  (* Clean after run *)
-  let cleanup () =
-    let safe f a = try f a with _ -> () in
-    safe close_out chn_out;
-    safe close_out chn_err;
-    safe Sys.remove fn_out;
-    safe Sys.remove fn_err
-  in
-  let input_fn fn =
-    let chn_in = open_in fn in
-    let buff = Buffer.create 13 in
-    Buffer.add_channel buff chn_in (in_channel_length chn_in);
-    close_in chn_in;
-    Buffer.contents buff
-  in
-  try
-    let stdin_in, stdin_out = Unix.pipe () in
-    let command_array = Array.of_list (prog :: cli) in
-    let command = String.concat " " (Array.to_list command_array) in
-    let pid =
-      Unix.create_process_env prog command_array env stdin_in
-        (Unix.descr_of_out_channel chn_out)
-        (Unix.descr_of_out_channel chn_err)
-    in
-    let () =
-      Unix.close stdin_in;
-      Unix.close stdin_out
-    in
-    let return_code =
-      match snd (Unix.waitpid [] pid) with
-      | Unix.WEXITED code | Unix.WSIGNALED code | Unix.WSTOPPED code -> code
-    in
-    let err =
-      close_out chn_err;
-      input_fn fn_err
-    in
-    let out =
-      close_out chn_out;
-      input_fn fn_out
-    in
-    cleanup ();
-    (command, return_code, out, err)
-  with e ->
-    cleanup ();
-    raise e
 
 let load_mo_file tests f_test_mo fl_mo =
   let mo = open_in_bin fl_mo in
@@ -454,109 +353,6 @@ let merge_test tests =
          ]
 
 (**********************************)
-(* Test of Gettext implementation *)
-(**********************************)
-
-let implementation_test _tests =
-  (* Generate a test case of simple load of a MO file using an implementation *)
-  let test_load parameters_lst (realize_str, realize) =
-    let test_load_one realize parameters =
-      (* Extract usefull information out of parameters *)
-      let fl_mo = parameters.fl_mo in
-      let test_translations = parameters.translations in
-      (* Build t *)
-      let t = t_of_parameters parameters in
-      (* Build t' *)
-      let t' = realize t in
-      let test_one_translation translation =
-        (* We cannot compare directly extracted values and t' extracted
-           value , since we have a charset translation *)
-        try
-          match translation with
-          | Singular (str_id, _) -> ignore (GettextCompat.gettext t' str_id)
-          | Plural (str_id, str_plural, _) ->
-              (* Using values from 0 to 2, we cover most of the plural cases *)
-              ignore (GettextCompat.ngettext t' str_id str_plural 0);
-              ignore (GettextCompat.ngettext t' str_id str_plural 1);
-              ignore (GettextCompat.ngettext t' str_id str_plural 2)
-        with exc ->
-          assert_failure
-            ( Printexc.to_string exc ^ " in "
-            ^ string_of_translation translation )
-      in
-      fl_mo >:: fun () -> List.iter test_one_translation test_translations
-    in
-    realize_str >::: List.map (test_load_one realize) parameters_lst
-  in
-  (* Generate a cross test of string extracted, using different implementation *)
-  let test_cross implementation_lst parameters =
-    (* Extract usefull information out of parameters *)
-    let fl_mo = parameters.fl_mo in
-    let test_translations = parameters.translations in
-    (* Build t *)
-    let t = t_of_parameters parameters in
-    (* Build all t' *)
-    let t'_lst =
-      List.map
-        (fun (realize_str, realize) -> (realize_str, realize t))
-        implementation_lst
-    in
-    let check_translation str lst =
-      let _, same_str =
-        List.fold_left
-          (fun (prev_str_opt, res) (_, cur_str) ->
-            match prev_str_opt with
-            | Some prev_str -> (Some cur_str, res && prev_str = cur_str)
-            | None -> (Some cur_str, res))
-          (None, true) lst
-      in
-      if same_str then ()
-      else
-        assert_failure
-          (Printf.sprintf
-             "All values should be identical in [ %s ] in function %s"
-             (String.concat " ; "
-                (List.map
-                   (fun (realize_str, str) ->
-                     Printf.sprintf "(%s,%S)" realize_str str)
-                   lst))
-             str)
-    in
-    let test_cross_one translation =
-      match translation with
-      | Singular (str_id, _) ->
-          check_translation
-            (Printf.sprintf "GettextCompat.gettext t' %S" str_id)
-            (List.map
-               (fun (realize_str, t') ->
-                 (realize_str, GettextCompat.gettext t' str_id))
-               t'_lst)
-      | Plural (str_id, str_plural, _) ->
-          List.iter
-            (fun n ->
-              check_translation
-                (Printf.sprintf "GettextCompat.ngettext t' %S %S %d" str_id
-                   str_plural n)
-                (List.map
-                   (fun (realize_str, t') ->
-                     ( realize_str,
-                       GettextCompat.ngettext t' str_id str_plural n ))
-                   t'_lst))
-            [ 0; 1; 2 ]
-    in
-    fl_mo >:: fun () -> List.iter test_cross_one test_translations
-  in
-  (* Extract and test *)
-  let parameters_lst = List.map parameters_of_filename mo_files_data in
-  let implementation_lst = realize_data in
-  "Gettext implementation test"
-  >::: [
-         "Load" >::: List.map (test_load parameters_lst) implementation_lst;
-         "Cross check"
-         >::: List.map (test_cross implementation_lst) parameters_lst;
-       ]
-
-(**********************************)
 (* Test for PO processing comment *)
 (**********************************)
 
@@ -598,87 +394,26 @@ let run_ocaml_gettext tests =
              ~printer:string_of_int 0 return_code );
        ]
 
-(************************************************)
-(* Set bad locale and spot error when setlocale *)
-(* returns NULL                                 *)
-(************************************************)
-
-let bad_setlocale _tests =
-  "Call setlocale with bad locale"
-  >::: [
-         ( "setlocale with bad locale" >:: fun () ->
-           ignore (GettextStubCompat.setlocale GettextStubCompat.LC_ALL "xx")
-         );
-       ]
-
-(******************)
-(* Try to compile *)
-(******************)
-
-let compile_ocaml tests =
-  "Compile OCaml code"
-  >::: List.map
-         (fun (bn, exp_return_code, exp_err) ->
-           bn >:: fun () ->
-           let command, return_code, _out, err =
-             run_and_read "ocamlc"
-               [
-                 "-c";
-                 "-I";
-                 "../src/lib/gettext/base/.gettextBase.objs/byte";
-                 "-I";
-                 "../src/lib/gettext-stub/.gettextStub.objs/byte";
-                 "-I";
-                 tests.test_dir;
-                 Filename.concat tests.test_dir "TestGettext.ml";
-                 Filename.concat tests.test_dir bn;
-               ]
-           in
-           FileUtil.rm
-             (List.map (FilePath.replace_extension bn) [ "cmo"; "cmi" ]);
-           FileUtil.rm
-             (List.map (FilePath.add_extension "TestGettext") [ "cmo"; "cmi" ]);
-           assert_bool
-             (Printf.sprintf
-                "error output of %S:\nwant to contain: %S\ngot:\n%s"
-                command exp_err err)
-             (BatString.exists err exp_err);
-           assert_equal
-             ~msg:("return code of " ^ command)
-             ~printer:string_of_int exp_return_code return_code)
-         [
-           ("unsound_warning.ml", 0, "");
-           ("valid_format.ml", 0, "");
-           ("invalid_format1.ml", 2, "line 4, characters 28-29:");
-           ("invalid_format2.ml", 2, "line 4, characters 28-29:");
-           ("invalid_format3.ml", 2, "line 4, characters 27-28:");
-           ("invalid_format4.ml", 2, "line 4, characters 27-28:");
-           ("invalid_format5.ml", 2, "line 4, characters 36-52:");
-         ]
-
 (*********************)
 (* Main test routine *)
 (*********************)
 
-;;
-let tests = parse_arg () in
-let all_test =
-  "Test ocaml-gettext"
-  >::: [
-         format_test tests;
-         split_plural_test tests;
-         po_test tests;
-         compatibility_test tests;
-         extract_test tests;
-         install_test tests;
-         implementation_test tests;
-         po_process_test tests;
-         merge_test tests;
-         run_ocaml_gettext tests;
-         bad_setlocale tests;
-         compile_ocaml tests;
-       ]
-in
-print_env "tests";
-mkdir ~parent:true tests.test_dir;
-run_test_tt all_test
+let () = 
+  let tests = parse_arg () in
+  let all_test =
+    "Test ocaml-gettext"
+    >::: [
+           format_test tests;
+           split_plural_test tests;
+           po_test tests;
+           compatibility_test tests;
+           extract_test tests;
+           install_test tests;
+           po_process_test tests;
+           merge_test tests;
+           run_ocaml_gettext tests;
+         ]
+  in
+  print_env "tests";
+  mkdir ~parent:true tests.test_dir;
+  ignore(run_test_tt all_test)
