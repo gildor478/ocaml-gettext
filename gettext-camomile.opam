@@ -20,7 +20,7 @@ depends: [
   "camomile"
   "base-bytes"
   "gettext" {= version}
-  "ounit" {with-test}
+  "ounit" {with-test & > "2.0.8"}
   "fileutils" {with-test}
   "batteries" {with-test}
 ]

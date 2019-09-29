@@ -20,8 +20,7 @@
 (*  USA                                                                   *)
 (**************************************************************************)
 
-open OUnit
-open FileUtil
+open OUnit2
 open Common
 
 (* Different implementation of realize. *)
@@ -39,19 +38,14 @@ let realize_data =
 let bad_setlocale =
   "Call setlocale with bad locale"
   >::: [
-         ( "setlocale with bad locale" >:: fun () ->
+         ( "setlocale with bad locale" >:: fun _ ->
            ignore (GettextStubCompat.setlocale GettextStubCompat.LC_ALL "xx")
          );
        ]
 
 let () =
-  let tests = parse_arg () in
-  let all_test =
-    "test-stub"
-    >::: [
-      bad_setlocale;
-      implementation_test tests realize_data;
-    ]
-  in
-  mkdir ~parent:true tests.test_dir;
-  ignore(run_test_tt_main all_test)
+  run_test_tt_main
+    ("test-stub" >::: [
+        bad_setlocale;
+        implementation_test realize_data;
+      ])

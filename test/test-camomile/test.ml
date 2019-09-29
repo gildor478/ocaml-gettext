@@ -20,9 +20,8 @@
 (*  USA                                                                   *)
 (**************************************************************************)
 
-open OUnit
+open OUnit2
 open Common
-open FileUtil
 
 (* Different implementation of realize. *)
 let realize_data =
@@ -32,13 +31,6 @@ let realize_data =
     ("Camomile.Open", GettextCamomile.Open.realize);
   ]
 
+(*   mkdir ~parent:true tests.test_dir; *)
 let () =
-  let tests = parse_arg () in
-  let all_test =
-    "test-camomile"
-    >::: [
-      implementation_test tests realize_data;
-    ]
-  in
-  mkdir ~parent:true tests.test_dir;
-  ignore(run_test_tt_main all_test)
+  run_test_tt_main ("test-camomile" >::: [ implementation_test realize_data ])

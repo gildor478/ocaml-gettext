@@ -6,4 +6,4 @@
   (glob_files ../testdata/fr_FR/LC_MESSAGES/*))
  (libraries common gettext-stub oUnit batteries)
  (action
-  (run %{test} --test-dir ../testdata)))
+  (run %{test} -test-dir ../testdata)))

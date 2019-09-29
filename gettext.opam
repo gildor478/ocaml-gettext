@@ -19,7 +19,7 @@ depends: [
   "dune" {>= "1.11.0"}
   "fileutils"
   "base-bytes"
-  "ounit" {with-test}
+  "ounit" {with-test & > "2.0.8"}
   "batteries" {with-test}
 ]
 synopsis: "Internationalization and localization library (i18n and l10n)"

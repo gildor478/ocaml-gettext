@@ -8,5 +8,7 @@
   (glob_files testdata/fr_FR/LC_MESSAGES/*))
  (libraries oUnit batteries fileutils gettext.extension common)
  (action
-  (run %{test} --ocaml-gettext ../src/bin/ocaml-gettext/OCamlGettext.exe
-    --ocaml-xgettext ../src/bin/ocaml-xgettext/xgettext.exe)))
+  (run %{test}
+    -runner sequential
+    -ocaml-gettext ../src/bin/ocaml-gettext/OCamlGettext.exe
+    -ocaml-xgettext ../src/bin/ocaml-xgettext/xgettext.exe)))
