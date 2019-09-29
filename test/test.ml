@@ -410,13 +410,21 @@ let compile_ocaml tests =
          (fun (bn, exp_return_code, exp_err) ->
            bn >:: fun () ->
            let opt_options =
-             if Sys.os_type = "Win32" then
+             let major, minor =
+               Scanf.sscanf Sys.ocaml_version "%d.%d.%d" (fun x y _ -> (x, y))
+             in
+             if (major, minor) >= (4, 3) then
                ["-color"; "never"]
              else
                []
            in
+           let env =
+             Array.append
+               (Unix.environment ())
+               [| "OCAML_COLOR='never'" |]
+           in
            let command, return_code, _out, err =
-             run_and_read "ocamlc"
+             run_and_read ~env "ocamlc"
                (opt_options @ [
                  "-c";
                  "-I";
