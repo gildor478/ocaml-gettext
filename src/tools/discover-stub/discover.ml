@@ -22,13 +22,21 @@ let () =
               (* Default that should work on standard Linux distributions. *)
               ([], []);
 
-              (* MacOS with Homebrew, the library is "keg-only" to prevent
-               * conflict with system installed BSD gettext library, so we have
-               * to pull it from /usr/local.
+              (* MacOS with Homebrew.
+               * The library is "keg-only" to prevent conflict with system
+               * installed BSD gettext library, so we have to pull it from
+               * /usr/local.
                * https://formulae.brew.sh/formula/gettext
                *)
               (["-I/usr/local/opt/gettext/include"],
                ["-L/usr/local/opt/gettext/lib"; "-lintl"]);
+
+              (* MacOS with MacPorts.
+               * -- This is untested, a patch is welcome if you use MacPorts --
+               * https://ports.macports.org/port/gettext/summary
+               *)
+              (["-I/usr/local/include"],
+               ["-L/usr/local/lib"; "-lintl"]);
             ]
         with Not_found ->
           C.die "no ways to compile with gettext library"

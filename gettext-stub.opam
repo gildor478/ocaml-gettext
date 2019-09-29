@@ -23,6 +23,10 @@ depends: [
   "fileutils" {with-test}
   "batteries" {with-test}
 ]
+depexts: [
+  ["gettext"] {os = "macos" & os-distribution = "homebrew"}
+  ["gettext"] {os = "macos" & os-distribution = "macports"}
+]
 synopsis:
 "Internationalization and localization using C gettext library (i18n and l10n)"
 description:"""

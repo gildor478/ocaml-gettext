@@ -7,7 +7,6 @@ env:
     - OUNIT_CI=true PINS="gettext.0.4.0:. gettext-stub.0.4.0:. gettext-camomile.0.4.0:."
 addons:
   homebrew:
-    packages: gettext
     update: true
 cache:
   directories:
