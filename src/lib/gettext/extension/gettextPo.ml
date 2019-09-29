@@ -151,6 +151,7 @@ let input_po chn =
       raise (PoInconsistentMerge (str1, str2))
 
 let output_po chn po =
+  let () = set_binary_mode_out chn true in
   let comment_max_length = 80 in
   let fpf x = Printf.fprintf chn x in
   let escape_string str =

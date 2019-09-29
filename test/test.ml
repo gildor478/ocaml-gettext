@@ -165,8 +165,14 @@ let extract_test tests =
     >::: [
            ( "Extracting" >:: fun () ->
              ( try
+                 let ocaml_xgettext =
+                   if FilePath.is_relative tests.ocaml_xgettext then
+                     FilePath.make_absolute (Sys.getcwd ()) tests.ocaml_xgettext
+                   else
+                     tests.ocaml_xgettext
+                 in
                  (* Extract data from files *)
-                 GettextCompile.extract tests.ocaml_xgettext default_options
+                 GettextCompile.extract ocaml_xgettext default_options
                    filename_options [ fl_ml ] fl_pot
                with x ->
                  assert_failure
@@ -403,15 +409,24 @@ let compile_ocaml tests =
   >::: List.map
          (fun (bn, exp_return_code, exp_err) ->
            bn >:: fun () ->
+           let opt_options =
+             if Sys.os_type = "Win32" then
+               ["-color"; "never"]
+             else
+               []
+           in
            let command, return_code, _out, err =
              run_and_read "ocamlc"
-               [
+               (opt_options @ [
                  "-c";
-                 "-I"; "../src/lib/gettext/base/.gettextBase.objs/byte";
+                 "-I";
+                 make_filename
+                   [Filename.parent_dir_name;
+                     "src"; "lib"; "gettext"; "base"; ".gettextBase.objs"; "byte"];
                  "-I"; tests.test_dir;
                  Filename.concat tests.test_dir "TestGettext.ml";
                  Filename.concat tests.test_dir bn;
-               ]
+               ])
            in
            FileUtil.rm
              (List.map (FilePath.replace_extension bn) [ "cmo"; "cmi" ]);

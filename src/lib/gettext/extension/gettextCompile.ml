@@ -59,7 +59,10 @@ let extract command default_options filename_options filename_lst filename_pot
     in
     let real_command = make_command options filename in
     let chn = Unix.open_process_in real_command in
-    let value = (Marshal.from_channel chn : po_content) in
+    let value =
+      set_binary_mode_in chn true;
+      (Marshal.from_channel chn : po_content)
+    in
     match Unix.close_process_in chn with
     | Unix.WEXITED 0 -> GettextPo.merge_po po value
     | Unix.WEXITED exit_code ->

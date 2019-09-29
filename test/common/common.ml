@@ -283,7 +283,12 @@ let mo_files_data testdata_dir =
     make_filename [ testdata_dir; "fr_FR"; "LC_MESSAGES"; "test11.mo" ];
   ]
 
-let run_and_read prog ?(env = [||]) cli =
+let run_and_read prog ?env cli =
+  let env =
+    match env with
+    | None -> Unix.environment ()
+    | Some a -> a
+  in
   (* Temporary file to retain data from command *)
   let fn_out, chn_out = Filename.open_temp_file "ocaml-gettext-out" ".txt" in
   let fn_err, chn_err = Filename.open_temp_file "ocaml-gettext-err" ".txt" in
@@ -298,8 +303,13 @@ let run_and_read prog ?(env = [||]) cli =
   let input_fn fn =
     let chn_in = open_in fn in
     let buff = Buffer.create 13 in
-    Buffer.add_channel buff chn_in (in_channel_length chn_in);
-    close_in chn_in;
+    begin
+      try
+        Buffer.add_channel buff chn_in (in_channel_length chn_in);
+        close_in chn_in;
+      with _ ->
+        ()
+    end;
     Buffer.contents buff
   in
   try

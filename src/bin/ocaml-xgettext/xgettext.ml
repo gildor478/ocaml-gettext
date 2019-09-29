@@ -105,6 +105,7 @@ let add_translation loc singular plural_opt domain =
 
 let output_translations ?output_file t =
   let fd = match output_file with Some f -> open_out f | None -> stdout in
+  set_binary_mode_out fd true;
   Marshal.to_channel fd t.po_content []
 
 let rec is_like lid = function
