@@ -2,7 +2,7 @@
  (name test)
  (package gettext-stub)
  (deps
-  (glob_files testdata/*)
+  (glob_files ../testdata/*)
   (glob_files ../testdata/fr_FR/LC_MESSAGES/*))
  (libraries common gettext-stub oUnit batteries)
  (action

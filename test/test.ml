@@ -394,6 +394,47 @@ let run_ocaml_gettext tests =
              ~printer:string_of_int 0 return_code );
        ]
 
+(******************)
+(* Try to compile *)
+(******************)
+
+let compile_ocaml tests =
+  "Compile OCaml code"
+  >::: List.map
+         (fun (bn, exp_return_code, exp_err) ->
+           bn >:: fun () ->
+           let command, return_code, _out, err =
+             run_and_read "ocamlc"
+               [
+                 "-c";
+                 "-I"; "../src/lib/gettext/base/.gettextBase.objs/byte";
+                 "-I"; tests.test_dir;
+                 Filename.concat tests.test_dir "TestGettext.ml";
+                 Filename.concat tests.test_dir bn;
+               ]
+           in
+           FileUtil.rm
+             (List.map (FilePath.replace_extension bn) [ "cmo"; "cmi" ]);
+           FileUtil.rm
+             (List.map (FilePath.add_extension "TestGettext") [ "cmo"; "cmi" ]);
+           assert_bool
+             (Printf.sprintf
+                "error output of %S:\nwant to contain: %S\ngot:\n%s"
+                command exp_err err)
+             (BatString.exists err exp_err);
+           assert_equal
+             ~msg:("return code of " ^ command)
+             ~printer:string_of_int exp_return_code return_code)
+         [
+           ("unsound_warning.ml", 0, "");
+           ("valid_format.ml", 0, "");
+           ("invalid_format1.ml", 2, "line 4, characters 28-29:");
+           ("invalid_format2.ml", 2, "line 4, characters 28-29:");
+           ("invalid_format3.ml", 2, "line 4, characters 27-28:");
+           ("invalid_format4.ml", 2, "line 4, characters 27-28:");
+           ("invalid_format5.ml", 2, "line 4, characters 36-52:");
+         ]
+
 (*********************)
 (* Main test routine *)
 (*********************)
@@ -412,6 +453,7 @@ let () =
            po_process_test tests;
            merge_test tests;
            run_ocaml_gettext tests;
+           compile_ocaml tests;
          ]
   in
   mkdir ~parent:true tests.test_dir;
