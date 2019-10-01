@@ -1,3 +1,13 @@
+## v0.4.0 - 2019-10-02
+
+### Changed
+- Migrate build system to dune and opam.
+- Make the package available on Linux, MacOSX and Windows.
+- Reformat the documentation to use GitHub compatible Markdown.
+
+### Fixed
+- Move ocaml-xgettext from Camlp4 to ppx (thanks to Richard W.M. Jones).
+
 ## v0.3.8 - 2017-11-12
 - Replace string by bytes, for compability with OCAml 4.06.
 
