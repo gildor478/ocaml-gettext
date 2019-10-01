@@ -393,6 +393,7 @@ let compile_ocaml =
             in
             let out = Buffer.create 13 in
             let capture_out strm = Stream.iter (Buffer.add_char out) strm in
+            let match_exp_err = Str.regexp (".*"^(Str.quote exp_err)^".*") in
             assert_command
               ~exit_code:(Unix.WEXITED exp_return_code)
               ~use_stderr:true
@@ -417,7 +418,7 @@ let compile_ocaml =
               (Printf.sprintf
                  "error output:\nwant to contain: %S\ngot:\n%s"
                  exp_err (Buffer.contents out))
-              (BatString.exists (Buffer.contents out) exp_err))
+              (Str.string_match match_exp_err (Buffer.contents out) 0))
          [
            ("unsound_warning.ml", 0, "");
            ("valid_format.ml", 0, "");
