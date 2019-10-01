@@ -5,6 +5,7 @@ license: "LGPL-2.1-only with OCaml-LGPL-linking-exception"
 homepage: "https://github.com/gildor478/ocaml-gettext"
 dev-repo: "git+https://github.com/gildor478/ocaml-gettext.git"
 bug-reports: "https://github.com/gildor478/ocaml-gettext/issues"
+doc: "https://gildor478.github.io/ocaml-gettext/"
 build: [
   ["ocaml" "configure.ml"
     "--with-defaultlocaledir" "%{lib}%/gettext/share/locale"
@@ -24,8 +25,7 @@ depends: [
   "fileutils" {with-test}
   "batteries" {with-test}
 ]
-synopsis:
-"Internationalization and localization library using camomile (i18n and l10n)"
+synopsis: "Internationalization library using camomile (i18n)"
 description:"""
 See gettext package description.
 """

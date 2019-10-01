@@ -5,6 +5,7 @@ license: "LGPL-2.1-only with OCaml-LGPL-linking-exception"
 homepage: "https://github.com/gildor478/ocaml-gettext"
 dev-repo: "git+https://github.com/gildor478/ocaml-gettext.git"
 bug-reports: "https://github.com/gildor478/ocaml-gettext/issues"
+doc: "https://gildor478.github.io/ocaml-gettext/"
 build: [
   ["ocaml" "configure.ml"
     "--with-defaultlocaledir" "%{lib}%/gettext/share/locale"
@@ -28,8 +29,7 @@ depexts: [
   ["gettext"] {os = "macos" & os-distribution = "macports"}
   ["gettext"] {os = "win32" & os-distribution = "cygwinports"}
 ]
-synopsis:
-"Internationalization and localization using C gettext library (i18n and l10n)"
+synopsis: "Internationalization using C gettext library (i18n)"
 description:"""
 See gettext package description.
 """
