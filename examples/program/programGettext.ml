@@ -30,8 +30,8 @@ module Gettext =
 
       let dir = None
 
-      let dependencies = Library.init @ Gui.init
+      let dependencies = ExamplesLibrary.Library.init @ ExamplesGUI.Gui.init
     end)
-    (* I do prefer fully ocaml implementation, so choose the 
-   GettextCamomile module *)
+    (* I do prefer fully ocaml implementation, so choose the GettextCamomile
+       module *)
     (GettextCamomile.Map)

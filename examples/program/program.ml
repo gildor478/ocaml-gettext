@@ -37,7 +37,7 @@ let () =
   in
   let () =
     Arg.parse args
-      (fun str -> ())
+      (fun _ -> ())
       (spf
          (f_
             "\"Hello you\" program by Sylvain Le Gall\n\n\
@@ -46,5 +46,5 @@ let () =
              Options:")
          gettext_copyright)
   in
-  Library.hello_you !my_name;
-  Gui.hello_you !my_name
+  ExamplesLibrary.Library.hello_you !my_name;
+  ExamplesGUI.Gui.hello_you !my_name
