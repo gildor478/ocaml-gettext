@@ -1,8 +1,6 @@
 /_build/
 /configure
 /dist/
-/doc/*.1
-/doc/*.5
 /po/*.mo
 /po/fr.po.bak
 /test/test
