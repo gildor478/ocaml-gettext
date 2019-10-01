@@ -1,9 +1,4 @@
----
-title: OCaml-gettext reference manual
-author:
-- Sylvain Le Gall
-...
-
+# OCaml-gettext reference manual
 
 [gettext documentation]: http://www.gnu.org/software/gettext/manual/gettext.html
 [ocaml-gettext-options manpage]: ocaml-gettext.5.md
@@ -141,9 +136,9 @@ to use ocamlfind. There are five findlib packages:
 
 - gettext.base: the base package of ocaml-gettext. It contains the top
   level type required to compile any library,
-- gettext.extension[^5]: a package used to extend ocaml-gettext. It
-  is reserved for very particular functions (such as creating a new
-  `realize` function),
+- gettext.extension<sup>[5](#5)</sup>: a package used to extend 
+  ocaml-gettext. It is reserved for very particular functions (such as
+  creating a new `realize` function),
 - gettext.extract: a package that enables to create special `camlp4`
   program (such as `ocaml-xgettext`),
 - gettext-stub: an implementation of ocaml-gettext using gettext,
@@ -397,24 +392,30 @@ query gettext' or some other method).
 Links
 =====
 
--[Gettext documentation](http://www.gnu.org/software/gettext/manual/gettext.html)
+[Gettext documentation](http://www.gnu.org/software/gettext/manual/gettext.html)
 
 [^1]: Only if you want to build unitary test tool
+
 [^2]: Only if you want to build benchmarking tool
+
 [^3]: Only if you want to build the documentation
+
 [^4]: If needed, you can use `./configure --help` to have a complete
     help on every option you can use to tweak the installation of
     ocaml-gettext. To enable documentation generation, use
     `--enable-doc`. To enable benchmark executable, use
     `--enable-bench`. To enable test executable, use `--enable-test`.
-[^5]: This feature is described here for your information only. Since it
-    belongs to low level implementation of ocaml-gettext, it should not
-    be used.
+
+<a name="5">[5]</a>: This feature is described here for your information
+    only. Since it belongs to low level implementation of ocaml-gettext,
+    it should not be used.
+
 [^6]: Strings which should be used by `Printf` function are checked to
     be sure that the returned strings are equivalent to the provided
     English string. In particular, every "%"-symbol should be the same
     in the provided string and the returned string. If not, it is the
     untranslated string which is returned.
+
 [^7]: For now, extracting strings from OCaml source file and glade file,
     requires to patch gettext. You can find this path in patches. This
     patch will be sent to upstream author once it will be considered
