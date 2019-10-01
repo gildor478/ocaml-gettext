@@ -338,10 +338,10 @@ let hello_you name =
   GMain.Main.main ()
 ```
 
-`./program --gettext-dir ../build/share/locale --gettext-lang C --my-name Sylvain`:
+`./program --gettext-dir ../build/share/locale --gettext-lang C --my-name Sylvain`:<br>
 ![Default GUI, not translated](gui.png "GUI")
 
-`./program --gettext-dir ../build/share/locale --gettext-lang C --my-name Sylvain`:
+`./program --gettext-dir ../build/share/locale --gettext-lang C --my-name Sylvain`:<br>
 ![GUI translated to french](gui-fr.png "GUI fr")
 
 > **Warning**
