@@ -4,10 +4,9 @@
 [ocaml-gettext-options manpage]: ocaml-gettext.5.md
 
 Overview
-========
+--------
 
-What is ocaml-gettext?
-----------------------
+### What is ocaml-gettext?
 
 ocaml-gettext is a library to support string translation in OCaml. It
 provides a simple interface to help programmers and translators to
@@ -45,8 +44,7 @@ As a result of porting gettext to ocaml-gettext, we have:
 - `ocaml-gettext`: a command line tool to help you to extract, to
   merge and to install gettext data.
 
-How is ocaml-gettext related to gettext?
-----------------------------------------
+### How is ocaml-gettext related to gettext?
 
 ocaml-gettext is a close cousin of gettext. In fact, the API is based on
 gettext. Almost everything in ocaml-gettext is compatible with gettext:
@@ -67,10 +65,9 @@ be as precise as possible to enable programming with ocaml-gettext
 without having the need to be a gettext expert.
 
 Programming with ocaml-gettext
-==============================
+------------------------------
 
-Overview
---------
+### Overview
 
 The API of ocaml-gettext is really reduced. It is made on purpose. The
 design is heavily based on modules and functors. There is no real reason
@@ -113,8 +110,7 @@ use the library. The top level functions use a global reference to store
 the parameters `t` and `t'`. This helps to integrate ocaml-gettext more
 easily into existing application.
 
-Makefile and source layout
---------------------------
+### Makefile and source layout
 
 The source layout should conform to the one described in [gettext
 documentation]. In particular, it should contain a `po` directory.
@@ -136,7 +132,7 @@ to use ocamlfind. There are five findlib packages:
 
 - gettext.base: the base package of ocaml-gettext. It contains the top
   level type required to compile any library,
-- gettext.extension<sup>[5](#5)</sup>: a package used to extend 
+- gettext.extension<sup>[1](#1)</sup>: a package used to extend
   ocaml-gettext. It is reserved for very particular functions (such as
   creating a new `realize` function),
 - gettext.extract: a package that enables to create special `camlp4`
@@ -149,8 +145,7 @@ In order to link an application or a library using ocaml-gettext, you
 should link with one of : gettext.base, gettext-camomile or
 gettext-stub.
 
-Library
--------
+### Library
 
 Library should use the module `Gettext.Library`. It doesn't need any
 real implementation of ocaml-gettext. By this way, you can let the
@@ -174,7 +169,7 @@ appropriate `Init`, you should use the function provided :
 
 - `s_`: for translating singular strings,
 - `f_`: for translating singular strings which will be used with `Printf`
-  function[^6],
+  function<sup>[2](#2)</sup>,
 - `sn_`: for translating plural strings,
 - `fn_`: for translating plural strings which will be used with
   `Printf` function,
@@ -202,8 +197,7 @@ function `Gettext.string_of_exception` is localised).
 > your library, if and only if the MO file build with is also installed.
 > If not installed ocaml-gettext is useless.
 
-Program
--------
+### Program
 
 Program should use ocaml-gettext just as libraries do. The only
 difference lies in the fact that you should provide a `realize` function
@@ -211,19 +205,21 @@ in the `InitProgram`. The other difference is that the `init` value is
 not a dependency that should be used by other program. It is a `Arg`
 usable value. It allows user to define some important parameters.
 
-              $>./program --help
+```shell
+$>./program --help
 
-                  --my-name name                      Your name. Default : ""
-                  --gettext-failsafe {ignore|inform-stderr|raise-exception}
-                                                      Choose how to handle failure in ocaml-gettext. Default: ignore.
-                  --gettext-disable                   Disable the translation perform by ocaml-gettext. Default: enable.
-                  --gettext-domain-dir textdomain dir Set a dir to search ocaml-gettext files for the specified domain. Default: [  ].
-                  --gettext-dir dir                   Add a search dir for ocaml-gettext files. Default: [ "/usr/share/locale";
-                                                      "/usr/local/share/locale" ].
-                  --gettext-language language         Set the default language for ocaml-gettext. Default: (none).
-                  --gettext-codeset codeset           Set the default codeset for outputting string with ocaml-gettext. Default: ISO-8859-1.
-                  -help                               Display this list of options
-                  --help                              Display this list of options
+    --my-name name                      Your name. Default : ""
+    --gettext-failsafe {ignore|inform-stderr|raise-exception}
+                                        Choose how to handle failure in ocaml-gettext. Default: ignore.
+    --gettext-disable                   Disable the translation perform by ocaml-gettext. Default: enable.
+    --gettext-domain-dir textdomain dir Set a dir to search ocaml-gettext files for the specified domain. Default: [  ].
+    --gettext-dir dir                   Add a search dir for ocaml-gettext files. Default: [ "/usr/share/locale";
+                                        "/usr/local/share/locale" ].
+    --gettext-language language         Set the default language for ocaml-gettext. Default: (none).
+    --gettext-codeset codeset           Set the default codeset for outputting string with ocaml-gettext. Default: ISO-8859-1.
+    -help                               Display this list of options
+    --help                              Display this list of options
+```
 
 
 
@@ -291,8 +287,7 @@ need to fetch? Does it use already a C library that link with gettext?).
       work in threaded environment. To support a language, the
       corresponding locales need to be generated.
 
-Graphical user interface
-------------------------
+### Graphical user interface
 
 Graphical user interface works just as a program or a library. The only
 difference is that the file which contains the graphical user interface
@@ -313,7 +308,7 @@ file (for example, `xgettext` supports glade file).
 But for now you can only use the second alternative, because OCaml is
 not yet supported in `xgettext`. This should be fixed, once
 `ocaml-gettext` will be enough stable to become a back-end for
-`xgettext`[^7].
+`xgettext`<sup>[3](#3)</sup>.
 
 In the two cases, you just have to add your GUI file (in OCaml or native
 form) to `POTFILES`.
@@ -321,6 +316,33 @@ form) to `POTFILES`.
 Graphical user interfaces are good candidates for settings a fixed
 `Init.codeset`. Typically, GTK2 interfaces require to have these
 parameters set to UTF-8.
+
+```ocaml
+open GuiGettext.Gettext;;
+
+(* Give access to the init of GuiGettext *)
+let init =  Gettext.init
+
+(* Build a simple window that display your name *)
+let hello_you name =
+  let spf x = Printf.sprintf x in
+  let window =
+		GWindow.window ~title:(s_ "Hello world !") ~border_width:12 ()
+  in
+  let label =
+    GMisc.label ~text:(spf (f_ "Hello %s") name) ~packing:window#add ()
+  in
+  ignore (window#event#connect#delete ~callback:(fun _ -> false));
+  ignore (window#connect#destroy ~callback:(fun _ -> GMain.Main.quit ()));
+  window#show ();
+  GMain.Main.main ()
+```
+
+`./program --gettext-dir ../build/share/locale --gettext-lang C --my-name Sylvain`:
+![Default GUI, not translated](gui.png "GUI")
+
+`./program --gettext-dir ../build/share/locale --gettext-lang C --my-name Sylvain`:
+![GUI translated to french](gui-fr.png "GUI fr")
 
 > **Warning**
 >
@@ -331,7 +353,7 @@ parameters set to UTF-8.
 > before using `Arg.parse` with the ocaml-gettext args.
 
 Translating ocaml-gettext programs and libraries
-================================================
+------------------------------------------------
 
 ocaml-gettext has been built around gettext. This allows translators to
 use exactly the same technics as they should use with gettext. All the
@@ -343,8 +365,7 @@ It is recommended to use GUI which allows easier translation such as :
 - [gtranslator](http://gtranslator.sourceforge.net/),
 - [kbabel](http://i18n.kde.org/tools/kbabel/).
 
-Using ocaml-gettext programs
-============================
+### Using ocaml-gettext programs
 
 ocaml-gettext program can be used just as any OCaml program. The only
 difference with standard OCaml program is that they come with a bunch of
@@ -358,30 +379,31 @@ You can find more details in the [gettextdocumentation] or in the
 [ocaml-gettext-options manpage].
 
 Tips and tricks
-===============
+---------------
 
-Adding gettext support without depending on ocaml-gettext
----------------------------------------------------------
+### Adding gettext support without depending on ocaml-gettext
 
 You want to 'gettextify' your program, adding 's\_' and 'f\_'
 annotations throughout. However now your program has an additional
 dependency, ocaml-gettext. You can make ocaml-gettext optional by
 creating a set of dummy functions which do nothing:
 
-              (* This file is generated automatically by ./configure. *)
-              module Gettext =
-              struct
-                external s_ : string -> string = "%identity"
-                external f_ : ('a -> 'b, 'c, 'd) format -> ('a -> 'b, 'c, 'd) format = "%identity"
+```ocaml
+(* This file is generated automatically by ./configure. *)
+module Gettext =
+struct
+  external s_ : string -> string = "%identity"
+  external f_ : ('a -> 'b, 'c, 'd) format -> ('a -> 'b, 'c, 'd) format = "%identity"
 
-                let sn_ : string -> string -> int -> string =
-                  fun s p n ->
-                    if n = 1 then s else p
+  let sn_ : string -> string -> int -> string =
+    fun s p n ->
+      if n = 1 then s else p
 
-                let fn_ : ('a -> 'b, 'c, 'd) format -> ('a -> 'b, 'c, 'd) format -> int -> ('a -> 'b, 'c, 'd) format =
-                  fun s p n ->
-                    if n = 1 then s else p
-              end
+  let fn_ : ('a -> 'b, 'c, 'd) format -> ('a -> 'b, 'c, 'd) format -> int -> ('a -> 'b, 'c, 'd) format =
+    fun s p n ->
+      if n = 1 then s else p
+end
+```
 
 
 You have to arrange for your configure script to place the above content
@@ -390,33 +412,21 @@ whether it detects that ocaml-gettext is installed (eg. using 'ocamlfind
 query gettext' or some other method).
 
 Links
-=====
+-----
 
 [Gettext documentation](http://www.gnu.org/software/gettext/manual/gettext.html)
 
-[^1]: Only if you want to build unitary test tool
-
-[^2]: Only if you want to build benchmarking tool
-
-[^3]: Only if you want to build the documentation
-
-[^4]: If needed, you can use `./configure --help` to have a complete
-    help on every option you can use to tweak the installation of
-    ocaml-gettext. To enable documentation generation, use
-    `--enable-doc`. To enable benchmark executable, use
-    `--enable-bench`. To enable test executable, use `--enable-test`.
-
-<a name="5">[5]</a>: This feature is described here for your information
+<a name="1">1</a>: This feature is described here for your information
     only. Since it belongs to low level implementation of ocaml-gettext,
     it should not be used.
 
-[^6]: Strings which should be used by `Printf` function are checked to
-    be sure that the returned strings are equivalent to the provided
+<a name="2">2</a>: Strings which should be used by `Printf` function are
+    checked to be sure that the returned strings are equivalent to the provided
     English string. In particular, every "%"-symbol should be the same
     in the provided string and the returned string. If not, it is the
     untranslated string which is returned.
 
-[^7]: For now, extracting strings from OCaml source file and glade file,
-    requires to patch gettext. You can find this path in patches. This
+<a name="3">3</a>: For now, extracting strings from OCaml source file and glade
+    file, requires to patch gettext. You can find this path in patches. This
     patch will be sent to upstream author once it will be considered
     enough stable.
