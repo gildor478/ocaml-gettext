@@ -23,7 +23,6 @@ depends: [
   "gettext" {= version}
   "ounit" {with-test & > "2.0.8"}
   "fileutils" {with-test}
-  "batteries" {with-test}
 ]
 synopsis: "Internationalization library using camomile (i18n)"
 description:"""
