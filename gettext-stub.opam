@@ -27,6 +27,8 @@ depexts: [
   ["gettext"] {os = "macos" & os-distribution = "homebrew"}
   ["gettext"] {os = "macos" & os-distribution = "macports"}
   ["gettext"] {os = "win32" & os-distribution = "cygwinports"}
+  ["gettext-dev"] {os-distribution = "alpine"}
+  ["libc6-dev"] {os-family = "debian"}
 ]
 synopsis: "Internationalization using C gettext library (i18n)"
 description:"""
