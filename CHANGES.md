@@ -1,3 +1,10 @@
+## v0.4.1 - 2019-10-02
+
+### Fixed
+- Improve documentation layout.
+- Set minimum version of OCaml to 4.03.
+- Add depext for Alpine Linux.
+
 ## v0.4.0 - 2019-10-02
 
 ### Changed
