@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Low level interface to gettext C library.
-  * @author Sylvain Le Gall
+    @author Sylvain Le Gall
   *)
 
 type lc =
