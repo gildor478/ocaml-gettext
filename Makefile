@@ -54,21 +54,20 @@ clean:
 bench:
 	dune exec test/bench/bench.exe
 
-.PHONY: build doc test all uninstall clean install bench
-
 headache: distclean
 	headache -h .header \
 		-c .headache.config \
 		`find $(CURDIR)/ -type d -name .svn -prune -false -o -type f`
 
-deploy:
-	mkdir dist || true
-	admin-gallu-deploy \
-		--package_name ocaml-gettext --package_version "$(VERSION)" \
-		--verbose --forge_upload --forge_group ocaml-gettext \
-		--autogen
-
-.PHONY: deploy
+deploy: doc test
+	dune-release lint
+	dune-release tag
+	git push --all
+	git push --tag
+	dune-release
 
 eol:
 	find ./ -name _build -prune -false -or -name "*.ml" | xargs grep -r -e "  *$$"
+
+.PHONY: build doc test all uninstall clean install bench deploy
+
