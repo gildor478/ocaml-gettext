@@ -16,7 +16,7 @@ build: [
    "@runtest" {with-test} ]
 ]
 depends: [
-  "ocaml"
+  "ocaml" {>= "4.03.0"}
   "dune" {>= "1.11.0"}
   "base-bytes"
   "gettext" {= version}
