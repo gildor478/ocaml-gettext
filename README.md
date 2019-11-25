@@ -35,7 +35,7 @@ Installation
 The recommended way to install ocaml-gettext is via the [opam package manager][opam]:
 
 ```sh
-$ opam install ounit
+$ opam install gettext gettext-camomile gettext-stub
 ```
 
 Documentation
