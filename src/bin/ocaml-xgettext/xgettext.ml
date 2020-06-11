@@ -121,7 +121,11 @@ let visit_expr (iterator : Ast_iterator.iterator) expr =
   | Pexp_apply
       ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
         ( Asttypes.Nolabel,
+#if OCAML_VERSION >= (4, 11, 0)
+          { pexp_desc = Pexp_constant (Pconst_string (singular, _, _)); _ } )
+#else
           { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ } )
+#endif
         :: _ )
     when is_like lid [ "s_"; "f_" ] ->
       (* Add a singular / default domain string *)
@@ -129,9 +133,17 @@ let visit_expr (iterator : Ast_iterator.iterator) expr =
   | Pexp_apply
       ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
         ( Asttypes.Nolabel,
+#if OCAML_VERSION >= (4, 11, 0)
+          { pexp_desc = Pexp_constant (Pconst_string (singular, _, _)); _ } )
+#else
           { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ } )
+#endif
         :: ( Asttypes.Nolabel,
+#if OCAML_VERSION >= (4, 11, 0)
+             { pexp_desc = Pexp_constant (Pconst_string (plural, _, _)); _ } )
+#else
              { pexp_desc = Pexp_constant (Pconst_string (plural, _)); _ } )
+#endif
            :: _ )
     when is_like lid [ "sn_"; "fn_" ] ->
       (* Add a plural / default domain string *)
@@ -140,7 +152,11 @@ let visit_expr (iterator : Ast_iterator.iterator) expr =
       ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
         _
         :: ( Asttypes.Nolabel,
+#if OCAML_VERSION >= (4, 11, 0)
+             { pexp_desc = Pexp_constant (Pconst_string (singular, _, _)); _ } )
+#else
              { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ } )
+#endif
            :: _ )
     when is_like lid [ "gettext"; "fgettext" ] ->
       (* Add a singular / default domain string *)
@@ -149,9 +165,17 @@ let visit_expr (iterator : Ast_iterator.iterator) expr =
       ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
         _
         :: ( Asttypes.Nolabel,
+#if OCAML_VERSION >= (4, 11, 0)
+             { pexp_desc = Pexp_constant (Pconst_string (domain, _, _)); _ } )
+#else
              { pexp_desc = Pexp_constant (Pconst_string (domain, _)); _ } )
+#endif
            :: ( Asttypes.Nolabel,
+#if OCAML_VERSION >= (4, 11, 0)
+                { pexp_desc = Pexp_constant (Pconst_string (singular, _, _)); _ }
+#else
                 { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ }
+#endif
               )
               :: _ )
     when is_like lid [ "dgettext"; "fdgettext"; "dcgettext"; "fdcgettext" ] ->
@@ -161,9 +185,17 @@ let visit_expr (iterator : Ast_iterator.iterator) expr =
       ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
         _
         :: ( Asttypes.Nolabel,
+#if OCAML_VERSION >= (4, 11, 0)
+             { pexp_desc = Pexp_constant (Pconst_string (singular, _, _)); _ } )
+#else
              { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ } )
+#endif
            :: ( Asttypes.Nolabel,
+#if OCAML_VERSION >= (4, 11, 0)
+                { pexp_desc = Pexp_constant (Pconst_string (plural, _, _)); _ } )
+#else
                 { pexp_desc = Pexp_constant (Pconst_string (plural, _)); _ } )
+#endif
               :: _ )
     when is_like lid [ "ngettext"; "fngettext" ] ->
       (* Add a plural / default domain string *)
@@ -172,12 +204,24 @@ let visit_expr (iterator : Ast_iterator.iterator) expr =
       ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
         _
         :: ( Asttypes.Nolabel,
+#if OCAML_VERSION >= (4, 11, 0)
+             { pexp_desc = Pexp_constant (Pconst_string (domain, _, _)); _ } )
+#else
              { pexp_desc = Pexp_constant (Pconst_string (domain, _)); _ } )
+#endif
            :: ( Asttypes.Nolabel,
+#if OCAML_VERSION >= (4, 11, 0)
+                { pexp_desc = Pexp_constant (Pconst_string (singular, _, _)); _ }
+#else
                 { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ }
+#endif
               )
               :: ( Asttypes.Nolabel,
+#if OCAML_VERSION >= (4, 11, 0)
+                   { pexp_desc = Pexp_constant (Pconst_string (plural, _, _)); _ }
+#else
                    { pexp_desc = Pexp_constant (Pconst_string (plural, _)); _ }
+#endif
                  )
                  :: _ )
     when is_like lid [ "dngettext"; "fdngettext"; "dcngettext"; "fdcngettext" ]
