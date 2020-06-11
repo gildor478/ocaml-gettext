@@ -1,3 +1,8 @@
+## v0.4.2 - 2020-06-11
+
+### Fixed
+- Compatibility with OCaml 4.11. (Thanks to kit-ty-kate, closes: #8)
+
 ## v0.4.1 - 2019-10-02
 
 ### Fixed
