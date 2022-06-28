@@ -4,6 +4,6 @@
  (deps
   (glob_files testdata/*)
   (glob_files ../testdata/fr_FR/LC_MESSAGES/*))
- (libraries common gettext-camomile oUnit fileutils)
+ (libraries common gettext-camomile ounit2 fileutils)
  (action
   (run %{test} -test-dir ../testdata)))
