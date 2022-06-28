@@ -20,7 +20,7 @@ depends: [
   "dune" {>= "1.11.0"}
   "cppo" {build}
   "fileutils"
-  "ounit2" {with-test & > "2.2.6"}
+  "ounit2" {with-test & > "2.2.7"}
 ]
 synopsis: "Internationalization library (i18n)"
 description:"""
