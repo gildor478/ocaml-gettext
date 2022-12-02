@@ -1,3 +1,8 @@
+## Unreleased
+
+### Fixed
+- Compatibility with OCaml 5
+
 ## v0.4.2 - 2020-06-11
 
 ### Fixed
