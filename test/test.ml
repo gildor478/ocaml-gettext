@@ -221,7 +221,7 @@ let install_test =
     Printf.sprintf "%s warning" fl_mo >:: fun ctxt ->
       let tests = make_tests ctxt in
       let out = Buffer.create 13 in
-      let capture_out strm = Stream.iter (Buffer.add_char out) strm in
+      let capture_out strm = Seq.iter (Buffer.add_char out) strm in
       let fl_mo = concat tests.test_dir fl_mo in
       let fl_dst = make_filename (tests.install_dir :: fl_dsts) in
         assert_command
@@ -392,7 +392,7 @@ let compile_ocaml =
                 []
             in
             let out = Buffer.create 13 in
-            let capture_out strm = Stream.iter (Buffer.add_char out) strm in
+            let capture_out strm = Seq.iter (Buffer.add_char out) strm in
             let match_exp_err = Str.regexp (".*"^(Str.quote exp_err)^".*") in
             assert_command
               ~exit_code:(Unix.WEXITED exp_return_code)
