@@ -20,7 +20,7 @@
 (*  USA                                                                   *)
 (**************************************************************************)
 
-open CamomileLibraryDefault.Camomile
+open Camomile
 open GettextTypes
 
 (** Error reported when something goes wrong during Camomile initialization.
