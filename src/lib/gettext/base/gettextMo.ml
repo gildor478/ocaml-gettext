@@ -142,7 +142,7 @@ let input_mo_untranslated _failsafe chn mo_header number =
       try
         seek_in chn offset_pair;
         input_int32_pair_string chn mo_header.endianess
-      with End_of_file ->
+      with End_of_file | Sys_error _ ->
         raise (MoInvalidStringOutOfBound (in_channel_length chn, offset_pair))
     in
     split_plural str
