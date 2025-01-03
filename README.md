@@ -1,8 +1,7 @@
 OCaml-gettext - Internationalization library for OCaml (i18n)
 =============================================================
 
-[![Travis status][travis-img]][travis]
-[![AppVeyor status][appveyor-img]][appveyor]
+[![OCaml-CI Build Status](https://img.shields.io/endpoint?url=https://ci.ocamllabs.io/badge/gildor478/ocaml-gettext/master&logo=ocaml)](https://ci.ocamllabs.io/github/gildor478/ocaml-gettext)
 
 Internationalization of a program means that the program have the possibility
 to handle different language. It can output messages which depend on the
@@ -23,11 +22,6 @@ comes with :
 * a pure Ocaml implementation, based on Camomile,
 * an alternative implementation with a binding to GNU gettext library,
 * `ocaml-gettext` a tool to extract strings from Ocaml source.
-
-[travis]:         https://travis-ci.org/gildor478/ocaml-gettext
-[travis-img]:     https://travis-ci.org/gildor478/ocaml-gettext.svg?branch=master
-[appveyor]:       https://ci.appveyor.com/project/gildor478/ocaml-gettext
-[appveyor-img]:   https://ci.appveyor.com/api/projects/status/4dalakr6ixnhotve/branch/master?svg=true
 
 Installation
 ------------
