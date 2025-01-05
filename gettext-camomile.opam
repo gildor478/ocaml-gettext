@@ -20,7 +20,7 @@ depends: [
   "dune" {>= "2.9.0"}
   "camomile" {>= "2.0.0"}
   "gettext" {= version}
-  "ounit2" {with-test & > "2.2.7"}
+  "ounit2" {with-test & >= "2.2.7"}
   "fileutils" {with-test & >= "0.6.6"}
 ]
 synopsis: "Internationalization library using camomile (i18n)"

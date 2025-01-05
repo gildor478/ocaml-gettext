@@ -18,9 +18,9 @@ build: [
 depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "2.9.0"}
-  "dune-configurator"
+  "dune-configurator" {>= "3.17.0"}
   "gettext" {= version}
-  "ounit2" {with-test & > "2.2.7"}
+  "ounit2" {with-test & >= "2.2.7"}
   "fileutils" {with-test & >= "0.6.6"}
 ]
 depexts: [

@@ -18,10 +18,9 @@ build: [
 depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "2.9.0"}
-  "cppo" {build}
+  "cppo" {build & >= "1.8.0"}
   "fileutils" {>= "0.6.6"}
-  "ounit2" {with-test & > "2.2.7"}
-  "seq" {with-test}
+  "ounit2" {with-test & >= "2.2.7"}
 ]
 synopsis: "Internationalization library (i18n)"
 description:"""
