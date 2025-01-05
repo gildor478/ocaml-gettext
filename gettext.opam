@@ -16,8 +16,8 @@ build: [
    "@runtest" {with-test} ]
 ]
 depends: [
-  "ocaml" {>= "4.03.0"}
-  "dune" {>= "1.11.0"}
+  "ocaml" {>= "4.14.0"}
+  "dune" {>= "2.9.0"}
   "cppo" {build}
   "fileutils" {>= "0.6.6"}
   "ounit2" {with-test & > "2.2.7"}
