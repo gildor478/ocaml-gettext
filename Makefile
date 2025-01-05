@@ -33,9 +33,6 @@ doc: $(GENERATED_FILES)
 	dune build @doc
 
 test: $(GENERATED_FILES)
-	dune build examples/library/examplesLibrary.a
-	dune build examples/gui/examplesGUI.a
-	dune build examples/program/program.exe
 	dune runtest
 
 all: $(GENERATED_FILES)

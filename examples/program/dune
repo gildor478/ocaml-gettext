@@ -1,3 +1,4 @@
-(executable
-  (name program)
-  (libraries gettext.base gettext-camomile examplesGUI examplesLibrary))
+(test
+ (name program)
+ (package gettext-camomile)
+ (libraries gettext.base gettext-camomile examplesGUI examplesLibrary))
