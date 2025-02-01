@@ -55,7 +55,7 @@ int ml2c_lc_tab[7] = {
   LC_ALL
 };
 
-inline int ml2c_lc(value v)
+int ml2c_lc(value v)
 {
   return ml2c_lc_tab[Int_val(v)];
 }

@@ -25,7 +25,7 @@ msgid "An empty entry has been encounter."
 msgstr "Une entrée vide a été trouvée."
 
 #: ../libgettext-ocaml/gettext.ml:189
-msgid "Cannot find an approriate ocaml-gettext compiled file ( %s )."
+msgid "Cannot find an appropriate ocaml-gettext compiled file ( %s )."
 msgstr "Impossible de trouver un fichier ocaml-gettext compilé approprié ( %s )."
 
 #: ../libgettext-ocaml/gettext.ml:251

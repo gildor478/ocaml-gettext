@@ -30,7 +30,7 @@ msgid "An empty entry has been encounter."
 msgstr ""
 
 #: ../libgettext-ocaml/gettext.ml:189
-msgid "Cannot find an approriate ocaml-gettext compiled file ( %s )."
+msgid "Cannot find an appropriate ocaml-gettext compiled file ( %s )."
 msgstr ""
 
 #: ../libgettext-ocaml/gettext.ml:251
