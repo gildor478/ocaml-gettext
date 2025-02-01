@@ -49,7 +49,7 @@ clean:
 	dune clean
 
 bench:
-	dune exec test/bench/bench.exe
+	dune exec test/bench/bench.exe -- --test_dir ./test/testdata
 
 headache: distclean
 	headache -h .header \

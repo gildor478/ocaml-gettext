@@ -43,10 +43,11 @@ type parameters = {
   translations : translation list;
 }
 
-let parameters_of_filename fl_mo =
+let parameters_of_filename test_dir fl_mo =
   (* File scheme:
     base_dir/lang/category/domain.mo
    *)
+  let fl_mo = FilePath.concat test_dir fl_mo in
   let textdomain = chop_extension (basename fl_mo) in
   let category =
     GettextCategory.category_of_string (basename (dirname fl_mo))
@@ -314,7 +315,7 @@ let implementation_test realize_data =
         (* Extract usefull information out of parameters *)
         let tests = make_tests ctx in
         let parameters =
-          parameters_of_filename (Filename.concat tests.test_dir fl_mo)
+          parameters_of_filename tests.test_dir fl_mo
         in
         let test_translations = parameters.translations in
         (* Build t *)
@@ -346,8 +347,8 @@ let implementation_test realize_data =
     fl_mo >:: fun ctxt ->
       (* Extract usefull information out of parameters *)
       let tests = make_tests ctxt in
-      let parameters = 
-        parameters_of_filename (Filename.concat tests.test_dir fl_mo)
+      let parameters =
+        parameters_of_filename tests.test_dir fl_mo
       in
       let test_translations = parameters.translations in
       (* Build t *)
