@@ -35,8 +35,8 @@ let () =
                * -- This is untested, a patch is welcome if you use MacPorts --
                * https://ports.macports.org/port/gettext/summary
                *)
-              (["-I/usr/local/include"],
-               ["-L/usr/local/lib"; "-lintl"]);
+              (["-I/opt/local/include"],
+               ["-L/opt/local/lib"; "-lintl"]);
             ]
         with Not_found ->
           C.die "no ways to compile with gettext library"
