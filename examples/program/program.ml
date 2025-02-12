@@ -46,7 +46,7 @@ let () =
              Options:")
          gettext_copyright)
   in
-  if true then
-    ExamplesLibrary.Library.hello_you !my_name
-  else
-    ExamplesGUI.Gui.hello_you !my_name
+  ExamplesLibrary.Library.library_only_function() ;
+  ExamplesLibrary.Library.hello_you !my_name ;
+
+  ExamplesGUI.Gui.hello_you !my_name

@@ -25,7 +25,7 @@ open GettextCategory
 open GettextModules
 
 let unsafe_format_of_string fmt str =
-  if false then Obj.magic str else format_of_string fmt
+  if false then Obj.magic str else Scanf.format_from_string str fmt
 
 let bindtextdomain textdomain dir t =
   upgrade_textdomain t textdomain (None, Some dir)

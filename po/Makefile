@@ -21,15 +21,13 @@
 ##########################################################################
 
 
-include ../ConfMakefile
-include ../TopMakefile
-
+BUILDPO=../build/share/locale/
 OCAML_GETTEXT_PACKAGE = ocaml-gettext
 LINGUAS=$(shell cat LINGUAS)
 SOURCES=POTFILES
 
-OCAML_GETTEXT=$(BUILDBIN)/ocaml-gettext
-OCAML_GETTEXT_EXTRACT_OPTIONS=--extract-command $(BUILDBIN)/ocaml-xgettext
+OCAML_GETTEXT=ocaml-gettext
+OCAML_GETTEXT_EXTRACT_OPTIONS=--extract-command ocaml-xgettext
 OCAML_GETTEXT_COMPILE_OPTIONS=
 OCAML_GETTEXT_INSTALL_OPTIONS=
 OCAML_GETTEXT_MERGE_OPTIONS=
@@ -63,12 +61,12 @@ $(BUILDPO):
 
 .PRECIOUS: $(POTFILE) 
 
-install-buildpo: $(MOFILES) $(BUILDPO) $(OCAML_GETTEXT)
+install-buildpo: $(MOFILES) $(BUILDPO)
 	$(OCAML_GETTEXT) --action install $(OCAML_GETTEXT_INSTALL_OPTIONS)    \
 	--install-textdomain $(OCAML_GETTEXT_PACKAGE)                         \
 	--install-destdir $(BUILDPO) $(MOFILES)
 
-install-po: $(MOFILES) $(OCAML_GETTEXT)
+install-po: $(MOFILES)
 	$(OCAML_GETTEXT) --action install $(OCAML_GETTEXT_INSTALL_OPTIONS)    \
 	--install-textdomain $(OCAML_GETTEXT_PACKAGE)                         \
 	--install-destdir $(PODIR) $(MOFILES)
