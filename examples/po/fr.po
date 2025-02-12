@@ -15,43 +15,43 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n>1;"
 
-#: ../gui/gui.ml:15
+#: ../program/program.ml:42
+msgid "\"Hello you\" program by Sylvain Le Gall\n\n%s\n\nCommand: program [options]\n\nOptions:"
+msgstr "\\\"Bonjour à toi\\\" application par Sylvain Le Gall\n\n%s\n\nCommande: program [options]\n\nOptions :"
+
+#: ../gui/gui.ml:35
 msgid "Hello %s"
 msgstr "Bonjour %s"
 
-#: ../library/library.ml:14
-msgid "Hello %s !\\n"
-msgstr "Bonjour %s !\\n"
+#: ../library/library.ml:43
+msgid "Hello %s\n"
+msgstr "Bonjour %s\n"
 
-#: ../library/library.ml:29
-msgid "Hello %s\\n"
-msgstr "Bonjour %s\\n"
+#: ../library/library.ml:32
+msgid "Hello %s !\n"
+msgstr "Bonjour %s !\n"
 
-#: ../library/library.ml:13 ../gui/gui.ml:13
+#: ../library/library.ml:31 ../gui/gui.ml:33
 msgid "Hello world !"
 msgstr "Bonjour le monde !"
 
-#: ../library/library.ml:18
+#: ../library/library.ml:36
 msgid "There is "
 msgid_plural "There are "
 msgstr[0] "Il y a "
 msgstr[1] "Il y a"
 
-#: ../library/library.ml:24
-msgid "There is %d plate.\\n"
-msgid_plural "There are %d plates.\\n"
-msgstr[0] "Il y a %d assiettes.\\n"
-msgstr[1] "Il y a %d assiettes.\\n"
+#: ../library/library.ml:40
+msgid "There is %d plate.\n"
+msgid_plural "There are %d plates.\n"
+msgstr[0] "Il y a %d assiettes.\n"
+msgstr[1] "Il y a %d assiettes.\n"
 
-#: ../program/program.ml:35
-msgid "\\\"Hello you\\\" program by Sylvain Le Gall\n\n%s\n\nCommand: program [options]\n\nOptions:"
-msgstr "\\\"Bonjour Ã  toi\\\" application par Sylvain Le Gall\n\n%s\n\nCommande: program [options]\n\nOptions :"
-
-#: ../program/program.ml:19
+#: ../program/program.ml:34
 msgid "name Your name. Default : %S"
-msgstr "nom Votre nom. Par dÃ©faut : %S"
+msgstr "nom Votre nom. Par défaut : %S"
 
-#: ../library/library.ml:20
+#: ../library/library.ml:37
 msgid "plate."
 msgid_plural "plates."
 msgstr[0] "assiette."
