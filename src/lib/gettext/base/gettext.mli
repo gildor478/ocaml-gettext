@@ -54,7 +54,7 @@ val string_of_exception : exn -> string
 val init : GettextTypes.dependencies
 
 (** Module to handle typical library requirement *)
-module Library (Init : GettextTypes.INIT_TYPE) : sig
+module Library (_ : GettextTypes.INIT_TYPE) : sig
   (** Definition of all variables required by ocaml-gettext to use this module
         (includes all the dependencies of the library, as defined in
         {!GettextTypes.Init}).
@@ -80,8 +80,8 @@ end
 
 (** Module to handle typical program requirement *)
 module Program
-    (Init : GettextTypes.INIT_TYPE)
-    (Realize : GettextTypes.REALIZE_TYPE) : sig
+    (_ : GettextTypes.INIT_TYPE)
+    (_ : GettextTypes.REALIZE_TYPE) : sig
 
   (** The first element is a [Arg] argument list. The second element
         contains some information about the gettext library (version,

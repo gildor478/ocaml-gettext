@@ -32,6 +32,23 @@ The recommended way to install ocaml-gettext is via the [opam package manager][o
 $ opam install gettext gettext-camomile gettext-stub
 ```
 
+Building without Camomile
+-------------------------
+
+This project uses standard `dune` mechanism for building. It provides 3
+different packages:
+
+- `gettext`: the base module
+- `gettext-camomile`; gettext using Camomile.
+- `gettext-stub`: gettext using the C library.
+
+If you want to not use Camomile, you can just compile or test the other module,
+using `dune`:
+
+```sh
+$ dune test --only-packages=gettext,gettext-stub
+```
+
 Documentation
 -------------
 
