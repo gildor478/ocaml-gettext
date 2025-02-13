@@ -44,7 +44,7 @@ let upgrade_textdomain t k value =
 
 let create ?(failsafe = Ignore) ?(categories = []) ?(codesets = [])
     ?(dirs = []) ?(textdomains = []) ?(codeset = GettextConfig.default_codeset)
-    ?(path = GettextConfig.default_path) ?language textdomain =
+    ?(path = GettextConfig.default_path()) ?language textdomain =
   let map_categories =
     List.fold_left
       (fun map (category, locale) -> MapCategory.add category locale map)

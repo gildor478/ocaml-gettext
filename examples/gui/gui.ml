@@ -27,6 +27,7 @@ let init = Gettext.init
 
 (* Build a simple window that display your name *)
 let hello_you name =
+  let _ = GMain.init () in
   let spf x = Printf.sprintf x in
   let window =
     GWindow.window ~title:(s_ "Hello world !") ~border_width:12 ()

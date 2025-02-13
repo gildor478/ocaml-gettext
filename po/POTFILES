@@ -1,1 +1,2 @@
-../libgettext-ocaml/gettext.ml
+../src/lib/gettext/base/gettext.ml
+../src/bin/ocaml-gettext/OCamlGettext.ml
