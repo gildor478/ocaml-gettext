@@ -1,3 +1,6 @@
 (lang dune 3.15)
 (env
-  (_ (env-vars (BENCH_ENABLED true))))
+  (_
+    (env-vars
+      (BENCH_ENABLED true)
+      (EXAMPLES_ENABLED true))))

@@ -1,3 +1,4 @@
 (executable
  (name program)
+ (enabled_if "%{env:EXAMPLES_ENABLED=false}")
  (libraries gettext.base gettext-camomile examplesGUI examplesLibrary))

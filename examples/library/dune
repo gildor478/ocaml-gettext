@@ -1,3 +1,4 @@
 (library
  (name examplesLibrary)
+ (enabled_if "%{env:EXAMPLES_ENABLED=false}")
  (libraries gettext.base))
