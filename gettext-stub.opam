@@ -9,6 +9,7 @@ bug-reports: "https://github.com/gildor478/ocaml-gettext/issues"
 depends: [
   "dune" {>= "3.15"}
   "gettext" {= version}
+  "dune-configurator" {>= "3.17.0"}
   "ounit2" {>= "2.2.7" & with-test}
   "odoc" {with-doc}
 ]
@@ -29,3 +30,10 @@ build: [
   ["dune" "install" "-p" name "--create-install-files" name]
 ]
 dev-repo: "git+https://github.com/gildor478/ocaml-gettext.git"
+depexts: [
+  ["gettext"] {os = "macos" & os-distribution = "homebrew"}
+  ["gettext"] {os = "macos" & os-distribution = "macports"}
+  ["gettext"] {os = "win32" & os-distribution = "cygwinports"}
+  ["gettext-dev"] {os-distribution = "alpine"}
+  ["libc6-dev"] {os-family = "debian"}
+]

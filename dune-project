@@ -21,15 +21,12 @@
     (ounit2 (and (>= 2.2.7) :with-test))
     (fileutils (>= 0.6.6)))
   (sites (share locale)))
-; TODO
-; -  ["ocaml" "configure.ml"
-; -    "--with-defaultlocaledir" "%{lib}%/gettext/share/locale"
-; -    "--version" version]
 
 (package
   (name gettext-stub)
   (depends
     (gettext (= :version))
+    (dune-configurator (>= 3.17.0))
     (ounit2 (and (>= 2.2.7) :with-test))))
 
 (package
