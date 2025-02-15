@@ -288,7 +288,8 @@ type mo_translation = {
   pot_creation_date : string option;
   po_revision_date : string option;
   last_translator : string option;
-  language_tream : string option;
+  language_team : string option;
+  language : string option;
   mime_version : string option;
   content_type : string option;
   content_transfer_encoding : string option;

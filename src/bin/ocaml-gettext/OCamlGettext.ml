@@ -93,12 +93,12 @@ let string_of_exception exc =
   | InstallUninstallTooManyFilename ->
       s_
         "You cannot specify at the same time a language, a textdomain\n\
-         and provide more than one file to install/uninstall : all files\n\
+         and provide more than one file to install/uninstall: all files\n\
          will have the same destination filename."
   | CompileTooManyFilename ->
       s_
         "You cannot specify a output filename and more than one\n\
-         filename : all the compiled file will have the same output filename"
+         filename: all the compiled file will have the same output filename"
   | _ -> Gettext.string_of_exception exc
 
 let do_extract t =

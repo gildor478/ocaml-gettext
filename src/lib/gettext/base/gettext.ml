@@ -145,7 +145,7 @@ let string_of_exception exc =
         fln cmd signal
   | DomainFileDoesntExist lst ->
       spf
-        (f_ "Cannot find an appropriate ocaml-gettext compiled file ( %s ).")
+        (f_ "Cannot find an appropriate ocaml-gettext compiled file (%s).")
         (string_of_list lst)
   | GettextUninitialized -> s_ "Ocaml-gettext library is not initialized"
   | MoInvalidOptions (lexbuf, text) ->

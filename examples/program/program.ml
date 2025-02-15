@@ -31,7 +31,7 @@ let () =
       ( [
           ( "--my-name",
             Arg.String (fun s -> my_name := s),
-            spf (f_ "name Your name. Default : %S") !my_name );
+            spf (f_ "name Your name. Default: %S") !my_name );
         ]
       @ gettext_args )
   in

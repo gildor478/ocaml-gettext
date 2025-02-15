@@ -21,13 +21,14 @@
 ##########################################################################
 
 
-BUILDPO=../build/share/locale/
+BUILDPO=../_build/default/share/locale/
 OCAML_GETTEXT_PACKAGE = ocaml-gettext
 LINGUAS=$(shell cat LINGUAS)
-SOURCES=POTFILES
+SOURCES=$(shell cat POTFILES)
 
 OCAML_GETTEXT=ocaml-gettext
-OCAML_GETTEXT_EXTRACT_OPTIONS=--extract-command ocaml-xgettext
+OCAML_XGETTEXT=ocaml-xgettext
+OCAML_GETTEXT_EXTRACT_OPTIONS=--extract-command $(OCAML_XGETTEXT)
 OCAML_GETTEXT_COMPILE_OPTIONS=
 OCAML_GETTEXT_INSTALL_OPTIONS=
 OCAML_GETTEXT_MERGE_OPTIONS=
@@ -56,10 +57,10 @@ clean:: clean-po
 	$(OCAML_GETTEXT) --action merge   $(OCAML_GETTEXT_MERGE_OPTIONS)      \
 	--merge-pot $(POTFILE) $@
 
-$(BUILDPO): 
+$(BUILDPO):
 	mkdir -p $(BUILDPO)
 
-.PRECIOUS: $(POTFILE) 
+.PRECIOUS: $(POTFILE)
 
 install-buildpo: $(MOFILES) $(BUILDPO)
 	$(OCAML_GETTEXT) --action install $(OCAML_GETTEXT_INSTALL_OPTIONS)    \

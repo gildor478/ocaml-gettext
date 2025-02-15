@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 08:45+0000\n"
+"POT-Creation-Date: 2025-02-15 18:03+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,12 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: ../library/library.ml:37
+msgid " plate."
+msgid_plural "plates."
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../program/program.ml:42
 msgid "\"Hello you\" program by Sylvain Le Gall\n\n%s\n\nCommand: program [options]\n\nOptions:"
@@ -30,11 +36,15 @@ msgid "Hello %s\n"
 msgstr ""
 
 #: ../library/library.ml:32
-msgid "Hello %s !\n"
+msgid "Hello %s!\n"
 msgstr ""
 
-#: ../library/library.ml:31 ../gui/gui.ml:33
+#: ../gui/gui.ml:33
 msgid "Hello world !"
+msgstr ""
+
+#: ../library/library.ml:31
+msgid "Hello world!"
 msgstr ""
 
 #: ../library/library.ml:36
@@ -50,12 +60,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: ../program/program.ml:34
-msgid "name Your name. Default : %S"
+msgid "name Your name. Default: %S"
 msgstr ""
-
-#: ../library/library.ml:37
-msgid "plate."
-msgid_plural "plates."
-msgstr[0] ""
-msgstr[1] ""
 

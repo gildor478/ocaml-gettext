@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 09:40+0000\n"
+"POT-Creation-Date: 2025-02-15 17:56+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -54,7 +54,7 @@ msgid "An error occurs while processing."
 msgstr ""
 
 #: ../src/lib/gettext/base/gettext.ml:148
-msgid "Cannot find an approriate ocaml-gettext compiled file ( %s )."
+msgid "Cannot find an appropriate ocaml-gettext compiled file (%s)."
 msgstr ""
 
 #: ../src/lib/gettext/base/gettext.ml:222
@@ -158,11 +158,11 @@ msgid "Unable to parse the POSIX language environment variable %s"
 msgstr ""
 
 #: ../src/bin/ocaml-gettext/OCamlGettext.ml:99
-msgid "You cannot specify a output filename and more than one\nfilename : all the compiled file will have the same output filename"
+msgid "You cannot specify a output filename and more than one\nfilename: all the compiled file will have the same output filename"
 msgstr ""
 
 #: ../src/bin/ocaml-gettext/OCamlGettext.ml:94
-msgid "You cannot specify at the same time a language, a textdomain\nand provide more than one file to install/uninstall : all files\nwill have the same destination filename."
+msgid "You cannot specify at the same time a language, a textdomain\nand provide more than one file to install/uninstall: all files\nwill have the same destination filename."
 msgstr ""
 
 #: ../src/bin/ocaml-gettext/OCamlGettext.ml:92

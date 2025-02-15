@@ -42,7 +42,7 @@ end
     This function can be used to get a value for a LOCALE_TYPE implementation.
     Raise Not_found if nothing appropriate.
 *)
-let posix_getenv t category =
+let posix_getenv (t: GettextTypes.t) category =
   (* http://www.gnu.org/software/gettext/manual/html_mono/gettext.html#SEC155
          In the function dcgettext at every call the current setting of the
          highest priority environment variable is determined and used.
@@ -82,7 +82,7 @@ module Posix : LOCALE_TYPE = struct
        locale(1).
      *)
 
-  let get_locale t category =
+  let get_locale (t: GettextTypes.t) category =
     let posix_lang = posix_getenv t category in
     let locale =
       try

@@ -247,7 +247,8 @@ let input_mo_informations failsafe chn mo_header =
     pot_creation_date = extract_field_string "POT-Creation-Date";
     po_revision_date = extract_field_string "PO-Revision-Date";
     last_translator = extract_field_string "Last-Translator";
-    language_tream = extract_field_string "Language-Team";
+    language_team = extract_field_string "Language-Team";
+    language = extract_field_string "Language";
     mime_version = extract_field_string "MIME-Version";
     content_type = extract_field_string "Content-Type";
     content_transfer_encoding =
@@ -273,7 +274,9 @@ let string_of_mo_informations ?(compute_plurals = (0, 3)) mo_translation =
   p buff "Last-Translator           : %s\n"
     (extract_string mo_translation.last_translator);
   p buff "Language-Team             : %s\n"
-    (extract_string mo_translation.language_tream);
+    (extract_string mo_translation.language_team);
+  p buff "Language             : %s\n"
+    (extract_string mo_translation.language);
   p buff "MIME-Version              : %s\n"
     (extract_string mo_translation.mime_version);
   p buff "Content-Type              : %s\n"
