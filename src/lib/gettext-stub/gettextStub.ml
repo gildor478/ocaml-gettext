@@ -22,8 +22,7 @@
 
 (** Concrete implementation based on native gettext library.
     @see <http://www.gnu.org/software/gettext/gettext.html/> Gettext library
-    @author Sylvain Le Gall
-*)
+    @author Sylvain Le Gall *)
 
 (** {1 Concrete implementations} *)
 
@@ -33,7 +32,7 @@ open GettextCategory
 
 (** Native implementation of gettext. All translation are bound to C library
     call. Still use check_format, to ensure that strings follow printf format.
-  *)
+*)
 module Native : GettextTypes.REALIZE_TYPE = struct
   (**/**)
 
@@ -62,9 +61,8 @@ module Native : GettextTypes.REALIZE_TYPE = struct
       | Some dir -> ignore (GettextStubCompat.bindtextdomain textdomain dir)
       | None -> (
           match default_dir with
-          | Some dir ->
-              ignore (GettextStubCompat.bindtextdomain textdomain dir)
-          | None -> () )
+          | Some dir -> ignore (GettextStubCompat.bindtextdomain textdomain dir)
+          | None -> ())
     in
     (* We only use the first path of t.path, since there is no notion of search
        path in native gettext. So the MO file should be in :
@@ -79,7 +77,7 @@ module Native : GettextTypes.REALIZE_TYPE = struct
           try GettextStubCompat.setlocale GettextStubCompat.LC_ALL language
           with Failure _ as exc ->
             let () = fail_or_continue t.failsafe exc () in
-            GettextStubCompat.setlocale GettextStubCompat.LC_ALL "" )
+            GettextStubCompat.setlocale GettextStubCompat.LC_ALL "")
       | None -> GettextStubCompat.setlocale GettextStubCompat.LC_ALL ""
     in
     let () =
@@ -118,12 +116,11 @@ module Native : GettextTypes.REALIZE_TYPE = struct
 end
 
 (** Native implementation of gettext. Use the Native module, but use
-    informations provided to preload all textdomain translation. The preload
-    is made by trying to translate the string "", which is mandatory in MO file.
+    informations provided to preload all textdomain translation. The preload is
+    made by trying to translate the string "", which is mandatory in MO file.
     This is not the default behavior of gettext. Use this module if you know
     that it is better to preload all string. Don't use this module if you think
-    you will only have a few strings to translate.
-  *)
+    you will only have a few strings to translate. *)
 module Preload : GettextTypes.REALIZE_TYPE = struct
   (**/**)
 

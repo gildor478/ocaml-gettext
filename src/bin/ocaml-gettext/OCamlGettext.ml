@@ -21,15 +21,13 @@
 (**************************************************************************)
 
 (** Ocaml-gettext tools.
-    @author Sylvain Le Gall
-  *)
+    @author Sylvain Le Gall *)
 
 (** Helper program to:
-  - extract translatable strings from OCaml source,
-  - compile PO file,
-  - install MO file,
-  - merge POT and PO file.
-*)
+    - extract translatable strings from OCaml source,
+    - compile PO file,
+    - install MO file,
+    - merge POT and PO file. *)
 
 open GettextTypes
 open GettextCategory
@@ -41,11 +39,8 @@ module OcamlGettext =
   Gettext.Program
     (struct
       let textdomain = "ocaml-gettext"
-
       let codeset = None
-
       let dir = None
-
       let dependencies = Gettext.init
     end)
     (OCamlGettextRealize)
@@ -81,9 +76,7 @@ type t = {
 }
 
 exception ActionRequired
-
 exception InstallUninstallTooManyFilename
-
 exception CompileTooManyFilename
 
 let string_of_exception exc =
@@ -251,167 +244,162 @@ let () =
   let gettext_args, gettext_copyright = OcamlGettext.init in
   let args =
     Arg.align
-      ( [
-          ( "--action",
-            Arg.Symbol
-              ( List.map fst actions,
-                fun symbol ->
-                  try
+      ([
+         ( "--action",
+           Arg.Symbol
+             ( List.map fst actions,
+               fun symbol ->
+                 try
+                   t :=
+                     {
+                       !t with
+                       action_option = Some (List.assoc symbol actions);
+                     }
+                 with Not_found ->
+                   raise (Arg.Bad (spf (f_ "Invalid action: %s.") symbol)) ),
+           s_ "Action to execute. Default: none." );
+         ( "--extract-command",
+           Arg.String (fun cmd -> t := { !t with extract_command = cmd }),
+           spf
+             (f_
+                "cmd Command to extract translatable strings from an OCaml \
+                 source file. Default: %s.")
+             !t.extract_command );
+         ( "--extract-default-option",
+           Arg.String
+             (fun default_option ->
+               t := { !t with extract_default_option = default_option }),
+           spf
+             (f_
+                "options Default option used when extracting translatable \
+                 strings. Default: %S.")
+             !t.extract_default_option );
+         ( "--extract-filename-option",
+           Arg.Tuple
+             (let filename = ref "" in
+              [
+                Arg.String (fun str -> filename := str);
+                Arg.String
+                  (fun options ->
                     t :=
                       {
                         !t with
-                        action_option = Some (List.assoc symbol actions);
-                      }
-                  with Not_found ->
-                    raise (Arg.Bad (spf (f_ "Invalid action: %s.") symbol)) ),
-            s_ "Action to execute. Default: none." );
-          ( "--extract-command",
-            Arg.String (fun cmd -> t := { !t with extract_command = cmd }),
-            spf
-              (f_
-                 "cmd Command to extract translatable strings from an OCaml \
-                  source file. Default: %s.")
-              !t.extract_command );
-          ( "--extract-default-option",
-            Arg.String
-              (fun default_option ->
-                t := { !t with extract_default_option = default_option }),
-            spf
-              (f_
-                 "options Default option used when extracting translatable \
-                  strings. Default: %S.")
-              !t.extract_default_option );
-          ( "--extract-filename-option",
-            Arg.Tuple
-              (let filename = ref "" in
-               [
-                 Arg.String (fun str -> filename := str);
-                 Arg.String
-                   (fun options ->
-                     t :=
-                       {
-                         !t with
-                         extract_filename_options =
-                           (!filename, options) :: !t.extract_filename_options;
-                       });
-               ]),
-            spf
-              (f_
-                 "filename options Per filename option used when extracting \
-                  strings from the specified filename. Default: %s.")
-              (string_of_list
-                 (List.map
-                    (fun (str1, str2) -> spf "(%s,%s)" str1 str2)
-                    !t.extract_filename_options)) );
-          ( "--extract-pot",
-            Arg.String (fun str -> t := { !t with extract_pot = str }),
-            spf
-              (f_
-                 "filename POT file to write when extracting translatable \
-                  strings. Default: %s.")
-              !t.extract_pot );
-          ( "--compile-output",
-            Arg.String
-              (fun str ->
-                t := { !t with compile_output_file_option = Some str }),
-            s_
-              "filename MO file to write when compiling a PO file. Default: \
-               name of the PO file with \".mo\" extension." );
-          ( "--install-language",
-            Arg.String
-              (fun str -> t := { !t with install_language_option = Some str }),
-            s_
-              "language Language to use when installing a MO file. Default: \
-               try to guess it from the name of the MO file." );
-          ( "--install-category",
-            Arg.String
-              (fun str ->
-                t :=
-                  {
-                    !t with
-                    install_category = GettextCategory.category_of_string str;
-                  }),
-            spf
-              (f_
-                 "category Category to use when installing a MO file. \
-                  Default: %s.")
-              (GettextCategory.string_of_category !t.install_category) );
-          ( "--install-textdomain",
-            Arg.String
-              (fun str ->
-                t := { !t with install_textdomain_option = Some str }),
-            s_
-              "textdomain Textdomain to use when installing a MO file. \
-               Default: try to guess it from the name of the MO file." );
-          ( "--install-destdir",
-            Arg.String (fun str -> t := { !t with install_destdir = str }),
-            spf
-              (f_
-                 "dirname Base dir used when installing a MO file. Default: %s.")
-              !t.install_destdir );
-          ( "--strict",
-            Arg.Unit (fun () -> t := { !t with strict = true }),
-            spf
-              (f_ " Additional check are errors during install. Default: %b.")
-              !t.strict );
-          ( "--uninstall-language",
-            Arg.String
-              (fun str ->
-                t := { !t with uninstall_language_option = Some str }),
-            s_
-              "language Language to use when uninstalling a MO file. Default: \
-               try to guess it from the name of the MO file." );
-          ( "--uninstall-category",
-            Arg.String
-              (fun str ->
-                t :=
-                  {
-                    !t with
-                    uninstall_category = GettextCategory.category_of_string str;
-                  }),
-            spf
-              (f_
-                 "category Category to use when uninstalling a MO file.  \
-                  Default: %s.")
-              (GettextCategory.string_of_category !t.uninstall_category) );
-          ( "--uninstall-textdomain",
-            Arg.String
-              (fun str ->
-                t := { !t with uninstall_textdomain_option = Some str }),
-            s_
-              "textdomain Textdomain to use when uninstalling a MO file. \
-               Default: try to guess it from the name of the MO file." );
-          ( "--uninstall-orgdir",
-            Arg.String (fun str -> t := { !t with uninstall_orgdir = str }),
-            spf
-              (f_
-                 "dirname Base dir used when uninstalling a MO file. Default: \
-                  %s.")
-              !t.uninstall_orgdir );
-          ( "--merge-pot",
-            Arg.String (fun str -> t := { !t with merge_filename_pot = str }),
-            spf
-              (f_
-                 "filename POT file to use as a master for merging PO file. \
-                  Default: %s.")
-              !t.merge_filename_pot );
-          ( "--merge-backup-extension",
-            Arg.String
-              (fun str -> t := { !t with merge_backup_extension = str }),
-            spf
-              (f_
-                 "extension Backup extension to use when moving PO file which \
-                  have been merged. Default: %s.")
-              !t.merge_backup_extension );
-          ( "--version",
-            Arg.Unit (fun () -> t := { !t with action_option = Some Version }),
-            s_ " Returns version information on ocaml-gettext." );
-          ( "--short-version",
-            Arg.Unit
-              (fun () -> t := { !t with action_option = Some VersionShort }),
-            s_ " Returns only the version string of ocaml-gettext." );
-        ]
-      @ gettext_args )
+                        extract_filename_options =
+                          (!filename, options) :: !t.extract_filename_options;
+                      });
+              ]),
+           spf
+             (f_
+                "filename options Per filename option used when extracting \
+                 strings from the specified filename. Default: %s.")
+             (string_of_list
+                (List.map
+                   (fun (str1, str2) -> spf "(%s,%s)" str1 str2)
+                   !t.extract_filename_options)) );
+         ( "--extract-pot",
+           Arg.String (fun str -> t := { !t with extract_pot = str }),
+           spf
+             (f_
+                "filename POT file to write when extracting translatable \
+                 strings. Default: %s.")
+             !t.extract_pot );
+         ( "--compile-output",
+           Arg.String
+             (fun str -> t := { !t with compile_output_file_option = Some str }),
+           s_
+             "filename MO file to write when compiling a PO file. Default: \
+              name of the PO file with \".mo\" extension." );
+         ( "--install-language",
+           Arg.String
+             (fun str -> t := { !t with install_language_option = Some str }),
+           s_
+             "language Language to use when installing a MO file. Default: try \
+              to guess it from the name of the MO file." );
+         ( "--install-category",
+           Arg.String
+             (fun str ->
+               t :=
+                 {
+                   !t with
+                   install_category = GettextCategory.category_of_string str;
+                 }),
+           spf
+             (f_
+                "category Category to use when installing a MO file. Default: \
+                 %s.")
+             (GettextCategory.string_of_category !t.install_category) );
+         ( "--install-textdomain",
+           Arg.String
+             (fun str -> t := { !t with install_textdomain_option = Some str }),
+           s_
+             "textdomain Textdomain to use when installing a MO file. Default: \
+              try to guess it from the name of the MO file." );
+         ( "--install-destdir",
+           Arg.String (fun str -> t := { !t with install_destdir = str }),
+           spf
+             (f_ "dirname Base dir used when installing a MO file. Default: %s.")
+             !t.install_destdir );
+         ( "--strict",
+           Arg.Unit (fun () -> t := { !t with strict = true }),
+           spf
+             (f_ " Additional check are errors during install. Default: %b.")
+             !t.strict );
+         ( "--uninstall-language",
+           Arg.String
+             (fun str -> t := { !t with uninstall_language_option = Some str }),
+           s_
+             "language Language to use when uninstalling a MO file. Default: \
+              try to guess it from the name of the MO file." );
+         ( "--uninstall-category",
+           Arg.String
+             (fun str ->
+               t :=
+                 {
+                   !t with
+                   uninstall_category = GettextCategory.category_of_string str;
+                 }),
+           spf
+             (f_
+                "category Category to use when uninstalling a MO file.  \
+                 Default: %s.")
+             (GettextCategory.string_of_category !t.uninstall_category) );
+         ( "--uninstall-textdomain",
+           Arg.String
+             (fun str ->
+               t := { !t with uninstall_textdomain_option = Some str }),
+           s_
+             "textdomain Textdomain to use when uninstalling a MO file. \
+              Default: try to guess it from the name of the MO file." );
+         ( "--uninstall-orgdir",
+           Arg.String (fun str -> t := { !t with uninstall_orgdir = str }),
+           spf
+             (f_
+                "dirname Base dir used when uninstalling a MO file. Default: \
+                 %s.")
+             !t.uninstall_orgdir );
+         ( "--merge-pot",
+           Arg.String (fun str -> t := { !t with merge_filename_pot = str }),
+           spf
+             (f_
+                "filename POT file to use as a master for merging PO file. \
+                 Default: %s.")
+             !t.merge_filename_pot );
+         ( "--merge-backup-extension",
+           Arg.String (fun str -> t := { !t with merge_backup_extension = str }),
+           spf
+             (f_
+                "extension Backup extension to use when moving PO file which \
+                 have been merged. Default: %s.")
+             !t.merge_backup_extension );
+         ( "--version",
+           Arg.Unit (fun () -> t := { !t with action_option = Some Version }),
+           s_ " Returns version information on ocaml-gettext." );
+         ( "--short-version",
+           Arg.Unit
+             (fun () -> t := { !t with action_option = Some VersionShort }),
+           s_ " Returns only the version string of ocaml-gettext." );
+       ]
+      @ gettext_args)
   in
   let () =
     Arg.parse args

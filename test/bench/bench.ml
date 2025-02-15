@@ -42,10 +42,7 @@ let parse_arg () =
     (Arg.align
        [
          ( "--test_dir",
-           Arg.String
-             (fun dir ->
-                benchs :=
-                  { !benchs with test_dir = dir }),
+           Arg.String (fun dir -> benchs := { !benchs with test_dir = dir }),
            "dir Search the specified directory for MO file." );
          ( "--verbose",
            Arg.Unit (fun () -> benchs := { !benchs with verbose = true }),
@@ -58,16 +55,16 @@ let parse_arg () =
              !benchs.time );
        ])
     (fun _str -> ())
-    ( "Benchmark utility for ocaml-gettext v" ^ GettextConfig.version
-      ^ " by Sylvain Le Gall\n"
-      ^ "Copyright (C) 2004-2008 Sylvain Le Gall <sylvain@le-gall.net>\n"
-      ^ "Licensed under LGPL v2.1 with Ocaml exception." );
+    ("Benchmark utility for ocaml-gettext v" ^ GettextConfig.version
+   ^ " by Sylvain Le Gall\n"
+   ^ "Copyright (C) 2004-2008 Sylvain Le Gall <sylvain@le-gall.net>\n"
+   ^ "Licensed under LGPL v2.1 with Ocaml exception.");
   !benchs
 
 let print_debug benchs str =
   if benchs.verbose then (
     print_string str;
-    print_newline () )
+    print_newline ())
   else ()
 
 let make_buffer lst = (lst, [])
@@ -78,28 +75,20 @@ let get_buffer (lst1, lst2) =
   | [], hd :: tl -> (hd, (tl, [ hd ]))
   | [], [] -> failwith "Buffer is empty"
 
-type fixture = {
-  textdomain: string;
-  realized_lst: (string * t') list;
-}
+type fixture = { textdomain : string; realized_lst : (string * t') list }
 
 (* Set up benchmarks. *)
 let set_up benchs =
   let parameters =
-    parameters_of_filename
-      benchs.test_dir
+    parameters_of_filename benchs.test_dir
       (FilePath.DefaultPath.make_filename
-         ["fr_FR"; "LC_MESSAGES"; "test2.mo" ])
+         [ "fr_FR"; "LC_MESSAGES"; "test2.mo" ])
   in
   let t = t_of_parameters parameters in
-  let realized_lst = List.map
-      (fun (name, realize) -> name, realize t)
-      realize_data
+  let realized_lst =
+    List.map (fun (name, realize) -> (name, realize t)) realize_data
   in
-  {
-    textdomain = parameters.textdomain;
-    realized_lst = realized_lst;
-  }
+  { textdomain = parameters.textdomain; realized_lst }
 
 (*******************************)
 (* Performance of check_format *)
@@ -147,7 +136,7 @@ let realize_bench benchs =
   let bench_lst =
     List.map
       (fun (str_implementation, realize) ->
-         (str_implementation, f, (realize, parameters_lst)))
+        (str_implementation, f, (realize, parameters_lst)))
       realize_data
   in
   print_debug benchs "Benchmarking realize:";
@@ -160,16 +149,18 @@ let realize_bench benchs =
 let s_bench benchs =
   let fun_gettext t' textdomain =
     let _ : string = GettextCompat.dgettext t' textdomain "" in
-    let _ : string = GettextCompat.dgettext t' textdomain "%s is replaced by %s." in
+    let _ : string =
+      GettextCompat.dgettext t' textdomain "%s is replaced by %s."
+    in
     let _ : string = GettextCompat.dgettext t' textdomain "hey" in
     ()
   in
   let fixture = set_up benchs in
-  ("s_ benchmark",
-   throughputN benchs.time
-     (List.map (fun (name, t') ->
-          (name, fun_gettext t', fixture.textdomain))
-         fixture.realized_lst))
+  ( "s_ benchmark",
+    throughputN benchs.time
+      (List.map
+         (fun (name, t') -> (name, fun_gettext t', fixture.textdomain))
+         fixture.realized_lst) )
 
 (*********************)
 (* Performance of f_ *)
@@ -177,18 +168,24 @@ let s_bench benchs =
 
 let f_bench benchs =
   let fun_gettext t' textdomain =
-    let _ : string = Printf.sprintf (GettextCompat.fdgettext t' textdomain "'Your command, please?', asked the waiter.") in
+    let _ : string =
+      Printf.sprintf
+        (GettextCompat.fdgettext t' textdomain
+           "'Your command, please?', asked the waiter.")
+    in
     (* TODO: gettextFormat doesn't handle well %2$s in the translation. *)
-(*     let _ : string = Printf.sprintf (GettextCompat.fdgettext t' textdomain "%s is replaced by %s.") "a" "b" in *)
-    let _ : string = Printf.sprintf (GettextCompat.fdgettext t' textdomain "hey") in
+    (*     let _ : string = Printf.sprintf (GettextCompat.fdgettext t' textdomain "%s is replaced by %s.") "a" "b" in *)
+    let _ : string =
+      Printf.sprintf (GettextCompat.fdgettext t' textdomain "hey")
+    in
     ()
   in
   let fixture = set_up benchs in
-  ("f_ benchmark",
-   throughputN benchs.time
-     (List.map (fun (name, t') ->
-          (name, fun_gettext t', fixture.textdomain))
-         fixture.realized_lst))
+  ( "f_ benchmark",
+    throughputN benchs.time
+      (List.map
+         (fun (name, t') -> (name, fun_gettext t', fixture.textdomain))
+         fixture.realized_lst) )
 
 (**********************)
 (* Performance of sn_ *)
@@ -196,18 +193,26 @@ let f_bench benchs =
 
 let sn_bench benchs =
   let fun_gettext t' textdomain =
-    let _ : string = GettextCompat.dngettext t' textdomain "%d coffee" "more %d coffee" 0 in
-    let _ : string = GettextCompat.dngettext t' textdomain "%d coffee" "more %d coffee" 1 in
-    let _ : string = GettextCompat.dngettext t' textdomain "%d coffee" "more %d coffee" 2 in
-    let _ : string = GettextCompat.dngettext t' textdomain "%d coffee" "more %d coffee" 3 in
+    let _ : string =
+      GettextCompat.dngettext t' textdomain "%d coffee" "more %d coffee" 0
+    in
+    let _ : string =
+      GettextCompat.dngettext t' textdomain "%d coffee" "more %d coffee" 1
+    in
+    let _ : string =
+      GettextCompat.dngettext t' textdomain "%d coffee" "more %d coffee" 2
+    in
+    let _ : string =
+      GettextCompat.dngettext t' textdomain "%d coffee" "more %d coffee" 3
+    in
     ()
   in
   let fixture = set_up benchs in
-  ("sn_ benchmark",
-   throughputN benchs.time
-     (List.map (fun (name, t') ->
-          (name, fun_gettext t', fixture.textdomain))
-         fixture.realized_lst))
+  ( "sn_ benchmark",
+    throughputN benchs.time
+      (List.map
+         (fun (name, t') -> (name, fun_gettext t', fixture.textdomain))
+         fixture.realized_lst) )
 
 (**********************)
 (* Performance of fn_ *)
@@ -215,36 +220,44 @@ let sn_bench benchs =
 
 let fn_bench benchs =
   let fun_gettext t' textdomain =
-    let _ : string = GettextCompat.dngettext t' textdomain "%d coffee" "more %d coffee" 0 in
-    let _ : string = GettextCompat.dngettext t' textdomain "%d coffee" "more %d coffee" 1 in
-    let _ : string = GettextCompat.dngettext t' textdomain "%d coffee" "more %d coffee" 2 in
-    let _ : string = GettextCompat.dngettext t' textdomain "%d coffee" "more %d coffee" 3 in
+    let _ : string =
+      GettextCompat.dngettext t' textdomain "%d coffee" "more %d coffee" 0
+    in
+    let _ : string =
+      GettextCompat.dngettext t' textdomain "%d coffee" "more %d coffee" 1
+    in
+    let _ : string =
+      GettextCompat.dngettext t' textdomain "%d coffee" "more %d coffee" 2
+    in
+    let _ : string =
+      GettextCompat.dngettext t' textdomain "%d coffee" "more %d coffee" 3
+    in
     ()
   in
   let fixture = set_up benchs in
-  ("fn_ benchmark",
-   throughputN benchs.time
-     (List.map (fun (name, t') ->
-          (name, fun_gettext t', fixture.textdomain))
-         fixture.realized_lst))
+  ( "fn_ benchmark",
+    throughputN benchs.time
+      (List.map
+         (fun (name, t') -> (name, fun_gettext t', fixture.textdomain))
+         fixture.realized_lst) )
 
 (**************************)
 (* Main benchmark routine *)
 (**************************)
-
 ;;
+
 let benchs = parse_arg () in
 let () = print_endline benchs.test_dir in
 let all_bench =
-  [ format_bench; realize_bench; s_bench; f_bench ; sn_bench; fn_bench ]
+  [ format_bench; realize_bench; s_bench; f_bench; sn_bench; fn_bench ]
 in
 
 (* Running *)
 let all_results = List.map (fun x -> x benchs) all_bench in
 List.iter
   (fun (str, results) ->
-     print_newline ();
-     print_newline ();
-     print_endline str;
-     tabulate results)
+    print_newline ();
+    print_newline ();
+    print_endline str;
+    tabulate results)
   all_results

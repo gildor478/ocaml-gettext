@@ -21,15 +21,12 @@
 (**************************************************************************)
 
 open GettextUtils
-(**
-    @author Sylvain Le Gall
-  *)
+(** @author Sylvain Le Gall *)
 
 open GettextTypes
 open GettextMo_int32
 
 let mo_sig_be = int32_of_byte (0x95, 0x04, 0x12, 0xde)
-
 let mo_sig_le = int32_of_byte (0xde, 0x12, 0x04, 0x95)
 
 let check_mo_header chn hdr =
@@ -107,8 +104,8 @@ let input_mo_header chn =
 let output_mo_header chn hdr =
   let output = output_int32 chn hdr.endianess in
   (* magic_number : be is the native way to
-  * specify it, it will be translated through
-  * the output_int32*)
+   * specify it, it will be translated through
+   * the output_int32*)
   output mo_sig_be;
   output hdr.file_format_revision;
   output hdr.number_of_strings;
@@ -251,8 +248,7 @@ let input_mo_informations failsafe chn mo_header =
     language = extract_field_string "Language";
     mime_version = extract_field_string "MIME-Version";
     content_type = extract_field_string "Content-Type";
-    content_transfer_encoding =
-      extract_field_string "Content-Transfer-Encoding";
+    content_transfer_encoding = extract_field_string "Content-Transfer-Encoding";
     plural_forms = extract_field_string "Plural-Forms";
     content_type_charset;
     nplurals;
@@ -275,8 +271,7 @@ let string_of_mo_informations ?(compute_plurals = (0, 3)) mo_translation =
     (extract_string mo_translation.last_translator);
   p buff "Language-Team             : %s\n"
     (extract_string mo_translation.language_team);
-  p buff "Language             : %s\n"
-    (extract_string mo_translation.language);
+  p buff "Language             : %s\n" (extract_string mo_translation.language);
   p buff "MIME-Version              : %s\n"
     (extract_string mo_translation.mime_version);
   p buff "Content-Type              : %s\n"
@@ -297,8 +292,8 @@ let string_of_mo_informations ?(compute_plurals = (0, 3)) mo_translation =
 
 let output_mo ?(endianess = LittleEndian) chn lst =
   (* There could have potential issue with alignment, but it seems to be fixed
-  * at 1 in gettext-0.14.1/gettext-tools/configure.ac, so there is no probleme
-  * *)
+   * at 1 in gettext-0.14.1/gettext-tools/configure.ac, so there is no probleme
+   *)
   let null_terminated lst = List.map (fun str -> str ^ "\000") lst in
   let compute_table start_pos lst =
     let compute_length lst = List.map String.length lst in
@@ -346,7 +341,10 @@ let output_mo ?(endianess = LittleEndian) chn lst =
     null_terminated (List.map to_string sorted_lst)
   in
   let gN = List.length sorted_lst in
-  let gO = 28 (* Size of the header *) in
+  let gO =
+    28
+    (* Size of the header *)
+  in
   let gT = gO + (8 * gN) in
   let gS =
     0
@@ -386,9 +384,7 @@ let fold_mo failsafe f init fl_mo =
       let fun_plural_forms = informations.GettextTypes.fun_plural_forms in
       let rec fold_mo_aux accu i =
         if i < Int32.to_int mo_header.number_of_strings then
-          let new_translation =
-            input_mo_translation failsafe chn mo_header i
-          in
+          let new_translation = input_mo_translation failsafe chn mo_header i in
           let new_accu = f new_translation accu in
           fold_mo_aux new_accu (i + 1)
         else accu

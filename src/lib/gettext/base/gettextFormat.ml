@@ -21,17 +21,15 @@
 (**************************************************************************)
 
 (** Check string equivalence regarding printf use.
-    @author Sylvain Le Gall
-  *)
+    @author Sylvain Le Gall *)
 
 open GettextTypes
 open GettextUtils
 
-(** [check_format failsafe translation] Returns a translation structure
-    if all the string contained in the translation are equivalent of str_id,
-    regarding printf format. If not, replace each string which conflict by
-    str_id, in the result.
-  *)
+(** [check_format failsafe translation] Returns a translation structure if all
+    the string contained in the translation are equivalent of str_id, regarding
+    printf format. If not, replace each string which conflict by str_id, in the
+    result. *)
 let check_format failsafe translation =
   let format_lst_of_string str =
     let lexbuf = Lexing.from_string str in

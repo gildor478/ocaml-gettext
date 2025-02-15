@@ -21,57 +21,47 @@
 (**************************************************************************)
 
 (** Gettext compatibility with the native gettext API
-    @author Sylvain Le Gall
-  *)
+    @author Sylvain Le Gall *)
 
 open GettextTypes
 open GettextCategory
 
 val textdomain : textdomain -> t -> t
-(** [textdomain domain t] Set the current text domain.
-  *)
+(** [textdomain domain t] Set the current text domain. *)
 
 val get_textdomain : t -> textdomain
-(** [get_textdomain t] Returns the current text domain.
-  *)
+(** [get_textdomain t] Returns the current text domain. *)
 
 val bindtextdomain : textdomain -> dir -> t -> t
 (** [bindtextdomain textdomain dir] Set the default base directory for the
-    specified domain.
-  *)
+    specified domain. *)
 
 val bind_textdomain_codeset : textdomain -> codeset -> t -> t
 (** [bind_textdomain_codeset textdomain codeset] Set the codeset to use for the
     specified domain. [codeset] must be a valid codeset for the underlying
-    character encoder/decoder (iconv, camomile, extlib...)
-  *)
+    character encoder/decoder (iconv, camomile, extlib...) *)
 
 val gettext : t' -> string -> string
-(** [gettext t' str] Translate the string [str].
-  *)
+(** [gettext t' str] Translate the string [str]. *)
 
 val fgettext :
   t' -> ('a, 'b, 'c, 'd, 'e, 'f) format6 -> ('a, 'b, 'c, 'd, 'e, 'f) format6
-(** [fgettext t' str] [gettext] returning format.
-  *)
+(** [fgettext t' str] [gettext] returning format. *)
 
 val dgettext : t' -> textdomain -> string -> string
 (** [dgettext t' textdomain str] Translate the string [str] for the specified
-    domain.
-  *)
+    domain. *)
 
 val fdgettext :
   t' ->
   textdomain ->
   ('a, 'b, 'c, 'd, 'e, 'f) format6 ->
   ('a, 'b, 'c, 'd, 'e, 'f) format6
-(** [fdgettext t' textdomain str] [dgettext] returning format.
-  *)
+(** [fdgettext t' textdomain str] [dgettext] returning format. *)
 
 val dcgettext : t' -> textdomain -> string -> category -> string
 (** [dcgettext t' textdomain str category] Translate the string [str] for the
-    specified domain and category.
-  *)
+    specified domain and category. *)
 
 val fdcgettext :
   t' ->
@@ -79,14 +69,12 @@ val fdcgettext :
   ('a, 'b, 'c, 'd, 'e, 'f) format6 ->
   category ->
   ('a, 'b, 'c, 'd, 'e, 'f) format6
-(** [fdcgettext t' textdomain str category] [dcgettext] returning format.
-  *)
+(** [fdcgettext t' textdomain str category] [dcgettext] returning format. *)
 
 val ngettext : t' -> string -> string -> int -> string
-(** [ngettext t' str str_plural n] Translate the string [str] using a plural form.
-    str_plural is the default english plural. n is the relevant number for plural
-    (i.e. the number of objects deals with the string).
-  *)
+(** [ngettext t' str str_plural n] Translate the string [str] using a plural
+    form. str_plural is the default english plural. n is the relevant number for
+    plural (i.e. the number of objects deals with the string). *)
 
 val fngettext :
   t' ->
@@ -94,13 +82,11 @@ val fngettext :
   ('a, 'b, 'c, 'd, 'e, 'f) format6 ->
   int ->
   ('a, 'b, 'c, 'd, 'e, 'f) format6
-(** [fngettext t' str str_plural n] [ngettext] returning format.
-  *)
+(** [fngettext t' str str_plural n] [ngettext] returning format. *)
 
 val dngettext : t' -> textdomain -> string -> string -> int -> string
 (** [dngettext t' textdomain str str_plural n] Translate the string [str] using
-    a plural form for the specified domain.
-  *)
+    a plural form for the specified domain. *)
 
 val fdngettext :
   t' ->
@@ -109,14 +95,12 @@ val fdngettext :
   ('a, 'b, 'c, 'd, 'e, 'f) format6 ->
   int ->
   ('a, 'b, 'c, 'd, 'e, 'f) format6
-(** [fdngettext t' textdomain str str_plural n] [dngettext] returning format.
-  *)
+(** [fdngettext t' textdomain str str_plural n] [dngettext] returning format. *)
 
 val dcngettext :
   t' -> textdomain -> string -> string -> int -> category -> string
 (** [dcngettext t' textdomain str str_plural n category] Translate the string
-    [str] using a plural form for the specified domain and category.
-  *)
+    [str] using a plural form for the specified domain and category. *)
 
 val fdcngettext :
   t' ->
@@ -127,5 +111,4 @@ val fdcngettext :
   category ->
   ('a, 'b, 'c, 'd, 'e, 'f) format6
 (** [fdcngettext t' textdomain str str_plural n category] [dcngettext] returning
-    format.
-  *)
+    format. *)

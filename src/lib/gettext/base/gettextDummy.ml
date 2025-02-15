@@ -21,8 +21,7 @@
 (**************************************************************************)
 
 (** Concrete implementation based on nothing.
-    @author Sylvain Le Gall
- *)
+    @author Sylvain Le Gall *)
 
 open GettextTypes
 

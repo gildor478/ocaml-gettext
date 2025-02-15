@@ -20,9 +20,7 @@
 (*  USA                                                                   *)
 (**************************************************************************)
 
-(**
-    @author Sylvain Le Gall
-  *)
+(** @author Sylvain Le Gall *)
 
 type locale = {
   language : string;

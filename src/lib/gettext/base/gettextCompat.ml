@@ -34,17 +34,14 @@ let bind_textdomain_codeset textdomain codeset t =
   upgrade_textdomain t textdomain (Some codeset, None)
 
 let textdomain default t = { t with default }
-
 let get_textdomain t = t.default
-
 let gettext t' str = t' false None str None LC_MESSAGES
 
 let fgettext t' fmt =
   unsafe_format_of_string fmt
     (t' true None (string_of_format fmt) None LC_MESSAGES)
 
-let dgettext t' textdomain str =
-  t' false (Some textdomain) str None LC_MESSAGES
+let dgettext t' textdomain str = t' false (Some textdomain) str None LC_MESSAGES
 
 let fdgettext t' textdomain fmt =
   unsafe_format_of_string fmt

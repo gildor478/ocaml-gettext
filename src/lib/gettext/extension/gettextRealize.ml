@@ -21,8 +21,7 @@
 (**************************************************************************)
 
 (** Module type for the function realize.
-    @author Sylvain Le Gall
-  *)
+    @author Sylvain Le Gall *)
 
 open GettextTypes
 open GettextCategory

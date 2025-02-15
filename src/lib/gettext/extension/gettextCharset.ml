@@ -21,32 +21,26 @@
 (**************************************************************************)
 
 (** Signature of module for charset conversion
-    @author Sylvain Le Gall
-  *)
+    @author Sylvain Le Gall *)
 
 open GettextTypes
 
 module type CHARSET_TYPE = sig
   type encoding = string
-
   type u
 
   val create : t -> encoding -> encoding -> u
-  (** create in_enc out_enc : create a new charset converter from charset
-        in_enc to out_enc.
-    *)
+  (** create in_enc out_enc : create a new charset converter from charset in_enc
+      to out_enc. *)
 
   val recode : u -> string -> string
-  (** recode str enc : return a transcoded string according to enc.
-    *)
+  (** recode str enc : return a transcoded string according to enc. *)
 end
 
 module Dummy : CHARSET_TYPE = struct
   type encoding = string
-
   type u = unit
 
   let create _t _in_enc _out_enc = ()
-
   let recode () str = str
 end

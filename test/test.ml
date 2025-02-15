@@ -63,9 +63,9 @@ let format_test =
         ()
     | trans1, trans2 ->
         assert_failure
-          ( string_of_translation trans1
+          (string_of_translation trans1
           ^ " differs from "
-          ^ string_of_translation trans2 )
+          ^ string_of_translation trans2)
   in
   "Printf format test"
   >::: List.map format_test_one format_translation_check_data
@@ -95,14 +95,14 @@ let split_plural_test =
 let po_test =
   let po_test_one f_test_mo fl_po =
     Printf.sprintf "Load and compile %s" fl_po >:: fun ctxt ->
-      let tests = make_tests ctxt in
-      let fl_mo = concat tests.test_dir (replace_extension fl_po "mo") in
-      let fl_po = concat tests.test_dir fl_po in
-      let chn = open_in fl_po in
-      ignore (GettextPo.input_po chn);
-      close_in chn;
-      GettextCompile.compile fl_po fl_mo;
-      load_mo_file ctxt f_test_mo fl_mo
+    let tests = make_tests ctxt in
+    let fl_mo = concat tests.test_dir (replace_extension fl_po "mo") in
+    let fl_po = concat tests.test_dir fl_po in
+    let chn = open_in fl_po in
+    ignore (GettextPo.input_po chn);
+    close_in chn;
+    GettextCompile.compile fl_po fl_mo;
+    load_mo_file ctxt f_test_mo fl_mo
   in
   "PO processing test"
   >::: List.map (po_test_one ignore)
@@ -119,8 +119,7 @@ let po_test =
                      | Plural (id, _, [ "" ]) ->
                          assert_failure
                            (Printf.sprintf
-                              "%s contains an empty translation for %s" fl_mo
-                              id)
+                              "%s contains an empty translation for %s" fl_mo id)
                      | _ -> ())
                    () fl_mo
                in
@@ -136,45 +135,45 @@ let extract_test =
   let default_options = "" in
   let filename_options = MapString.empty in
   let extract_test_one (fl_ml, contents) =
-    fl_ml >::: [
-      ("Extracting" >:: fun ctxt ->
-          let tests = make_tests ctxt in
-          let fl_pot = concat tests.test_dir (replace_extension fl_ml "pot") in
-          let fl_ml = concat tests.test_dir fl_ml in
-          begin
-            try
-              let ocaml_xgettext =
-                if FilePath.is_relative tests.ocaml_xgettext then
-                  FilePath.make_absolute (Sys.getcwd ()) tests.ocaml_xgettext
-                else
-                  tests.ocaml_xgettext
-              in
-              (* Extract data from files *)
-              GettextCompile.extract ocaml_xgettext default_options
-                filename_options [ fl_ml ] fl_pot
-            with x ->
-              assert_failure
-                ( fl_ml ^ " doesn't extract correctly: "
-                  ^ Gettext.string_of_exception x ) 
-          end;
+    fl_ml
+    >::: [
+           ( "Extracting" >:: fun ctxt ->
+             let tests = make_tests ctxt in
+             let fl_pot =
+               concat tests.test_dir (replace_extension fl_ml "pot")
+             in
+             let fl_ml = concat tests.test_dir fl_ml in
+             (try
+                let ocaml_xgettext =
+                  if FilePath.is_relative tests.ocaml_xgettext then
+                    FilePath.make_absolute (Sys.getcwd ()) tests.ocaml_xgettext
+                  else tests.ocaml_xgettext
+                in
+                (* Extract data from files *)
+                GettextCompile.extract ocaml_xgettext default_options
+                  filename_options [ fl_ml ] fl_pot
+              with x ->
+                assert_failure
+                  (fl_ml ^ " doesn't extract correctly: "
+                  ^ Gettext.string_of_exception x));
 
-          (* Load POT file *)
-          let po =
-            let chn = open_in fl_pot in
-            let res = GettextPo.input_po chn in
-            close_in chn;
-            res
-          in
-          (* Check result *)
-          List.iter
-            (fun str ->
-               if MapString.mem str po.no_domain then ()
-               else
-                 assert_failure
-                   (Printf.sprintf "Cannot find %S in %s" str fl_pot))
-            contents );
-    ]
-in
+             (* Load POT file *)
+             let po =
+               let chn = open_in fl_pot in
+               let res = GettextPo.input_po chn in
+               close_in chn;
+               res
+             in
+             (* Check result *)
+             List.iter
+               (fun str ->
+                 if MapString.mem str po.no_domain then ()
+                 else
+                   assert_failure
+                     (Printf.sprintf "Cannot find %S in %s" str fl_pot))
+               contents );
+         ]
+  in
   "OCaml file extraction test"
   >::: List.map extract_test_one
          [
@@ -195,54 +194,55 @@ in
 let install_test =
   let install_test_one (language, category, textdomain, fl_mo, fl_dsts) =
     fl_mo >:: fun ctxt ->
-      let tests = make_tests ctxt in
-      let fl_mo = concat tests.test_dir fl_mo in
-      let fl_dst = make_filename (tests.install_dir :: fl_dsts) in
-      GettextCompile.install true tests.install_dir language category textdomain
-        fl_mo;
-      assert_bool
-        (Printf.sprintf "%s is not installed at %s" fl_mo fl_dst)
-        (test Exists fl_dst)
+    let tests = make_tests ctxt in
+    let fl_mo = concat tests.test_dir fl_mo in
+    let fl_dst = make_filename (tests.install_dir :: fl_dsts) in
+    GettextCompile.install true tests.install_dir language category textdomain
+      fl_mo;
+    assert_bool
+      (Printf.sprintf "%s is not installed at %s" fl_mo fl_dst)
+      (test Exists fl_dst)
   in
   let install_fail_test_one (fl_mo, exc) =
     let error = Printexc.to_string exc in
     Printf.sprintf "%s (%s)" fl_mo error >:: fun ctxt ->
-      let tests = make_tests ctxt in
-      let fl_mo = concat tests.test_dir fl_mo in
-      assert_raises
-        ~msg:
-          (Printf.sprintf "Installation of %s should have failed with error %s"
-             fl_mo error) exc (fun () ->
-              GettextCompile.install true tests.install_dir "fr" LC_MESSAGES
-                "gettext-fail" fl_mo)
+    let tests = make_tests ctxt in
+    let fl_mo = concat tests.test_dir fl_mo in
+    assert_raises
+      ~msg:
+        (Printf.sprintf "Installation of %s should have failed with error %s"
+           fl_mo error) exc (fun () ->
+        GettextCompile.install true tests.install_dir "fr" LC_MESSAGES
+          "gettext-fail" fl_mo)
   in
   let install_warning_test_one
       (language, category, textdomain, fl_mo, exp_err, fl_dsts) =
     Printf.sprintf "%s warning" fl_mo >:: fun ctxt ->
-      let tests = make_tests ctxt in
-      let out = Buffer.create 13 in
-      let capture_out strm = Seq.iter (Buffer.add_char out) strm in
-      let fl_mo = concat tests.test_dir fl_mo in
-      let fl_dst = make_filename (tests.install_dir :: fl_dsts) in
-        assert_command
-          ~ctxt
-          ~use_stderr:true
-          ~foutput:capture_out
-          tests.ocaml_gettext
-          [
-            "--action"; "install";
-            "--install-language"; language;
-            "--install-category"; category;
-            "--install-textdomain"; textdomain;
-            "--install-destdir"; tests.install_dir;
-            fl_mo;
-          ];
-      assert_equal
-        ~msg:("error output")
-        ~printer:(Printf.sprintf "%S") exp_err (Buffer.contents out);
-      assert_bool
-        (Printf.sprintf "File %s doesn't exist" fl_dst)
-        (test Exists fl_dst)
+    let tests = make_tests ctxt in
+    let out = Buffer.create 13 in
+    let capture_out strm = Seq.iter (Buffer.add_char out) strm in
+    let fl_mo = concat tests.test_dir fl_mo in
+    let fl_dst = make_filename (tests.install_dir :: fl_dsts) in
+    assert_command ~ctxt ~use_stderr:true ~foutput:capture_out
+      tests.ocaml_gettext
+      [
+        "--action";
+        "install";
+        "--install-language";
+        language;
+        "--install-category";
+        category;
+        "--install-textdomain";
+        textdomain;
+        "--install-destdir";
+        tests.install_dir;
+        fl_mo;
+      ];
+    assert_equal ~msg:"error output" ~printer:(Printf.sprintf "%S") exp_err
+      (Buffer.contents out);
+    assert_bool
+      (Printf.sprintf "File %s doesn't exist" fl_dst)
+      (test Exists fl_dst)
   in
   "MO file installation test"
   >::: List.map install_test_one
@@ -256,8 +256,7 @@ let install_test =
              LC_MESSAGES,
              "gettext-test2",
              "test2.mo",
-             [ "fr_FR"; "LC_MESSAGES"; "gettext-test2.mo" ]
-           );
+             [ "fr_FR"; "LC_MESSAGES"; "gettext-test2.mo" ] );
            ( "fr",
              LC_TIME,
              "gettext-test3",
@@ -300,36 +299,34 @@ let merge_test =
   let merge_one (fl_pot, fl_po, backup_ext) =
     fl_pot ^ "+" ^ fl_po
     >::: [
-      ("Merging" >:: fun ctxt ->
-          let tests = make_tests ctxt in
-          let fl_pot = concat tests.test_dir fl_pot in
-          let fl_po = concat tests.test_dir fl_po in
+           ( "Merging" >:: fun ctxt ->
+             let tests = make_tests ctxt in
+             let fl_pot = concat tests.test_dir fl_pot in
+             let fl_po = concat tests.test_dir fl_po in
 
-          try
-            (* Copying the file to the good place *)
-            let fl_backup = add_extension fl_po backup_ext in
-            cp [ fl_po ] fl_pot;
-            GettextCompile.merge fl_pot [ fl_po ] backup_ext;
-            ( match cmp fl_po fl_po with
-              | Some -1 ->
-                assert_failure (fl_po ^ " or " ^ fl_po ^ " doesn't exist")
-              | Some _ -> assert_failure (fl_po ^ " differs from " ^ fl_po)
-              | None -> () );
-            match cmp fl_po fl_backup with
-            | Some -1 ->
-              assert_failure
-                (fl_po ^ " or " ^ fl_backup ^ " doesn't exist")
-            | Some _ -> assert_failure (fl_po ^ " differs from " ^ fl_backup)
-            | None -> ()
-          with x ->
-            assert_failure
-              ( "Unexpected error while processing " ^ fl_po ^ " ( "
-                ^ Printexc.to_string x ^ " )" ) );
-    ]
+             try
+               (* Copying the file to the good place *)
+               let fl_backup = add_extension fl_po backup_ext in
+               cp [ fl_po ] fl_pot;
+               GettextCompile.merge fl_pot [ fl_po ] backup_ext;
+               (match cmp fl_po fl_po with
+               | Some -1 ->
+                   assert_failure (fl_po ^ " or " ^ fl_po ^ " doesn't exist")
+               | Some _ -> assert_failure (fl_po ^ " differs from " ^ fl_po)
+               | None -> ());
+               match cmp fl_po fl_backup with
+               | Some -1 ->
+                   assert_failure (fl_po ^ " or " ^ fl_backup ^ " doesn't exist")
+               | Some _ -> assert_failure (fl_po ^ " differs from " ^ fl_backup)
+               | None -> ()
+             with x ->
+               assert_failure
+                 ("Unexpected error while processing " ^ fl_po ^ " ( "
+                ^ Printexc.to_string x ^ " )") );
+         ]
   in
   "POT/PO file merge test"
-  >::: List.map merge_one
-         [ ( "test4.pot", "test4.po", "bak" ); ]
+  >::: List.map merge_one [ ("test4.pot", "test4.po", "bak") ]
 
 (**********************************)
 (* Test for PO processing comment *)
@@ -347,16 +344,16 @@ let po_process_test =
   in
   "Gettext po process test"
   >::: [
-    ("multiline-comment.po" >:: fun ctxt ->
-        let tests = make_tests ctxt in
-        copy_merge_compare (concat tests.test_dir "multiline-comment.po") );
-    ("utf8-fr.po" >:: fun ctxt ->
-        let tests = make_tests ctxt in
-        copy_merge_compare (concat tests.test_dir "utf8-fr.po") );
-    ("utf8-ja.po" >:: fun ctxt ->
-        let tests = make_tests ctxt in
-        copy_merge_compare (concat tests.test_dir "utf8-ja.po") );
-  ]
+         ( "multiline-comment.po" >:: fun ctxt ->
+           let tests = make_tests ctxt in
+           copy_merge_compare (concat tests.test_dir "multiline-comment.po") );
+         ( "utf8-fr.po" >:: fun ctxt ->
+           let tests = make_tests ctxt in
+           copy_merge_compare (concat tests.test_dir "utf8-fr.po") );
+         ( "utf8-ja.po" >:: fun ctxt ->
+           let tests = make_tests ctxt in
+           copy_merge_compare (concat tests.test_dir "utf8-ja.po") );
+       ]
 
 (********************************************)
 (* Test for running ocaml-gettext program   *)
@@ -367,10 +364,10 @@ let po_process_test =
 let run_ocaml_gettext =
   "Running ocaml-gettext"
   >::: [
-    ( "ocaml-gettext with LC_ALL and LANG unset" >:: fun ctxt ->
-          let tests = make_tests ctxt in
-          assert_command ~ctxt tests.ocaml_gettext [ "--help" ])
-  ]
+         ( "ocaml-gettext with LC_ALL and LANG unset" >:: fun ctxt ->
+           let tests = make_tests ctxt in
+           assert_command ~ctxt tests.ocaml_gettext [ "--help" ] );
+       ]
 
 (******************)
 (* Try to compile *)
@@ -381,44 +378,45 @@ let compile_ocaml =
   >::: List.map
          (fun (bn, exp_return_code, exp_err) ->
            bn >:: fun ctxt ->
-            let tests = make_tests ctxt in
-            let opt_options =
-              let major, minor =
-                Scanf.sscanf Sys.ocaml_version "%d.%d.%d" (fun x y _ -> (x, y))
-              in
-              if (major, minor) >= (4, 3) then
-                ["-color"; "never"]
-              else
-                []
-            in
-            let out = Buffer.create 13 in
-            let capture_out strm = Seq.iter (Buffer.add_char out) strm in
-            let match_exp_err = Str.regexp (".*"^(Str.quote exp_err)^".*") in
-            assert_command
-              ~exit_code:(Unix.WEXITED exp_return_code)
-              ~use_stderr:true
-              ~foutput:capture_out
-              ~ctxt
-              "ocamlc"
-              (opt_options @ [
-                  "-c";
-                  "-I";
-                  make_filename
-                    [Filename.parent_dir_name;
-                     "src"; "lib"; "gettext"; "base"; ".gettextBase.objs"; "byte"];
-                  "-I"; tests.test_dir;
-                  Filename.concat tests.test_dir "TestGettext.ml";
-                  Filename.concat tests.test_dir bn;
-                ]);
-            FileUtil.rm
-              (List.map (FilePath.replace_extension bn) [ "cmo"; "cmi" ]);
-            FileUtil.rm
-              (List.map (FilePath.add_extension "TestGettext") [ "cmo"; "cmi" ]);
-            assert_bool
-              (Printf.sprintf
-                 "error output:\nwant to contain: %S\ngot:\n%s"
-                 exp_err (Buffer.contents out))
-              (Str.string_match match_exp_err (Buffer.contents out) 0))
+           let tests = make_tests ctxt in
+           let opt_options =
+             let major, minor =
+               Scanf.sscanf Sys.ocaml_version "%d.%d.%d" (fun x y _ -> (x, y))
+             in
+             if (major, minor) >= (4, 3) then [ "-color"; "never" ] else []
+           in
+           let out = Buffer.create 13 in
+           let capture_out strm = Seq.iter (Buffer.add_char out) strm in
+           let match_exp_err = Str.regexp (".*" ^ Str.quote exp_err ^ ".*") in
+           assert_command ~exit_code:(Unix.WEXITED exp_return_code)
+             ~use_stderr:true ~foutput:capture_out ~ctxt "ocamlc"
+             (opt_options
+             @ [
+                 "-c";
+                 "-I";
+                 make_filename
+                   [
+                     Filename.parent_dir_name;
+                     "src";
+                     "lib";
+                     "gettext";
+                     "base";
+                     ".gettextBase.objs";
+                     "byte";
+                   ];
+                 "-I";
+                 tests.test_dir;
+                 Filename.concat tests.test_dir "TestGettext.ml";
+                 Filename.concat tests.test_dir bn;
+               ]);
+           FileUtil.rm
+             (List.map (FilePath.replace_extension bn) [ "cmo"; "cmi" ]);
+           FileUtil.rm
+             (List.map (FilePath.add_extension "TestGettext") [ "cmo"; "cmi" ]);
+           assert_bool
+             (Printf.sprintf "error output:\nwant to contain: %S\ngot:\n%s"
+                exp_err (Buffer.contents out))
+             (Str.string_match match_exp_err (Buffer.contents out) 0))
          [
            ("unsound_warning.ml", 0, "");
            ("valid_format.ml", 0, "");
@@ -436,14 +434,14 @@ let compile_ocaml =
 let () =
   run_test_tt_main
     ("Test ocaml-gettext"
-     >::: [
-       format_test;
-       split_plural_test;
-       po_test;
-       extract_test;
-       install_test;
-       po_process_test;
-       merge_test;
-       run_ocaml_gettext;
-       compile_ocaml;
-     ])
+    >::: [
+           format_test;
+           split_plural_test;
+           po_test;
+           extract_test;
+           install_test;
+           po_process_test;
+           merge_test;
+           run_ocaml_gettext;
+           compile_ocaml;
+         ])

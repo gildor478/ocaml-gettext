@@ -23,13 +23,11 @@
 open Camomile
 open GettextTypes
 
-(** Error reported when something goes wrong during Camomile initialization.
-  *)
 exception GettextCamomileCreate of string * exn
+(** Error reported when something goes wrong during Camomile initialization. *)
 
-(** Error reported when something goes wrong during Camomile operation.
-  *)
 exception GettextCamomileRecode of string * exn
+(** Error reported when something goes wrong during Camomile operation. *)
 
 (** Charset module, that is derived directly from the camomile library. *)
 module Charset : GettextCharset.CHARSET_TYPE = struct
@@ -74,13 +72,12 @@ module Charset : GettextCharset.CHARSET_TYPE = struct
         str
 end
 
-(** Implementation based on a Map storage for string. *)
 module Map : GettextTypes.REALIZE_TYPE =
   GettextRealize.Generic (GettextTranslate.Map) (* Map translation *) (Charset)
     (* Camomile charset *)
     (GettextLocale.Posix)
+(** Implementation based on a Map storage for string. *)
 
-(** Implementation based on a Hashtbl storage for string. *)
 module Hashtbl : GettextTypes.REALIZE_TYPE =
   GettextRealize.Generic
     (GettextTranslate.Hashtbl)
@@ -88,10 +85,8 @@ module Hashtbl : GettextTypes.REALIZE_TYPE =
     (Charset)
     (* Camomile charset *)
     (GettextLocale.Posix)
+(** Implementation based on a Hashtbl storage for string. *)
 
-(** Low memory and fast initialization implementation, files are opened only
-    when needed.
- *)
 module Open : GettextTypes.REALIZE_TYPE =
   GettextRealize.Generic
     (GettextTranslate.Open)
@@ -99,3 +94,5 @@ module Open : GettextTypes.REALIZE_TYPE =
     (Charset)
     (* Camomile charset *)
     (GettextLocale.Posix)
+(** Low memory and fast initialization implementation, files are opened only
+    when needed. *)

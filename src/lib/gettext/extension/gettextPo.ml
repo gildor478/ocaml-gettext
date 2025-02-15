@@ -20,46 +20,41 @@
 (*  USA                                                                   *)
 (**************************************************************************)
 
-(**
-    @author Sylvain Le Gall
-  *)
+(** @author Sylvain Le Gall *)
 
 open GettextTypes
 
 (** empty_po : value representing an empty PO *)
 let empty_po = GettextPo_utils.empty_po
 
-(** add_po_translation_no_domain po (comment_lst,location_lst,translation) :
-    add a translation to a corpus of already defined translation with no domain
+(** add_po_translation_no_domain po (comment_lst,location_lst,translation) : add
+    a translation to a corpus of already defined translation with no domain
     defined. If the translation already exist, they are merged concerning
     location, and follow these rules for the translation itself :
-      - singular and singular : if there is an empty string ( "" ) in one
-        of the translation, use the other translation,
-      - plural and plural : if there is an empty string list ( [ "" ; "" ] ) in
-        one of the translaiton, use the other translation,
-      - singular and plural : merge into a plural form.
-    There is checks during the merge that can raise PoInconsistentMerge :
-      - for one singular string if the two plural strings differs
-      - if there is some elements that differs (considering the special case of
-        the empty string ) in the translation
-*)
+    - singular and singular : if there is an empty string ( "" ) in one of the
+      translation, use the other translation,
+    - plural and plural : if there is an empty string list ( [ "" ; "" ] ) in
+      one of the translaiton, use the other translation,
+    - singular and plural : merge into a plural form. There is checks during the
+      merge that can raise PoInconsistentMerge :
+    - for one singular string if the two plural strings differs
+    - if there is some elements that differs (considering the special case of
+      the empty string ) in the translation *)
 let add_po_translation_no_domain po po_translation =
   try GettextPo_utils.add_po_translation_no_domain po po_translation
   with PoInconsistentMerge (str1, str2) ->
     raise (PoInconsistentMerge (str1, str2))
 
 (** add_po_translation_domain po domain (comment_lst,location_lst,translation):
-   add a translation to the already defined translation with the domain
-   defined. See add_translation_no_domain for details.
-*)
+    add a translation to the already defined translation with the domain
+    defined. See add_translation_no_domain for details. *)
 let add_po_translation_domain po domain po_translation =
   try GettextPo_utils.add_po_translation_domain po domain po_translation
   with PoInconsistentMerge (str1, str2) ->
     raise (PoInconsistentMerge (str1, str2))
 
 (** merge_po po1 po2 : merge two PO. The rule for merging are the same as
-    defined in add_po_translation_no_domain. Can raise PoInconsistentMerge
-*)
+    defined in add_po_translation_no_domain. Can raise PoInconsistentMerge *)
 let merge_po po1 po2 =
   (* We take po2 as the initial set, we merge po1 into po2 beginning with
     po1.no_domain and then po1.domain *)
@@ -75,13 +70,12 @@ let merge_po po1 po2 =
   in
   MapTextdomain.fold merge_one_domain po1.domain merge_no_domain
 
-(** merge_pot po pot : merge a PO with a POT. Only consider strings that
-    exists in the pot. Always use location as defined in the POT. If a string
-    is not found, use the translation provided in the POT. If a plural is found
-    and a singular should be used, downgrade the plural to singular. If a
-    singular is found and a plural should be used, upgrade singular to plural,
-    using the strings provided in the POT for ending the translation.
-  *)
+(** merge_pot po pot : merge a PO with a POT. Only consider strings that exists
+    in the pot. Always use location as defined in the POT. If a string is not
+    found, use the translation provided in the POT. If a plural is found and a
+    singular should be used, downgrade the plural to singular. If a singular is
+    found and a plural should be used, upgrade singular to plural, using the
+    strings provided in the POT for ending the translation. *)
 let merge_pot pot po =
   let order_po_map ?domain () =
     match domain with
@@ -95,7 +89,7 @@ let merge_pot pot po =
                (fun key x lst -> if key = domain then lst else x :: lst)
                po.domain []
         in
-        try MapTextdomain.find domain po.domain :: tl with Not_found -> tl )
+        try MapTextdomain.find domain po.domain :: tl with Not_found -> tl)
   in
   let merge_translation map_lst key commented_translation_pot =
     let translation_pot = commented_translation_pot.po_comment_translation in
@@ -147,8 +141,7 @@ let input_po chn =
   try GettextPo_parser.msgfmt GettextPo_lexer.token lexbuf with
   | Parsing.Parse_error -> raise (PoInvalidFile ("parse error", lexbuf, chn))
   | Failure s -> raise (PoInvalidFile (s, lexbuf, chn))
-  | PoInconsistentMerge (str1, str2) ->
-      raise (PoInconsistentMerge (str1, str2))
+  | PoInconsistentMerge (str1, str2) -> raise (PoInconsistentMerge (str1, str2))
 
 let output_po chn po =
   let () = set_binary_mode_out chn true in
@@ -204,10 +197,10 @@ let output_po chn po =
               Buffer.add_char buff '\n';
               Buffer.add_string buff str_hyphen;
               Buffer.add_string buff str_sep;
-              String.length str_hyphen + String.length str_sep )
+              String.length str_hyphen + String.length str_sep)
             else (
               Buffer.add_string buff str_sep;
-              String.length str_sep )
+              String.length str_sep)
           in
           Buffer.add_string buff str;
           comment_line_aux false
@@ -218,20 +211,19 @@ let output_po chn po =
     comment_line_aux true 0 token_lst
   in
   let output_po_translation_aux _ commented_translation =
-    ( match commented_translation.po_comment_filepos with
+    (match commented_translation.po_comment_filepos with
     | [] -> ()
     | lst ->
         fpf "%s\n"
           (comment_line "#." " " comment_max_length
-             ( "#:"
+             ("#:"
              :: List.map
                   (fun (str, line) -> Printf.sprintf "%s:%d" str line)
-                  lst )) );
-    ( match commented_translation.po_comment_special with
+                  lst)));
+    (match commented_translation.po_comment_special with
     | [] -> ()
-    | lst ->
-        fpf "%s\n" (comment_line "#." " " comment_max_length ("#," :: lst)) );
-    ( match commented_translation.po_comment_translation with
+    | lst -> fpf "%s\n" (comment_line "#." " " comment_max_length ("#," :: lst)));
+    (match commented_translation.po_comment_translation with
     | PoSingular (id, str) ->
         fpf "msgid %a\n" hyphens id;
         fpf "msgstr %a\n" hyphens str
@@ -245,7 +237,7 @@ let output_po chn po =
               i + 1)
             0 lst
         in
-        () );
+        ());
     fpf "\n"
   in
   MapString.iter output_po_translation_aux po.no_domain;

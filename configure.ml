@@ -18,8 +18,5 @@ let () =
     (fun s ->
       raise (Arg.Bad (Printf.sprintf "don't know what to do with %S" s)))
     "Usage: ocaml configure.ml [OPTIONS]";
-  let oc = open_out_bin "src/lib/gettext/base/gettextConfigGen.ml" in
-  Printf.fprintf oc
-    "let default_localedir = %S\nlet localedir = %S\nlet version = %S\n"
-    !default_localedir !localedir !version;
-  close_out oc
+  let i = Sys.command "dune build src/lib/gettext/base/gettextConfigGen.ml" in
+  exit i

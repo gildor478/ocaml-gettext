@@ -23,10 +23,19 @@
 let default_dir = GettextConfigGen.default_localedir
 
 let default_path () =
-  let envpath = match Sys.getenv "OCAML_LOCALEPATH" with
-      s -> String.split_on_char ':' s
-    | exception Not_found -> [] in
-  envpath @ [ GettextConfigGen.localedir; GettextConfigGen.default_localedir ]
+  let dunepath =
+    match GettextConfigDune.Sites.locale with
+    | [ path ] -> [ path ]
+    | [] -> []
+    | _ -> assert false
+  in
+  let envpath =
+    match Sys.getenv "OCAML_LOCALEPATH" with
+    | s -> String.split_on_char ':' s
+    | exception Not_found -> []
+  in
+  envpath @ dunepath
+  @ [ GettextConfigGen.localedir; GettextConfigGen.default_localedir ]
 
 let default_codeset = ""
 

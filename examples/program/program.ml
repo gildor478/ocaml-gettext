@@ -28,12 +28,12 @@ let () =
   let gettext_args, gettext_copyright = ProgramGettext.Gettext.init in
   let args =
     Arg.align
-      ( [
-          ( "--my-name",
-            Arg.String (fun s -> my_name := s),
-            spf (f_ "name Your name. Default: %S") !my_name );
-        ]
-      @ gettext_args )
+      ([
+         ( "--my-name",
+           Arg.String (fun s -> my_name := s),
+           spf (f_ "name Your name. Default: %S") !my_name );
+       ]
+      @ gettext_args)
   in
   let () =
     Arg.parse args
@@ -46,7 +46,7 @@ let () =
              Options:")
          gettext_copyright)
   in
-  ExamplesLibrary.Library.library_only_function() ;
-  ExamplesLibrary.Library.hello_you !my_name ;
+  ExamplesLibrary.Library.library_only_function ();
+  ExamplesLibrary.Library.hello_you !my_name;
 
   ExamplesGUI.Gui.hello_you !my_name

@@ -4,6 +4,24 @@
 (ocamlyacc
  (modules gettextFormat_parser gettextMo_parser))
 
+(generate_sites_module
+ (module gettextConfigDune)
+ (sites gettext))
+
+(install
+ (package gettext)
+ (section
+  (site
+   (gettext locale)))
+ (files .keep-directory))
+
+(rule
+ (target gettextConfigGen.ml)
+ (action
+  (write-file
+   %{target}
+   "let default_localedir = \"%{env:GETTEXT_DEFAULT_LOCALEDIR=/usr/share/locale}\"\nlet localedir = \"%{env:GETTEXT_LOCALEDIR=/usr/local/share/locale}\"\nlet version = \"%%VERSION%%\"\n")))
+
 (library
  (name gettextBase)
  (wrapped false)
@@ -15,4 +33,4 @@
   GettextMo_int32
   GettextMo_lexer
   GettextMo_parser)
- (libraries fileutils))
+ (libraries dune-site fileutils))

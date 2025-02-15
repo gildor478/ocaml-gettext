@@ -39,13 +39,9 @@ let bad_setlocale =
   "Call setlocale with bad locale"
   >::: [
          ( "setlocale with bad locale" >:: fun _ ->
-           ignore (GettextStubCompat.setlocale GettextStubCompat.LC_ALL "xx")
-         );
+           ignore (GettextStubCompat.setlocale GettextStubCompat.LC_ALL "xx") );
        ]
 
 let () =
   run_test_tt_main
-    ("test-stub" >::: [
-        bad_setlocale;
-        implementation_test realize_data;
-      ])
+    ("test-stub" >::: [ bad_setlocale; implementation_test realize_data ])

@@ -20,9 +20,7 @@
 (*  USA                                                                   *)
 (**************************************************************************)
 
-(**
-    @author Sylvain Le Gall
-  *)
+(** @author Sylvain Le Gall *)
 
 open GettextTypes
 
@@ -73,7 +71,7 @@ let input_int32_pair_string chn endian =
     let str = Bytes.make ilength 'X' in
     seek_in chn ioffset;
     really_input chn str 0 ilength;
-    Bytes.to_string str )
+    Bytes.to_string str)
   else
     (* We use this exception, because that what should happen if we try to
         read the string *)
