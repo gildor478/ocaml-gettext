@@ -36,6 +36,8 @@ let () =
               ([ "-I/opt/local/include" ], [ "-L/opt/local/lib"; "-lintl" ]);
               (* OpenBSD and FreeBSD. *)
               ([ "-I/usr/local/include" ], [ "-L/usr/local/lib"; "-lintl" ]);
+              (* Cygwin. *)
+              ([ "-I/usr/include" ], [ "-L/usr/lib"; "-lintl" ]);
             ]
         with Not_found -> C.die "no ways to compile with gettext library"
       in
