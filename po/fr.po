@@ -1,3 +1,4 @@
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: ocaml-gettext v0.1.1\n"
@@ -12,235 +13,235 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n>1;"
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:355
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:345
 msgid " Additional check are errors during install. Default: %b."
 msgstr " Les vérifications supplémentines sont des erreurs lors de l'installation. Valeur par défaut: %b."
 
-#: ../src/lib/gettext/base/gettext.ml:269
+#: ../src/lib/gettext/base/gettext.ml:257
 msgid " Choose how to handle failure in ocaml-gettext. Default: %s."
 msgstr " Choisir la façon de traiter les erreurs dans ocaml-gettext.i Valeur par défaut : %s."
 
-#: ../src/lib/gettext/base/gettext.ml:276
+#: ../src/lib/gettext/base/gettext.ml:264
 msgid " Disable the translation perform by ocaml-gettext. Default: enable."
 msgstr " Désactive la traduction faite par ocaml-gettext. Valeur par défaut : active."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:412
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:400
 msgid " Returns only the version string of ocaml-gettext."
 msgstr " Retourne seulement la version sous forme de chaine de caractère de ocaml-gettext."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:408
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:396
 msgid " Returns version information on ocaml-gettext."
 msgstr " Retourne seulement les informations de version de ocaml-gettext."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:420
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:408
 msgid "%s\n\nCommand: ocaml-gettext -action (%s) [options]\nWhen trying to guess language and textdomain from a\nMO file, the rules applied are: language.textdomain.mo\n\nOptions:"
 msgstr "%s\n\nCommande: ocaml-gettext -action (%s) [options]\nLors de la tentative d'estimation d'un language and d'un textdomain pour un fichier MO\n, la régle suivante s'applique: language.textdomain.mo\n\nOptions:"
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:267
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:260
 msgid "Action to execute. Default: none."
 msgstr "Action à exécuter. Valeur par défaut: aucune."
 
-#: ../src/lib/gettext/base/gettext.ml:177
+#: ../src/lib/gettext/base/gettext.ml:165
 msgid "An empty entry has been encounter."
 msgstr "Une entrée vide a été trouvée."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:433
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:421
 msgid "An error occurs while processing."
 msgstr "Une erreur s'est produite pendant l'exécution."
 
-#: ../src/lib/gettext/base/gettext.ml:148
+#: ../src/lib/gettext/base/gettext.ml:138
 msgid "Cannot find an appropriate ocaml-gettext compiled file (%s)."
 msgstr "Impossible de trouver un fichier compilé ocaml-gettext approprié (%s)."
 
-#: ../src/lib/gettext/base/gettext.ml:222
+#: ../src/lib/gettext/base/gettext.ml:210
 msgid "Cannot find string %S."
 msgstr "Impossible de trouver la chaîne %S."
 
-#: ../src/lib/gettext/base/gettext.ml:205
+#: ../src/lib/gettext/base/gettext.ml:193
 msgid "Could not open file %s."
 msgstr "Impossible d'ouvrir le fichier %s."
 
-#: ../src/lib/gettext/base/gettext.ml:220
+#: ../src/lib/gettext/base/gettext.ml:208
 msgid "Error while merging two PO files: %S and %S cannot be merged."
 msgstr "Erreur lors de la fusion de 2 fichiers PO : %S et %S ne peuvent être fusionnés."
 
-#: ../src/lib/gettext/base/gettext.ml:212
+#: ../src/lib/gettext/base/gettext.ml:200
 msgid "Error while processing parsing of PO file, in msgid %S, %d index is out of bound."
 msgstr "Erreur lors du décodage du fichier PO, au niveau de msgid %S, l'indice %d est hors limite."
 
-#: ../src/lib/gettext/base/gettext.ml:208
+#: ../src/lib/gettext/base/gettext.ml:196
 msgid "Error while processing parsing of PO file: %S at %s."
 msgstr "Erreur lors du décodage du fichier PO : %S à %s."
 
-#: ../src/lib/gettext/base/gettext.ml:161
+#: ../src/lib/gettext/base/gettext.ml:151
 msgid "Error while processing parsing of content-type at %s: %S."
 msgstr "Erreur lors du décodage du champs content-type à %s : %S."
 
-#: ../src/lib/gettext/base/gettext.ml:153
+#: ../src/lib/gettext/base/gettext.ml:143
 msgid "Error while processing parsing of options at %s: %S."
 msgstr "Erreur lors du décodage des options à %s : %S."
 
-#: ../src/lib/gettext/base/gettext.ml:157
+#: ../src/lib/gettext/base/gettext.ml:147
 msgid "Error while processing parsing of plural at %s: %S."
 msgstr "Erreur lors du décodage de la forme plurielle à %s : %S."
 
-#: ../src/lib/gettext/base/gettext.ml:217
+#: ../src/lib/gettext/base/gettext.ml:205
 msgid "Error while trying to load PO file %s, file doesn't exist."
 msgstr "Erreur lors du chargement du fichier PO %s, le fichier n'existe pas."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:266
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:259
 msgid "Invalid action: %s."
 msgstr "Action invalide: %s."
 
-#: ../src/lib/gettext/base/gettext.ml:175
+#: ../src/lib/gettext/base/gettext.ml:163
 msgid "Junk at the end of the plural form id %S: %s."
 msgstr "Caractères non utilisé à la fin de la forme plurielle %S : %s."
 
-#: ../src/lib/gettext/base/gettext.ml:164
+#: ../src/lib/gettext/base/gettext.ml:154
 msgid "MO file provided is not encoded following ocaml-gettext convention."
 msgstr "Le fichier MO fourni ne suit pas les règles de la librairie ocaml-gettext."
 
-#: ../src/lib/gettext/base/gettext.ml:178
+#: ../src/lib/gettext/base/gettext.ml:166
 msgid "Number of strings is negative."
 msgstr "Le nombre de chaîne de caractères est négatif."
 
-#: ../src/lib/gettext/base/gettext.ml:150
+#: ../src/lib/gettext/base/gettext.ml:140
 msgid "Ocaml-gettext library is not initialized"
 msgstr "La librairie ocaml-gettext n'est pas initialisée."
 
-#: ../src/lib/gettext/base/gettext.ml:181
+#: ../src/lib/gettext/base/gettext.ml:169
 msgid "Offset of string table is out of bound ([%ld,%ld] should be in [%ld,%ld])."
 msgstr "Le décalage de la table de chaîne de caractère est hors limite ( [%ld,%ld] devrait être dans l'intervalle [%ld,%ld] )."
 
-#: ../src/lib/gettext/base/gettext.ml:187
+#: ../src/lib/gettext/base/gettext.ml:175
 msgid "Offset of translation table is out of bound ([%ld,%ld] should be in [%ld,%ld])."
 msgstr "Le décalage de la table de chaîne de traduction est hors limite ( [%ld,%ld] devrait être dans l'intervalle [%ld,%ld] )."
 
-#: ../src/lib/gettext/base/gettext.ml:199
+#: ../src/lib/gettext/base/gettext.ml:187
 msgid "Out of bound access when trying to find a string (%d < %d)."
 msgstr "Accès hors limite lors de la recherche d'une chaîne de caractère ( %d < %d )."
 
-#: ../src/lib/gettext/base/gettext.ml:203
+#: ../src/lib/gettext/base/gettext.ml:191
 msgid "Out of bound access when trying to find a translation (%d < %d)."
 msgstr "Accès hors limite lors de la recherche d'une traduction ( %d < %d )."
 
-#: ../src/lib/gettext/base/gettext.ml:137
+#: ../src/lib/gettext/base/gettext.ml:127
 msgid "Problem reading file %s: %s."
 msgstr "Problème lors de la lecture du fichier %s : %s."
 
-#: ../src/lib/gettext/base/gettext.ml:140
+#: ../src/lib/gettext/base/gettext.ml:130
 msgid "Problem while extracting %s: command %S exits with code %d."
 msgstr "Problème lors de l'extraction %s : la commande %S s'est terminée avec le code de sortie %d."
 
-#: ../src/lib/gettext/base/gettext.ml:144
+#: ../src/lib/gettext/base/gettext.ml:134
 msgid "Problem while extracting %s: command %S killed by signal %d."
 msgstr "Problème lors de l'extraction %s : la commande %S a été tuée avec le signal %d."
 
-#: ../src/lib/gettext/base/gettext.ml:193
+#: ../src/lib/gettext/base/gettext.ml:181
 msgid "Translation table and string table overlap ([%ld,%ld] and [%ld,%ld] have a non empty intersection)."
 msgstr "Les tables de traduction et de chaîne de caractères se recouvrent ( [%ld,%ld] et [%ld,%ld] ont une intersection non vide )."
 
-#: ../src/lib/gettext/base/gettext.ml:167
+#: ../src/lib/gettext/base/gettext.ml:156
 msgid "Trying to fetch the plural form %d of a singular form %S."
 msgstr "Tentative de récupération de la forme plurielle %d d'une forme singulière %S."
 
-#: ../src/lib/gettext/base/gettext.ml:171
+#: ../src/lib/gettext/base/gettext.ml:159
 msgid "Trying to fetch the plural form %d of plural form %s."
 msgstr "Tentative de récupération de la forme plurielle %d de la forme plurielle %d."
 
-#: ../src/lib/gettext/base/gettext.ml:224
+#: ../src/lib/gettext/base/gettext.ml:212
 msgid "Unable to parse the POSIX language environment variable %s"
 msgstr "Incapable de décoder la variable d'environnement language POSIX %s."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:99
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:92
 msgid "You cannot specify a output filename and more than one\nfilename: all the compiled file will have the same output filename"
 msgstr "Vous ne pouvez pas définir un fichier de sortie et plus\nd'un fichier : tous les fichiers de sortie vont avoir le même nom."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:94
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:87
 msgid "You cannot specify at the same time a language, a textdomain\nand provide more than one file to install/uninstall: all files\nwill have the same destination filename."
 msgstr "Vous ne pouvez pas spécifier à la fois un language, un textdomain\net fournier plus qu'un fichier à installer/désinstaller : tous les fichiers\nvont avoir le même nom de destination."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:92
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:85
 msgid "You must specify one action."
 msgstr "Vous devez spécifier une action."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:335
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:327
 msgid "category Category to use when installing a MO file. Default: %s."
 msgstr "category Categorie à utiliser pendant l'installation du fichier MO.  Valeur par défaut: %s."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:373
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:362
 msgid "category Category to use when uninstalling a MO file.  Default: %s."
 msgstr "category Category à utiliser pendant la désinstallation du fichier MO. Valeur par défaut: %s."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:271
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:264
 msgid "cmd Command to extract translatable strings from an OCaml source file. Default: %s."
 msgstr "cmd Commande pour extraire les chaines de caractères traductible depuis les fichiers sources OCaml.  Valeur par défaut: %s."
 
-#: ../src/lib/gettext/base/gettext.ml:323
+#: ../src/lib/gettext/base/gettext.ml:310
 msgid "codeset Set the default codeset for outputting string with ocaml-gettext. Default: %s."
 msgstr "codeset Défini le jeux de caractères à utiliser pour écrire les traductions. Valeur par défaut : %s."
 
-#: ../src/lib/gettext/base/gettext.ml:306
+#: ../src/lib/gettext/base/gettext.ml:294
 msgid "dir Add a search dir for ocaml-gettext files. Default: %s."
 msgstr "dir Ajoute une répertoire de recherche pour les fichiers ocaml-gettext. Défaut : %s."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:349
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:340
 msgid "dirname Base dir used when installing a MO file. Default: %s."
 msgstr "dirname Répertoire de base utilisé pendant l'installation d'un fichier MO. Valeur par défaut: %s."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:387
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:376
 msgid "dirname Base dir used when uninstalling a MO file. Default: %s."
 msgstr "dirname Répertoire de base utilisé pendant la désinstallation d'un fichier MO. Valeur par défaut: %s."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:402
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:390
 msgid "extension Backup extension to use when moving PO file which have been merged. Default: %s."
 msgstr "extension Extension pour le fichier de backup à utiliser lors du déplacement d'un fichier PO qui a été fusioné. Valeur par defaut: %s."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:317
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:309
 msgid "filename MO file to write when compiling a PO file. Default: name of the PO file with \".mo\" extension."
 msgstr "filename Fichier MO à écrire lors de la compilation d'un fichier PO. Valeur par défaut: nom du fichier PO avec l'extension \".mo\"."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:394
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:383
 msgid "filename POT file to use as a master for merging PO file. Default: %s."
 msgstr "filename Fichier POT à utiliser comme patron pour fusionner les fichiers PO. Valeur par défaut: %s."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:309
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:302
 msgid "filename POT file to write when extracting translatable strings. Default: %s."
 msgstr "filename Fichier POT à écrire lors de l'extraction des chaines de caractères traductible. Valeur par défaut: %s."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:299
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:292
 msgid "filename options Per filename option used when extracting strings from the specified filename. Default: %s."
 msgstr "filename options Options spécifiques par fichier utilisé lors de l'extraction des chaines de caractères traductibles du fichier spécifié. Valeur par défaut: %s."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:323
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:315
 msgid "language Language to use when installing a MO file. Default: try to guess it from the name of the MO file."
 msgstr "language Langage à utiilser lors de l'installation d'un fichier MO. Valeur par défaut: tente d'estimer depuis le nom du fichier MO."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:361
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:350
 msgid "language Language to use when uninstalling a MO file. Default: try to guess it from the name of the MO file."
 msgstr "language Langage à utiliser lors de la désinstallation d'un fichier MO. Valeur par défaut: tente d'estimer depuis le nom du fichier MO."
 
-#: ../src/lib/gettext/base/gettext.ml:313
+#: ../src/lib/gettext/base/gettext.ml:300
 msgid "language Set the default language for ocaml-gettext. Default: %s."
 msgstr "language Défini le langage par défaut pour ocaml-gettext. Défaut : %s."
 
-#: ../src/lib/gettext/base/gettext.ml:133
+#: ../src/lib/gettext/base/gettext.ml:123
 msgid "line %d character %d"
 msgstr "la ligne %d au caractère %d"
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:280
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:273
 msgid "options Default option used when extracting translatable strings. Default: %S."
 msgstr "options Option par défaut lors de l'extraction des chaines de caractères traductibles. Valeur par défaut: %s."
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:343
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:334
 msgid "textdomain Textdomain to use when installing a MO file. Default: try to guess it from the name of the MO file."
 msgstr "textdomain Textdomain à utiliser lors de l'installation d'un fichier MO. Valeur par défaut: tente de deviner depuis le nom du fichier MO"
 
-#: ../src/bin/ocaml-gettext/OCamlGettext.ml:381
+#: ../src/bin/ocaml-gettext/OCamlGettext.ml:370
 msgid "textdomain Textdomain to use when uninstalling a MO file. Default: try to guess it from the name of the MO file."
 msgstr "textdomain Textdomain à utiliser lors de la désinstallation d'un fichier MO. Valeur par défaut: tente de deviner depuis le nom du fichier MO."
 
-#: ../src/lib/gettext/base/gettext.ml:290
+#: ../src/lib/gettext/base/gettext.ml:278
 msgid "textdomain dir Set a dir to search ocaml-gettext files for the specified domain. Default: %s."
 msgstr "textdomain dir Défini un répertoire de recherche des fichiers ocaml-gettext pour le domaine de texte spécifié. Défaut : %s."
 

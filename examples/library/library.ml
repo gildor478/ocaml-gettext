@@ -33,10 +33,14 @@ let library_only_function () =
 
   (* More complicated : plural translation, using strings *)
   print_endline
+    (sn_ "There is " "There are " 1
+    ^ string_of_int 1 ^ sn_ " plate." " plates." 1);
+  print_endline
     (sn_ "There is " "There are " 2
-    ^ string_of_int 2 ^ sn_ " plate." "plates." 2);
+    ^ string_of_int 2 ^ sn_ " plate." " plates." 2);
 
   (* More simple forms of plural translation, using printf *)
+  Printf.printf (fn_ "There is %d plate.\n" "There are %d plates.\n" 1) 1;
   Printf.printf (fn_ "There is %d plate.\n" "There are %d plates.\n" 2) 2
 
 (* Another example function: used by program.ml *)

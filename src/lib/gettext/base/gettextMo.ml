@@ -191,7 +191,7 @@ let get_translated_value failsafe translation plural_number =
         (MoInvalidTranslationPlural (lst, x))
         List.nth lst 0
 
-let germanic_plural (* The germanic default *) n = if n = 1 then 1 else 0
+let germanic_plural (* The germanic default *) n = if n <> 1 then 1 else 0
 
 let input_mo_informations failsafe chn mo_header =
   (* La position de "" est forcément 0 *)

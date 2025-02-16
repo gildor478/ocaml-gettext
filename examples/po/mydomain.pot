@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-15 18:03+0000\n"
+"POT-Creation-Date: 2025-02-16 18:55+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: ../library/library.ml:37
 msgid " plate."
-msgid_plural "plates."
+msgid_plural " plates."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -27,7 +27,7 @@ msgstr[1] ""
 msgid "\"Hello you\" program by Sylvain Le Gall\n\n%s\n\nCommand: program [options]\n\nOptions:"
 msgstr ""
 
-#: ../gui/gui.ml:35
+#: ../gui/gui.ml:33
 msgid "Hello %s"
 msgstr ""
 
@@ -39,11 +39,7 @@ msgstr ""
 msgid "Hello %s!\n"
 msgstr ""
 
-#: ../gui/gui.ml:33
-msgid "Hello world !"
-msgstr ""
-
-#: ../library/library.ml:31
+#: ../gui/gui.ml:32 ../library/library.ml:31
 msgid "Hello world!"
 msgstr ""
 

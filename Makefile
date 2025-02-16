@@ -71,5 +71,12 @@ deploy: doc test
 eol:
 	find ./ -name _build -prune -false -or -name "*.ml" | xargs grep -r -e "  *$$"
 
-.PHONY: build doc test all uninstall clean install bench deploy lint fmt
+
+export OCAML_GETTEXT=$(readlink -f _build/default/src/bin/ocaml-gettext/OCamlGettext.exe)
+export OCAML_XGETTEXT=$(readlink -f _build/default/src/bin/ocaml-xgettext/xgettext.exe)
+update-po: build
+	$(MAKE) -C examples/po all
+	$(MAKE) -C po all
+
+.PHONY: build doc test all uninstall clean install bench deploy lint fmt update-po
 
