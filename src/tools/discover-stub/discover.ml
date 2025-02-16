@@ -11,6 +11,8 @@ int main() {
 |}
 
 let () =
+  let _ = Sys.command "brew shellenv" in
+  let _ = Sys.command "cygcheck -c -d" in
   C.main ~name:"gettext" (fun c ->
       let is_working (c_flags, link_flags) =
         C.c_test c gettext_code ~link_flags ~c_flags
