@@ -239,7 +239,7 @@ let install_test =
         fl_mo;
       ];
     assert_equal ~msg:"error output" ~printer:(Printf.sprintf "%S") exp_err
-      (Buffer.contents out);
+      (String.trim (Buffer.contents out));
     assert_bool
       (Printf.sprintf "File %s doesn't exist" fl_dst)
       (test Exists fl_dst)
@@ -287,7 +287,7 @@ let install_test =
                "test10",
                "test10.mo",
                "Error while processing parsing of plural at line 1 character \
-                10: \" nplurals=INTEGER; plural=EXPRESSION;\".\n",
+                10: \" nplurals=INTEGER; plural=EXPRESSION;\".",
                [ "fr"; "LC_MESSAGES"; "test10.mo" ] );
            ]
 
