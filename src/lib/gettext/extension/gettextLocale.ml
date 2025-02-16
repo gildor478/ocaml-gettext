@@ -21,8 +21,7 @@
 (**************************************************************************)
 
 (** Implements different operation over locale/category.
-    @author Sylvain Le Gall
-  *)
+    @author Sylvain Le Gall *)
 
 open GettextTypes
 open GettextCategory
@@ -30,19 +29,17 @@ open GettextUtils
 
 module type LOCALE_TYPE = sig
   val get_locale : t -> category -> locale list * codeset
-  (** get_locale t cat : Return the value of locale and encoding for cat.
-        The value returned is in ASCII. Priority should be given to the
-        values language/codeset provided in variable t.
-    *)
+  (** get_locale t cat : Return the value of locale and encoding for cat. The
+      value returned is in ASCII. Priority should be given to the values
+      language/codeset provided in variable t. *)
 end
 
-(** Return the best value of environnement variable, that can be found according to the
-    priority defined in gettext. The choice take into account t and category,
-    but may ignore it, if a variable with a best priority is set.
-    This function can be used to get a value for a LOCALE_TYPE implementation.
-    Raise Not_found if nothing appropriate.
-*)
-let posix_getenv t category =
+(** Return the best value of environnement variable, that can be found according
+    to the priority defined in gettext. The choice take into account t and
+    category, but may ignore it, if a variable with a best priority is set. This
+    function can be used to get a value for a LOCALE_TYPE implementation. Raise
+    Not_found if nothing appropriate. *)
+let posix_getenv (t : GettextTypes.t) category =
   (* http://www.gnu.org/software/gettext/manual/html_mono/gettext.html#SEC155
          In the function dcgettext at every call the current setting of the
          highest priority environment variable is determined and used.
@@ -71,7 +68,7 @@ let posix_getenv t category =
             ]
         in
         Sys.getenv best_env
-      with Not_found -> "C" )
+      with Not_found -> "C")
 
 module Posix : LOCALE_TYPE = struct
   (* Extract from "man setlocale"
@@ -82,7 +79,7 @@ module Posix : LOCALE_TYPE = struct
        locale(1).
      *)
 
-  let get_locale t category =
+  let get_locale (t : GettextTypes.t) category =
     let posix_lang = posix_getenv t category in
     let locale =
       try

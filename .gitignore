@@ -1,10 +1,11 @@
 /_build/
-/configure
+/_opam/
 /dist/
 /po/*.mo
 /po/fr.po.bak
+/examples/po/*.mo
+/examples/po/fr.po.bak
 /test/test
 /test/tests/
 *.merlin
-/*.install
 *.swp

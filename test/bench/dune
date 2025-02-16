@@ -1,3 +1,4 @@
 (executable
  (name bench)
- (libraries benchmark common))
+ (enabled_if "%{env:BENCH_ENABLED=false}")
+ (libraries benchmark common gettext-stub gettext-camomile))

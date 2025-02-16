@@ -21,8 +21,7 @@
 (**************************************************************************)
 
 (** Misc. utilities.
-    @author Sylvain Le Gall
-  *)
+    @author Sylvain Le Gall *)
 
 open GettextTypes
 

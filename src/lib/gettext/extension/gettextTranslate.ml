@@ -21,8 +21,7 @@
 (**************************************************************************)
 
 (** Signature of module for translation storage / access.
-    @author Sylvain Le Gall
-  *)
+    @author Sylvain Le Gall *)
 
 open GettextTypes
 open GettextUtils
@@ -33,19 +32,16 @@ module type TRANSLATE_TYPE = sig
   type u
 
   val create : t -> filename -> (string -> string) -> u
-  (** create t filename recode : Create a translation
-        table using filename as the mo file and recode as the encoding
-        converter.
-    *)
+  (** create t filename recode : Create a translation table using filename as
+      the mo file and recode as the encoding converter. *)
 
   (* BUG : need update *)
 
   val translate : u -> bool -> string -> (string * int) option -> string
-  (** translate str (plural_form,number) tbl : translate the string
-        str using tbl. It is possible that the operation modify tbl,
-        so it is returned also. It is also possible to get the plural
-        form of the translated string using plural_form and number.
-    *)
+  (** translate str (plural_form,number) tbl : translate the string str using
+      tbl. It is possible that the operation modify tbl, so it is returned also.
+      It is also possible to get the plural form of the translated string using
+      plural_form and number. *)
 end
 
 module Dummy : TRANSLATE_TYPE = struct
@@ -57,9 +53,7 @@ module Dummy : TRANSLATE_TYPE = struct
     match plural_form with
     | None -> charset str
     | Some (str_plural, x) ->
-        let check =
-          if printf_format then check_format Ignore else fun x -> x
-        in
+        let check = if printf_format then check_format Ignore else fun x -> x in
         charset
           (get_translated_value Ignore
              (check (Plural (str, str_plural, [])))

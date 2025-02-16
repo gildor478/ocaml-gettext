@@ -21,8 +21,7 @@
 (**************************************************************************)
 
 (** Functions to manipulate category.
-    @author Sylvain Le Gall
-  *)
+    @author Sylvain Le Gall *)
 
 type category =
   | LC_CTYPE
@@ -56,13 +55,7 @@ let category_of_string str =
 
 let categories =
   [
-    LC_CTYPE;
-    LC_NUMERIC;
-    LC_TIME;
-    LC_COLLATE;
-    LC_MONETARY;
-    LC_MESSAGES;
-    LC_ALL;
+    LC_CTYPE; LC_NUMERIC; LC_TIME; LC_COLLATE; LC_MONETARY; LC_MESSAGES; LC_ALL;
   ]
 
 let compare c1 c2 =

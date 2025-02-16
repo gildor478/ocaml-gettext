@@ -25,11 +25,8 @@ module Gettext =
   Gettext.Program
     (struct
       let textdomain = "mydomain"
-
       let codeset = None
-
       let dir = None
-
       let dependencies = ExamplesLibrary.Library.init @ ExamplesGUI.Gui.init
     end)
     (* I do prefer fully ocaml implementation, so choose the GettextCamomile

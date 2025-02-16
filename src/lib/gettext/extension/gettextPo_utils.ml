@@ -20,9 +20,7 @@
 (*  USA                                                                   *)
 (**************************************************************************)
 
-(**
-    @author Sylvain Le Gall
-  *)
+(** @author Sylvain Le Gall *)
 
 open GettextTypes
 
@@ -71,8 +69,7 @@ let add_po_translation_aux map commented_translation =
             PoSingular (str_id, str1)
         | PoSingular (_, str1), PoSingular (_, str2) ->
             raise
-              (PoInconsistentMerge
-                 (String.concat "" str1, String.concat "" str2))
+              (PoInconsistentMerge (String.concat "" str1, String.concat "" str2))
         | PoPlural (_, str1, lst1), PoPlural (_, str2, lst2)
           when is_lst_same str1 str2 && is_lst_empty lst1 ->
             PoPlural (str_id, str2, lst2)
@@ -88,8 +85,7 @@ let add_po_translation_aux map commented_translation =
               (PoInconsistentMerge (string_of_list lst1, string_of_list lst2))
         | PoPlural (_, str1, _), PoPlural (_, str2, _) ->
             raise
-              (PoInconsistentMerge
-                 (String.concat "" str1, String.concat "" str2))
+              (PoInconsistentMerge (String.concat "" str1, String.concat "" str2))
         | PoSingular (_, str), PoPlural (_, str_plural, lst)
         | PoPlural (_, str_plural, lst), PoSingular (_, str) -> (
             match lst with
@@ -98,8 +94,8 @@ let add_po_translation_aux map commented_translation =
             | [] -> PoPlural (str_id, str_plural, [ str ])
             | _ ->
                 raise
-                  (PoInconsistentMerge
-                     (String.concat "" str, string_of_list lst)) )
+                  (PoInconsistentMerge (String.concat "" str, string_of_list lst))
+            )
       in
       (* TODO: merge po_comment_special and use fuzzy when merging *)
       {

@@ -23,10 +23,7 @@
 (* Create the module Gettext, using the textdomain "mydomain" *)
 module Gettext = Gettext.Library (struct
   let textdomain = "mydomain"
-
   let codeset = Some "UTF-8"
-
   let dir = None
-
   let dependencies = Gettext.init
 end)

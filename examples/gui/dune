@@ -1,3 +1,4 @@
 (library
-  (name examplesGUI)
-  (libraries gettext.base lablgtk3))
+ (name examplesGUI)
+ (enabled_if "%{env:EXAMPLES_ENABLED=false}")
+ (libraries gettext.base lablgtk3))

@@ -43,10 +43,11 @@ type parameters = {
   translations : translation list;
 }
 
-let parameters_of_filename fl_mo =
+let parameters_of_filename test_dir fl_mo =
   (* File scheme:
     base_dir/lang/category/domain.mo
    *)
+  let fl_mo = FilePath.concat test_dir fl_mo in
   let textdomain = chop_extension (basename fl_mo) in
   let category =
     GettextCategory.category_of_string (basename (dirname fl_mo))
@@ -61,7 +62,7 @@ let parameters_of_filename fl_mo =
 (* Build the parameter t out of parameters extracted above *)
 let t_of_parameters parameters =
   (* We use a UTF-8 binding, this is the most generic encoding
-  * for all strings *)
+   * for all strings *)
   GettextModules.create ~failsafe:RaiseException
     ~codesets:[ (parameters.textdomain, "UTF-8") ]
     ~path:[ parameters.base_dir ] ~language:parameters.language
@@ -71,7 +72,7 @@ let t_of_parameters parameters =
 let format_translation_check_data =
   [
     (* Identity *)
-      (Singular ("%d", "%d"), Singular ("%d", "%d"));
+    (Singular ("%d", "%d"), Singular ("%d", "%d"));
     (Singular ("%i", "%i"), Singular ("%i", "%i"));
     (Singular ("%n", "%n"), Singular ("%n", "%n"));
     (Singular ("%N", "%N"), Singular ("%N", "%N"));
@@ -114,7 +115,7 @@ let format_translation_check_data =
     (Singular ("%!", "%!"), Singular ("%!", "%!"));
     (Singular ("%%", "%%"), Singular ("%%", "%%"));
     (* Always fails *)
-      (Singular ("%d", ""), Singular ("%d", "%d"));
+    (Singular ("%d", ""), Singular ("%d", "%d"));
     (Singular ("%i", ""), Singular ("%i", "%i"));
     (Singular ("%n", ""), Singular ("%n", "%n"));
     (Singular ("%N", ""), Singular ("%N", "%N"));
@@ -155,7 +156,7 @@ let format_translation_check_data =
     (Singular ("%a", ""), Singular ("%a", "%a"));
     (Singular ("%t", ""), Singular ("%t", "%t"));
     (* Mismatch *)
-      (Singular ("%d", "%i"), Singular ("%d", "%d"));
+    (Singular ("%d", "%i"), Singular ("%d", "%d"));
     (Singular ("%i", "%d"), Singular ("%i", "%i"));
     (Singular ("%n", "%d"), Singular ("%n", "%n"));
     (Singular ("%N", "%d"), Singular ("%N", "%N"));
@@ -198,24 +199,24 @@ let format_translation_check_data =
     (Singular ("%!", "%d"), Singular ("%!", "%!"));
     (Singular ("%%", "%d"), Singular ("%%", "%%"));
     (* All in one *)
-      ( Singular
-          ( "%d %i %n %N %u %x %X %o %s %S %c %C "
-            ^ "%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
-            ^ "%lo %nd %ni %nu %nx %nX %no %Ld %Li %Lu %Lx "
-            ^ "%LX %Lo %a %t %! %%",
-            "%d %i %n %N %u %x %X %o %s %S %c %C "
-            ^ "%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
-            ^ "%lo %nd %ni %nu %nx %nX %no %Ld %Li %Lu %Lx "
-            ^ "%LX %Lo %a %t %! %%" ),
-        Singular
-          ( "%d %i %n %N %u %x %X %o %s %S %c %C "
-            ^ "%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
-            ^ "%lo %nd %ni %nu %nx %nX %no %Ld %Li %Lu %Lx "
-            ^ "%LX %Lo %a %t %! %%",
-            "%d %i %n %N %u %x %X %o %s %S %c %C "
-            ^ "%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
-            ^ "%lo %nd %ni %nu %nx %nX %no %Ld %Li %Lu %Lx "
-            ^ "%LX %Lo %a %t %! %%" ) );
+    ( Singular
+        ( "%d %i %n %N %u %x %X %o %s %S %c %C "
+          ^ "%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
+          ^ "%lo %nd %ni %nu %nx %nX %no %Ld %Li %Lu %Lx "
+          ^ "%LX %Lo %a %t %! %%",
+          "%d %i %n %N %u %x %X %o %s %S %c %C "
+          ^ "%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
+          ^ "%lo %nd %ni %nu %nx %nX %no %Ld %Li %Lu %Lx "
+          ^ "%LX %Lo %a %t %! %%" ),
+      Singular
+        ( "%d %i %n %N %u %x %X %o %s %S %c %C "
+          ^ "%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
+          ^ "%lo %nd %ni %nu %nx %nX %no %Ld %Li %Lu %Lx "
+          ^ "%LX %Lo %a %t %! %%",
+          "%d %i %n %N %u %x %X %o %s %S %c %C "
+          ^ "%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
+          ^ "%lo %nd %ni %nu %nx %nX %no %Ld %Li %Lu %Lx "
+          ^ "%LX %Lo %a %t %! %%" ) );
     ( Singular
         ( "%d %i %n %N %u %x %X %o %s %S %c %C "
           ^ "%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
@@ -223,8 +224,7 @@ let format_translation_check_data =
           ^ "%LX %Lo %a %t %! %%",
           "%d %i %n %N %u %x %X %o %s %S %c %C "
           ^ "%f %F %e %E g %G %B %b %ld %li %lu %lx %lX "
-          ^ "lo nd ni nu nx %nX %no %Ld %Li %Lu %Lx " ^ "%LX %Lo %a %t %! %%"
-        ),
+          ^ "lo nd ni nu nx %nX %no %Ld %Li %Lu %Lx " ^ "%LX %Lo %a %t %! %%" ),
       Singular
         ( "%d %i %n %N %u %x %X %o %s %S %c %C "
           ^ "%f %F %e %E %g %G %B %b %ld %li %lu %lx %lX "
@@ -235,8 +235,8 @@ let format_translation_check_data =
           ^ "%lo %nd %ni %nu %nx %nX %no %Ld %Li %Lu %Lx "
           ^ "%LX %Lo %a %t %! %%" ) );
     (* Plural forms *)
-      ( Plural ("singular %d", "plural %i", [ "%d"; "%d" ]),
-        Plural ("singular %d", "singular %d", [ "%d"; "%d" ]) );
+    ( Plural ("singular %d", "plural %i", [ "%d"; "%d" ]),
+      Plural ("singular %d", "singular %d", [ "%d"; "%d" ]) );
     ( Plural ("singular %d", "plural %d", [ "%i"; "%d" ]),
       Plural ("singular %d", "plural %d", [ "singular %d"; "%d" ]) );
     ( Plural ("singular %d", "plural %d", [ "%d"; "%i" ]),
@@ -244,7 +244,7 @@ let format_translation_check_data =
     ( Plural ("singular %d", "plural %d", [ "%d"; "%d" ]),
       Plural ("singular %d", "plural %d", [ "%d"; "%d" ]) );
     (* Idem potent *)
-      (Singular ("%%", ""), Singular ("%%", ""));
+    (Singular ("%%", ""), Singular ("%%", ""));
     (Singular ("%!", ""), Singular ("%!", ""));
     (Singular ("", ""), Singular ("", ""));
     (Singular ("a", "b"), Singular ("a", "b"));
@@ -285,10 +285,10 @@ type tests = {
 }
 
 let ocaml_xgettext = Conf.make_exec "ocaml_xgettext"
-
 let ocaml_gettext = Conf.make_exec "ocaml_gettext"
 
-let test_dir = Conf.make_string "test_dir"
+let test_dir =
+  Conf.make_string "test_dir"
     (make_filename [ current_dir; "testdata" ])
     "Specify the location of the testdata directory"
 
@@ -300,8 +300,6 @@ let make_tests ctxt =
     install_dir = make_filename [ current_dir; "testinstall" ];
   }
 
-
-
 (**********************************)
 (* Test of Gettext implementation *)
 (**********************************)
@@ -311,102 +309,95 @@ let implementation_test realize_data =
   let test_load parameters_lst (realize_str, realize) =
     let test_load_one realize fl_mo =
       fl_mo >:: fun ctx ->
-        (* Extract usefull information out of parameters *)
-        let tests = make_tests ctx in
-        let parameters =
-          parameters_of_filename (Filename.concat tests.test_dir fl_mo)
-        in
-        let test_translations = parameters.translations in
-        (* Build t *)
-        let t = t_of_parameters parameters in
-        (* Build t' *)
-        let t' = realize t in
-        let test_one_translation translation =
-          (* We cannot compare directly extracted values and t' extracted
+      (* Extract usefull information out of parameters *)
+      let tests = make_tests ctx in
+      let parameters = parameters_of_filename tests.test_dir fl_mo in
+      let test_translations = parameters.translations in
+      (* Build t *)
+      let t = t_of_parameters parameters in
+      (* Build t' *)
+      let t' = realize t in
+      let test_one_translation translation =
+        (* We cannot compare directly extracted values and t' extracted
              value , since we have a charset translation *)
-          try
-            match translation with
-            | Singular (str_id, _) -> ignore (GettextCompat.gettext t' str_id)
-            | Plural (str_id, str_plural, _) ->
-                (* Using values from 0 to 2, we cover most of the plural cases *)
-                ignore (GettextCompat.ngettext t' str_id str_plural 0);
-                ignore (GettextCompat.ngettext t' str_id str_plural 1);
-                ignore (GettextCompat.ngettext t' str_id str_plural 2)
-          with exc ->
-            assert_failure
-              ( Printexc.to_string exc ^ " in "
-              ^ string_of_translation translation )
-        in
-        List.iter test_one_translation test_translations
+        try
+          match translation with
+          | Singular (str_id, _) -> ignore (GettextCompat.gettext t' str_id)
+          | Plural (str_id, str_plural, _) ->
+              (* Using values from 0 to 2, we cover most of the plural cases *)
+              ignore (GettextCompat.ngettext t' str_id str_plural 0);
+              ignore (GettextCompat.ngettext t' str_id str_plural 1);
+              ignore (GettextCompat.ngettext t' str_id str_plural 2)
+        with exc ->
+          assert_failure
+            (Printexc.to_string exc ^ " in " ^ string_of_translation translation)
+      in
+      List.iter test_one_translation test_translations
     in
     realize_str >::: List.map (test_load_one realize) parameters_lst
   in
   (* Generate a cross test of string extracted, using different implementation *)
   let test_cross implementation_lst fl_mo =
     fl_mo >:: fun ctxt ->
-      (* Extract usefull information out of parameters *)
-      let tests = make_tests ctxt in
-      let parameters = 
-        parameters_of_filename (Filename.concat tests.test_dir fl_mo)
+    (* Extract usefull information out of parameters *)
+    let tests = make_tests ctxt in
+    let parameters = parameters_of_filename tests.test_dir fl_mo in
+    let test_translations = parameters.translations in
+    (* Build t *)
+    let t = t_of_parameters parameters in
+    (* Build all t' *)
+    let t'_lst =
+      List.map
+        (fun (realize_str, realize) -> (realize_str, realize t))
+        implementation_lst
+    in
+    let check_translation str lst =
+      let _, same_str =
+        List.fold_left
+          (fun (prev_str_opt, res) (_, cur_str) ->
+            match prev_str_opt with
+            | Some prev_str -> (Some cur_str, res && prev_str = cur_str)
+            | None -> (Some cur_str, res))
+          (None, true) lst
       in
-      let test_translations = parameters.translations in
-      (* Build t *)
-      let t = t_of_parameters parameters in
-      (* Build all t' *)
-      let t'_lst =
-        List.map
-          (fun (realize_str, realize) -> (realize_str, realize t))
-          implementation_lst
-      in
-      let check_translation str lst =
-        let _, same_str =
-          List.fold_left
-            (fun (prev_str_opt, res) (_, cur_str) ->
-               match prev_str_opt with
-               | Some prev_str -> (Some cur_str, res && prev_str = cur_str)
-               | None -> (Some cur_str, res))
-            (None, true) lst
-        in
-        if same_str then ()
-        else
-          assert_failure
-            (Printf.sprintf
-               "All values should be identical in [ %s ] in function %s"
-               (String.concat " ; "
-                  (List.map
-                     (fun (realize_str, str) ->
-                        Printf.sprintf "(%s,%S)" realize_str str)
-                     lst))
-               str)
-      in
-      let test_cross_one translation =
-        match translation with
-        | Singular (str_id, _) ->
+      if same_str then ()
+      else
+        assert_failure
+          (Printf.sprintf
+             "All values should be identical in [ %s ] in function %s"
+             (String.concat " ; "
+                (List.map
+                   (fun (realize_str, str) ->
+                     Printf.sprintf "(%s,%S)" realize_str str)
+                   lst))
+             str)
+    in
+    let test_cross_one translation =
+      match translation with
+      | Singular (str_id, _) ->
           check_translation
             (Printf.sprintf "GettextCompat.gettext t' %S" str_id)
             (List.map
                (fun (realize_str, t') ->
-                  (realize_str, GettextCompat.gettext t' str_id))
+                 (realize_str, GettextCompat.gettext t' str_id))
                t'_lst)
-        | Plural (str_id, str_plural, _) ->
+      | Plural (str_id, str_plural, _) ->
           List.iter
             (fun n ->
-               check_translation
-                 (Printf.sprintf "GettextCompat.ngettext t' %S %S %d" str_id
-                    str_plural n)
-                 (List.map
-                    (fun (realize_str, t') ->
-                       ( realize_str,
-                         GettextCompat.ngettext t' str_id str_plural n ))
-                    t'_lst))
+              check_translation
+                (Printf.sprintf "GettextCompat.ngettext t' %S %S %d" str_id
+                   str_plural n)
+                (List.map
+                   (fun (realize_str, t') ->
+                     (realize_str, GettextCompat.ngettext t' str_id str_plural n))
+                   t'_lst))
             [ 0; 1; 2 ]
-      in
-      List.iter test_cross_one test_translations
+    in
+    List.iter test_cross_one test_translations
   in
   (* Extract and test *)
   "Gettext implementation test"
   >::: [
          "Load" >::: List.map (test_load mo_files_data) realize_data;
-         "Cross check"
-         >::: List.map (test_cross realize_data) mo_files_data;
+         "Cross check" >::: List.map (test_cross realize_data) mo_files_data;
        ]

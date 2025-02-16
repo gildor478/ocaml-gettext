@@ -20,9 +20,7 @@
 (*  USA                                                                   *)
 (**************************************************************************)
 
-(**
-    @author Sylvain Le Gall
-  *)
+(** @author Sylvain Le Gall *)
 
 open GettextTypes
 open GettextCategory
@@ -42,9 +40,9 @@ let upgrade_textdomain t k value =
   in
   { t with textdomains = MapTextdomain.add k new_value t.textdomains }
 
-let create ?(failsafe = Ignore) ?(categories = []) ?(codesets = [])
-    ?(dirs = []) ?(textdomains = []) ?(codeset = GettextConfig.default_codeset)
-    ?(path = GettextConfig.default_path) ?language textdomain =
+let create ?(failsafe = Ignore) ?(categories = []) ?(codesets = []) ?(dirs = [])
+    ?(textdomains = []) ?(codeset = GettextConfig.default_codeset)
+    ?(path = GettextConfig.default_path ()) ?language textdomain =
   let map_categories =
     List.fold_left
       (fun map (category, locale) -> MapCategory.add category locale map)

@@ -121,7 +121,9 @@ let visit_expr (iterator : Ast_iterator.iterator) expr =
   | Pexp_apply
       ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
         ( Asttypes.Nolabel,
-#if OCAML_VERSION >= (4, 11, 0)
+#if OCAML_VERSION >= (5, 3, 0)
+          { pexp_desc = Pexp_constant { pconst_desc = Pconst_string (singular, _, _); _ }; _ } )
+#elif OCAML_VERSION >= (4, 11, 0)
           { pexp_desc = Pexp_constant (Pconst_string (singular, _, _)); _ } )
 #else
           { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ } )
@@ -133,13 +135,17 @@ let visit_expr (iterator : Ast_iterator.iterator) expr =
   | Pexp_apply
       ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
         ( Asttypes.Nolabel,
-#if OCAML_VERSION >= (4, 11, 0)
+#if OCAML_VERSION >= (5, 3, 0)
+          { pexp_desc = Pexp_constant { pconst_desc = Pconst_string (singular, _, _); _ }; _ } )
+#elif OCAML_VERSION >= (4, 11, 0)
           { pexp_desc = Pexp_constant (Pconst_string (singular, _, _)); _ } )
 #else
           { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ } )
 #endif
         :: ( Asttypes.Nolabel,
-#if OCAML_VERSION >= (4, 11, 0)
+#if OCAML_VERSION >= (5, 3, 0)
+             { pexp_desc = Pexp_constant { pconst_desc = Pconst_string (plural, _, _); _ }; _ } )
+#elif OCAML_VERSION >= (4, 11, 0)
              { pexp_desc = Pexp_constant (Pconst_string (plural, _, _)); _ } )
 #else
              { pexp_desc = Pexp_constant (Pconst_string (plural, _)); _ } )
@@ -152,7 +158,9 @@ let visit_expr (iterator : Ast_iterator.iterator) expr =
       ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
         _
         :: ( Asttypes.Nolabel,
-#if OCAML_VERSION >= (4, 11, 0)
+#if OCAML_VERSION >= (5, 3, 0)
+             { pexp_desc = Pexp_constant { pconst_desc = Pconst_string (singular, _, _); _ }; _ } )
+#elif OCAML_VERSION >= (4, 11, 0)
              { pexp_desc = Pexp_constant (Pconst_string (singular, _, _)); _ } )
 #else
              { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ } )
@@ -165,13 +173,17 @@ let visit_expr (iterator : Ast_iterator.iterator) expr =
       ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
         _
         :: ( Asttypes.Nolabel,
-#if OCAML_VERSION >= (4, 11, 0)
+#if OCAML_VERSION >= (5, 3, 0)
+             { pexp_desc = Pexp_constant { pconst_desc = Pconst_string (domain, _, _); _ }; _ } )
+#elif OCAML_VERSION >= (4, 11, 0)
              { pexp_desc = Pexp_constant (Pconst_string (domain, _, _)); _ } )
 #else
              { pexp_desc = Pexp_constant (Pconst_string (domain, _)); _ } )
 #endif
            :: ( Asttypes.Nolabel,
-#if OCAML_VERSION >= (4, 11, 0)
+#if OCAML_VERSION >= (5, 3, 0)
+                { pexp_desc = Pexp_constant { pconst_desc = Pconst_string (singular, _, _); _ }; _ }
+#elif OCAML_VERSION >= (4, 11, 0)
                 { pexp_desc = Pexp_constant (Pconst_string (singular, _, _)); _ }
 #else
                 { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ }
@@ -185,13 +197,17 @@ let visit_expr (iterator : Ast_iterator.iterator) expr =
       ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
         _
         :: ( Asttypes.Nolabel,
-#if OCAML_VERSION >= (4, 11, 0)
+#if OCAML_VERSION >= (5, 3, 0)
+             { pexp_desc = Pexp_constant { pconst_desc = Pconst_string (singular, _, _); _ }; _ } )
+#elif OCAML_VERSION >= (4, 11, 0)
              { pexp_desc = Pexp_constant (Pconst_string (singular, _, _)); _ } )
 #else
              { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ } )
 #endif
            :: ( Asttypes.Nolabel,
-#if OCAML_VERSION >= (4, 11, 0)
+#if OCAML_VERSION >= (5, 3, 0)
+                { pexp_desc = Pexp_constant { pconst_desc = Pconst_string (plural, _, _); _ }; _ } )
+#elif OCAML_VERSION >= (4, 11, 0)
                 { pexp_desc = Pexp_constant (Pconst_string (plural, _, _)); _ } )
 #else
                 { pexp_desc = Pexp_constant (Pconst_string (plural, _)); _ } )
@@ -204,20 +220,26 @@ let visit_expr (iterator : Ast_iterator.iterator) expr =
       ( { pexp_desc = Pexp_ident { Asttypes.txt = lid; _ }; _ },
         _
         :: ( Asttypes.Nolabel,
-#if OCAML_VERSION >= (4, 11, 0)
+#if OCAML_VERSION >= (5, 3, 0)
+             { pexp_desc = Pexp_constant { pconst_desc = Pconst_string (domain, _, _); _ }; _ } )
+#elif OCAML_VERSION >= (4, 11, 0)
              { pexp_desc = Pexp_constant (Pconst_string (domain, _, _)); _ } )
 #else
              { pexp_desc = Pexp_constant (Pconst_string (domain, _)); _ } )
 #endif
            :: ( Asttypes.Nolabel,
-#if OCAML_VERSION >= (4, 11, 0)
+#if OCAML_VERSION >= (5, 3, 0)
+                { pexp_desc = Pexp_constant { pconst_desc = Pconst_string (singular, _, _); _ }; _ }
+#elif OCAML_VERSION >= (4, 11, 0)
                 { pexp_desc = Pexp_constant (Pconst_string (singular, _, _)); _ }
 #else
                 { pexp_desc = Pexp_constant (Pconst_string (singular, _)); _ }
 #endif
               )
               :: ( Asttypes.Nolabel,
-#if OCAML_VERSION >= (4, 11, 0)
+#if OCAML_VERSION >= (5, 3, 0)
+                   { pexp_desc = Pexp_constant { pconst_desc = Pconst_string (plural, _, _); _ }; _ }
+#elif OCAML_VERSION >= (4, 11, 0)
                    { pexp_desc = Pexp_constant (Pconst_string (plural, _, _)); _ }
 #else
                    { pexp_desc = Pexp_constant (Pconst_string (plural, _)); _ }

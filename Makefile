@@ -22,37 +22,36 @@
 
 default: build test
 
-GENERATED_FILES=src/lib/gettext/base/gettextConfigGen.ml
-$(GENERATED_FILES): configure.ml
-	ocaml configure.ml
-
-build: $(GENERATED_FILES)
+build:
 	dune build @install
 
-doc: $(GENERATED_FILES)
+doc:
 	dune build @doc
 
-test: $(GENERATED_FILES)
-	dune build examples/library/examplesLibrary.a
-	dune build examples/gui/examplesGUI.a
-	dune build examples/program/program.exe
+test:
 	dune runtest
 
-all: $(GENERATED_FILES)
+all:
 	dune build @all
-	dune runtest
 
-install: build
+install:
 	dune install
 
-uninstall: all
+uninstall:
 	dune uninstall
 
 clean:
 	dune clean
 
+fmt:
+	dune fmt
+
+lint:
+	opam-dune-lint
+
 bench:
-	dune exec test/bench/bench.exe
+	dune exec --workspace dune-workspace.dev \
+		test/bench/bench.exe -- --test_dir ./test/testdata
 
 headache: distclean
 	headache -h .header \
@@ -69,5 +68,5 @@ deploy: doc test
 eol:
 	find ./ -name _build -prune -false -or -name "*.ml" | xargs grep -r -e "  *$$"
 
-.PHONY: build doc test all uninstall clean install bench deploy
+.PHONY: build doc test all uninstall clean install bench deploy lint fmt
 
