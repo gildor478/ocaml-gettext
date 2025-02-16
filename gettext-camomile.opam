@@ -11,7 +11,7 @@ bug-reports: "https://github.com/gildor478/ocaml-gettext/issues"
 depends: [
   "dune" {>= "3.17"}
   "gettext" {= version}
-  "camomile" {<= "2.0.0"}
+  "camomile" {>= "2.0.0"}
   "ounit2" {>= "2.2.7" & with-test}
   "fileutils" {>= "0.6.6" & with-test}
   "odoc" {with-doc}

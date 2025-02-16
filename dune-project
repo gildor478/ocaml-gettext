@@ -48,6 +48,6 @@
   (description "See gettext package description.")
   (depends
     (gettext (= :version))
-    (camomile (<= 2.0.0))
+    (camomile (>= 2.0.0))
     (ounit2 (and (>= 2.2.7) :with-test))
     (fileutils (and (>= 0.6.6) :with-test))))
