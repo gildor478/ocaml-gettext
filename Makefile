@@ -48,6 +48,7 @@ fmt:
 
 lint:
 	opam-dune-lint
+	dune build @fmt
 
 bench:
 	dune exec --workspace dune-workspace.dev \
@@ -57,6 +58,8 @@ headache: distclean
 	headache -h .header \
 		-c .headache.config \
 		`find $(CURDIR)/ -type d -name .svn -prune -false -o -type f`
+
+git-pre-commit-hook: test lint
 
 deploy: doc test
 	dune-release lint

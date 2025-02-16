@@ -21,139 +21,107 @@
 (**************************************************************************)
 
 (** Types and exception of ocaml-gettext.
-    @author Sylvain Le Gall
-  *)
+    @author Sylvain Le Gall *)
 
 open GettextCategory
 
 (** {1 Core types of ocaml-gettext library} *)
 
 type range = Int32.t * Int32.t
-
 type textdomain = string
-
 type locale = string
-
 type dir = string
-
 type filename = string
-
 type codeset = string
 
 (** {1 Exceptions} *)
 
 exception CompileProblemReadingFile of filename * string
-(** Filename wich generates the error message str
-  *)
+(** Filename wich generates the error message str *)
 
 exception CompileExtractionFailed of filename * string * int
-(** While extracting filename the command str returns exit code i.
-  *)
+(** While extracting filename the command str returns exit code i. *)
 
 exception CompileExtractionInterrupted of filename * string * int
-(** While extracting filename the command receive signal i.
-  *)
+(** While extracting filename the command receive signal i. *)
 
 exception DomainFileDoesntExist of filename list
 (** Cannot the filename corresponding to a textdomain among the specified files.
-  *)
+*)
 
 exception FormatInconsistent of string * string
 (** The two strings returned doesn't have the same meaning regarding [Printf]
-    syntax.
-  *)
+    syntax. *)
 
 exception GettextUninitialized
 (** A part of the code try to translate a string, but ocaml-gettext is not
-    initialized.
-  *)
+    initialized. *)
 
 exception MoInvalidOptions of Lexing.lexbuf * string
-(** There is an invalid field in the content information of a MO file.
-  *)
+(** There is an invalid field in the content information of a MO file. *)
 
 exception MoInvalidPlurals of Lexing.lexbuf * string
-(** The plural-form field is not correct.
-  *)
+(** The plural-form field is not correct. *)
 
 exception MoInvalidContentType of Lexing.lexbuf * string
-(** The content-type field is not correct.
-  *)
+(** The content-type field is not correct. *)
 
 exception MoInvalidTranslationSingular of string * int
-(** A plural translation of a singular string has occured.
-  *)
+(** A plural translation of a singular string has occured. *)
 
 exception MoInvalidTranslationPlural of string list * int
-(** An out-of-bound plural translation has occured.
-  *)
+(** An out-of-bound plural translation has occured. *)
 
 exception MoJunk of string * string list
-(** There is more plural translation than the number of plural forms.
-  *)
+(** There is more plural translation than the number of plural forms. *)
 
 exception MoEmptyEntry
-(**
-  *)
+(**  *)
 
 exception MoInvalidFile
-(** A MO corrupted file has been read.
-  *)
+(** A MO corrupted file has been read. *)
 
 exception MoInvalidHeaderNegativeStrings
-(** The MO file specified a negative number of strings.
-  *)
+(** The MO file specified a negative number of strings. *)
 
 exception MoInvalidHeaderTableStringOutOfBound of range * range
-(** Offset of the string table is out of bound.
-  *)
+(** Offset of the string table is out of bound. *)
 
 exception MoInvalidHeaderTableTranslationOutOfBound of range * range
-(** Offset of the translation table is out of bound.
-  *)
+(** Offset of the translation table is out of bound. *)
 
 exception MoInvalidHeaderTableTranslationStringOverlap of range * range
-(** String and translation table overlap.
-  *)
+(** String and translation table overlap. *)
 
 exception MoInvalidStringOutOfBound of int * int
-(** The offset and length of a string entry leads to an access beyond the end
-    of the MO file.
-  *)
+(** The offset and length of a string entry leads to an access beyond the end of
+    the MO file. *)
 
 exception MoInvalidTranslationOutOfBound of int * int
-(** The offset and length of a translation entry leads to an access beyond the end
-    of the MO file.
-  *)
+(** The offset and length of a translation entry leads to an access beyond the
+    end of the MO file. *)
 
 exception MoCannotOpenFile of string
-(** An error occured when trying to open a MO file.
-  *)
+(** An error occured when trying to open a MO file. *)
 
 exception PoInvalidFile of string * Lexing.lexbuf * in_channel
-(** A PO file cannot be parsed.
-  *)
+(** A PO file cannot be parsed. *)
 
 exception PoFileInvalidIndex of string * int
 (** When parsing a PO file, found an out of order table indices in a plural
-    form.
-  *)
+    form. *)
 
 exception PoFileDoesntExist of string
-(** The PO file doesn't exist.
-  *)
+(** The PO file doesn't exist. *)
 
 exception PoInconsistentMerge of string * string
-(** Cannot merge two PO files.
-  *)
+(** Cannot merge two PO files. *)
 
 exception TranslateStringNotFound of string
-(** A string to translate cannot be found.
-  *)
+(** A string to translate cannot be found. *)
 
 exception LocalePosixUnparseable of string
-(** Cannot parse the POSIX representation of the locale.
-  *)
+(** Cannot parse the POSIX representation of the locale. *)
 
 (** {1 Modules signatures} *)
 
@@ -161,11 +129,8 @@ type dependencies = (textdomain * codeset option * dir option) list
 
 module type INIT_TYPE = sig
   val textdomain : textdomain
-
   val codeset : codeset option
-
   val dir : dir option
-
   val dependencies : dependencies
 end
 
@@ -185,8 +150,7 @@ module MapTextdomain = Map.Make (struct
   let compare = String.compare
 end)
 
-(** Defines behavior regarding exception in the ocaml-gettext library
-  *)
+(** Defines behavior regarding exception in the ocaml-gettext library *)
 type failsafe = Ignore | InformStderr of (exn -> string) | RaiseException
 
 type t = {
@@ -198,8 +162,7 @@ type t = {
   path : dir list;
   default : textdomain;
 }
-(** Data structure handling initialization variable of ocaml-gettext
-  *)
+(** Data structure handling initialization variable of ocaml-gettext *)
 
 type t' =
   bool ->
@@ -208,13 +171,11 @@ type t' =
   (string * int) option ->
   category ->
   string
-(** Function to translate effectively a string
-  *)
+(** Function to translate effectively a string *)
 
 (** {1 Types for MO file processing} *)
 
-(** Endianess of a MO file
-  *)
+(** Endianess of a MO file *)
 type endianess = BigEndian | LittleEndian
 
 type mo_header = {
@@ -299,42 +260,31 @@ type mo_translation = {
   nplurals : int;
   fun_plural_forms : int -> int;
 }
-(** Details associated with ""
-    Project-Id-Version: PACKAGE VERSION\n
-    Report-Msgid-Bugs-To: \n
-    POT-Creation-Date: 2004-05-31 16:53+0200\n
-    PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n
-    Last-Translator: FULL NAME <EMAIL@ADDRESS>\n
-    Language-Team: LANGUAGE <LL@li.org>\n
-    MIME-Version: 1.0\n
-    Content-Type: text/plain; charset=CHARSET\n
-    Content-Transfer-Encoding: 8bit\n
-    Plural-Forms: specific ( 0 is false and 1 is
-    true
-  *)
+(** Details associated with "" Project-Id-Version: PACKAGE VERSION\n
+    Report-Msgid-Bugs-To: \n POT-Creation-Date: 2004-05-31 16:53+0200\n
+    PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n Last-Translator: FULL NAME
+    <EMAIL@ADDRESS>\n Language-Team: LANGUAGE <LL@li.org>\n MIME-Version: 1.0\n
+    Content-Type: text/plain; charset=CHARSET\n Content-Transfer-Encoding:
+    8bit\n Plural-Forms: specific ( 0 is false and 1 is true *)
 
-(** Base type of MO content : translation of string. The first string members are
-    the string identifier ( singular form ).
-*)
+(** Base type of MO content : translation of string. The first string members
+    are the string identifier ( singular form ). *)
 type translation =
   | Singular of string * string
   | Plural of string * string * string list
 
 (** Types for the PO processing. The main difference with the type translation
-    comes from the necessity of keeping a maximum of comment.
-*)
+    comes from the necessity of keeping a maximum of comment. *)
 type po_translation =
   | PoSingular of string list * string list
   | PoPlural of string list * string list * string list list
 
 type po_filepos = filename * int
 (** PO string localizator : represents in which file/lineno a string can be
-    found.
-  *)
+    found. *)
 
 type po_special = string
-(** PO keyword: represents special keyword like fuzzy, wrap, c-format...
-  *)
+(** PO keyword: represents special keyword like fuzzy, wrap, c-format... *)
 
 type po_commented_translation = {
   po_comment_special : po_special list;
@@ -343,8 +293,7 @@ type po_commented_translation = {
 }
 
 type po_translations = po_commented_translation MapString.t
-(** Mapping of PO content using the string identifier as the key.
-*)
+(** Mapping of PO content using the string identifier as the key. *)
 
 type po_content = {
   no_domain : po_translations;
@@ -352,14 +301,12 @@ type po_content = {
 }
 (** Content of a PO file. Since comments should be saved, and that we only save
     comments before and in message translation, we need to keep trace of the
-    last comments, which is not attached to any translation.
-*)
+    last comments, which is not attached to any translation. *)
 
 (** {1 Modules signatures} *)
 
-(** Signature for module handling transformation of initialization parameters
-    to concrete translation function.
-  *)
+(** Signature for module handling transformation of initialization parameters to
+    concrete translation function. *)
 module type REALIZE_TYPE = sig
   val realize : t -> t'
 end
