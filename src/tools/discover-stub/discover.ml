@@ -15,11 +15,11 @@ let () =
     let i = Unix.open_process_in "brew --prefix" in
     let s =
       match String.trim (In_channel.input_all i) with
-      | "" -> "/usr/local/opt"
+      | "" -> "/usr/local"
       | s -> s
     in
     In_channel.close i;
-    Filename.concat (String.trim s) "gettext"
+    Filename.concat (Filename.concat s "opt") "gettext"
   in
   (* TODO: remove *)
   let _ = print_endline ("brew_prefix: " ^ brew_prefix) in

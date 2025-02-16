@@ -36,6 +36,7 @@ depexts: [
   ["gettext"] {os = "macos" & os-distribution = "homebrew"}
   ["gettext"] {os = "macos" & os-distribution = "macports"}
   ["gettext-devel"] {os = "win32" & os-distribution = "cygwinports"}
+  ["gettext-devel"] {os = "win32" & os-distribution = "cygwin"}
   ["gettext-dev"] {os-distribution = "alpine"}
   ["libc6-dev"] {os-family = "debian"}
 ]
