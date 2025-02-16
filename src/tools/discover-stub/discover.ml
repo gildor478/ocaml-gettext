@@ -12,20 +12,22 @@ int main() {
 
 let () =
   let brew_prefix =
-    let i = Unix.open_process_in "brew --prefix" in
-    let s =
-      match String.trim (In_channel.input_all i) with
-      | "" -> "/usr/local"
-      | s -> s
+    let default_path = "/usr/local" in
+    let path =
+      try
+        let brew_exec = FileUtil.which "brew" in
+        let i = Unix.open_process_in (brew_exec ^ " --prefix") in
+        let s =
+          match String.trim (In_channel.input_all i) with
+          | "" -> default_path
+          | s -> s
+        in
+        In_channel.close i;
+        s
+      with Not_found -> default_path
     in
-    In_channel.close i;
-    Filename.concat (Filename.concat s "opt") "gettext"
+    Filename.concat (Filename.concat path "opt") "gettext"
   in
-  (* TODO: remove *)
-  let _ = print_endline ("brew_prefix: " ^ brew_prefix) in
-  let _ = Sys.command "brew shellenv" in
-  let _ = Sys.command "cygcheck -c -d" in
-  let _ = Sys.command "opam config report" in
   C.main ~name:"gettext" (fun c ->
       let is_working (c_flags, link_flags) =
         C.c_test c gettext_code ~link_flags ~c_flags
