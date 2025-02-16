@@ -1,3 +1,18 @@
+## v0.5.0 - 2025-02-16
+
+### Changed
+- Use dune 3.17 and most recent features (
+- Use camomile 2.X.X
+- Upgrade all dependencies (ounit, fileutils, seq)
+
+### Fixed
+- Support for ocaml up to 5.3.
+- Add documentation to describe examples and how to use gettext with them.
+- Apply all patches from Debian.
+
+Thanks to Chet Murty, Stephane Glondu, Daniil Baturin, Marek Kubica, Marcelo
+Seri for their help with this release.
+
 ## v0.4.2 - 2020-06-11
 
 ### Fixed
