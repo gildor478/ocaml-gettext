@@ -7,7 +7,7 @@ homepage: "https://github.com/gildor478/ocaml-gettext"
 doc: "https://gildor478.github.io/ocaml-gettext/"
 bug-reports: "https://github.com/gildor478/ocaml-gettext/issues"
 depends: [
-  "dune" {>= "3.15"}
+  "dune" {>= "3.17"}
   "dune-site"
   "ocaml" {>= "4.14.0"}
   "cppo" {>= "1.8.0" & build}

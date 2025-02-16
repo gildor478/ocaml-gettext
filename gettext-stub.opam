@@ -7,7 +7,7 @@ homepage: "https://github.com/gildor478/ocaml-gettext"
 doc: "https://gildor478.github.io/ocaml-gettext/"
 bug-reports: "https://github.com/gildor478/ocaml-gettext/issues"
 depends: [
-  "dune" {>= "3.15"}
+  "dune" {>= "3.17"}
   "gettext" {= version}
   "dune-configurator" {>= "3.17.0"}
   "ounit2" {>= "2.2.7" & with-test}
