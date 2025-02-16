@@ -11,6 +11,18 @@ int main() {
 |}
 
 let () =
+  let brew_prefix =
+    let i = Unix.open_process_in "brew --prefix" in
+    let s =
+      match String.trim (In_channel.input_all i) with
+      | "" -> "/usr/local/opt"
+      | s -> s
+    in
+    In_channel.close i;
+    Filename.concat (String.trim s) "gettext"
+  in
+  (* TODO: remove *)
+  let _ = print_endline ("brew_prefix: " ^ brew_prefix) in
   let _ = Sys.command "brew shellenv" in
   let _ = Sys.command "cygcheck -c -d" in
   C.main ~name:"gettext" (fun c ->
@@ -29,12 +41,9 @@ let () =
                * /usr/local.
                * https://formulae.brew.sh/formula/gettext
                *)
-              ( [ "-I/usr/local/opt/gettext/include" ],
-                [ "-L/usr/local/opt/gettext/lib"; "-lintl" ] );
-              (* MacOS with MacPorts.
-               * -- This is untested, a patch is welcome if you use MacPorts --
-               * https://ports.macports.org/port/gettext/summary
-               *)
+              ( [ "-I" ^ Filename.concat brew_prefix "include" ],
+                [ "-L" ^ Filename.concat brew_prefix "lib"; "-lintl" ] );
+              (* MacOS with MacPorts. *)
               ([ "-I/opt/local/include" ], [ "-L/opt/local/lib"; "-lintl" ]);
               (* OpenBSD and FreeBSD. *)
               ([ "-I/usr/local/include" ], [ "-L/usr/local/lib"; "-lintl" ]);
