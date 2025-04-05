@@ -2,7 +2,6 @@
 (name gettext)
 
 (explicit_js_mode)
-(using dune_site 0.1)
 (generate_opam_files)
 
 (source (github gildor478/ocaml-gettext))
@@ -25,7 +24,6 @@
 "\|
  )
   (depends
-    dune-site
     (ocaml (>= "4.14.0"))
     (cppo (and (>= 1.8.0) :build))
     (seq (and (>= "base") :with-test))

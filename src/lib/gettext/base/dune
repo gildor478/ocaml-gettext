@@ -4,17 +4,6 @@
 (ocamlyacc
  (modules gettextFormat_parser gettextMo_parser))
 
-(generate_sites_module
- (module gettextConfigDune)
- (sites gettext))
-
-(install
- (package gettext)
- (section
-  (site
-   (gettext locale)))
- (files .keep-directory))
-
 (rule
  (target gettextConfigGen.ml)
  (action
@@ -33,4 +22,4 @@
   GettextMo_int32
   GettextMo_lexer
   GettextMo_parser)
- (libraries dune-site fileutils))
+ (libraries fileutils))
