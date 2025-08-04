@@ -1,7 +1,17 @@
+## v0.6.0 - unreleased
+
+### Changed
+- Get rid of dune-site, which is pulling dune as a dependencies everywhere. It
+  was used to add an ocaml-gettext-specific directory to the default MO search
+  path -- which was previously handled through a build flag (pre v0.5.0). There
+  are only a few reverse depenedencies to ocaml-gettext and no known usage of
+  this build flag, so we are deprecating the ability to configure this extra
+  path.
+
 ## v0.5.0 - 2025-02-16
 
 ### Changed
-- Use dune 3.17 and most recent features (
+- Use dune 3.17 and most recent features
 - Use camomile 2.X.X
 - Upgrade all dependencies (ounit, fileutils, seq)
 
