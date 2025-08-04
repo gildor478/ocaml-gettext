@@ -37,6 +37,7 @@
   (description "See gettext package description.")
   (depends
     (gettext (= :version))
+    (ocaml (>= "4.14.0"))
     (dune-configurator (>= 3.17.0))
     (ounit2 (and (>= 2.2.7) :with-test))))
 
@@ -46,6 +47,7 @@
   (description "See gettext package description.")
   (depends
     (gettext (= :version))
+    (ocaml (>= "4.14.0"))
     (camomile (>= 2.0.0))
     (ounit2 (and (>= 2.2.7) :with-test))
     (fileutils (and (>= 0.6.6) :with-test))))

@@ -11,6 +11,7 @@ bug-reports: "https://github.com/gildor478/ocaml-gettext/issues"
 depends: [
   "dune" {>= "3.17"}
   "gettext" {= version}
+  "ocaml" {>= "4.14.0"}
   "dune-configurator" {>= "3.17.0"}
   "ounit2" {>= "2.2.7" & with-test}
   "odoc" {with-doc}
