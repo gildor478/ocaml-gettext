@@ -1,12 +1,12 @@
 msgid ""
 msgstr ""
-"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 domain "fr"
 
 msgid "'Your command, please?', asked the waiter."
-msgstr "«Votre commande, s'il vous plait», dit le garçon."
+msgstr "Â«Votre commande, s'il vous plaitÂ», dit le garÃ§on."
 
 # Reverse the arguments.
 #, c-format
@@ -14,11 +14,11 @@ msgid "%s is replaced by %s."
 msgstr "%2$s remplace %1$s."
 
 msgid "hey"
-msgstr "hé"
+msgstr "hÃ©"
 
 domain "us"
 
 msgid "%d coffee"
 msgid_plural "more %d coffee"
-msgstr[0] "%d café"
-msgstr[1] "%d cafés"
+msgstr[0] "%d cafÃ©"
+msgstr[1] "%d cafÃ©s"

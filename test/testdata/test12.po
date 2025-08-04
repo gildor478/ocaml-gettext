@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "'Your command, please?', asked the waiter."

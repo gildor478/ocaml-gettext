@@ -14,23 +14,23 @@ msgstr ""
 
 #: test4.ml:89
 msgid "GettextCompat.fgettext"
-msgstr "Fonction de compatibilité fgettext"
+msgstr "Fonction de compatibilitÃ© fgettext"
 
 #: test4.ml:107
 msgid "GettextCompat.fngettext singular"
 msgid_plural "GettextCompat.fngettext plural"
-msgstr[0] "Fonction de compatibilité fngettext ( singulier )"
-msgstr[1] "Fonction de compatibilité fngettext ( pluriel )"
+msgstr[0] "Fonction de compatibilitÃ© fngettext ( singulier )"
+msgstr[1] "Fonction de compatibilitÃ© fngettext ( pluriel )"
 
 #: test4.ml:86
 msgid "GettextCompat.gettext"
-msgstr "Fonction de compatibilité gettext"
+msgstr "Fonction de compatibilitÃ© gettext"
 
 #: test4.ml:104
 msgid "GettextCompat.ngettext singular"
 msgid_plural "GettextCompat.ngettext plural"
-msgstr[0] "Fonction de compatibilité ngettext ( singulier )"
-msgstr[1] "Fonction de compatibilité ngettext ( pluriel )"
+msgstr[0] "Fonction de compatibilitÃ© ngettext ( singulier )"
+msgstr[1] "Fonction de compatibilitÃ© ngettext ( pluriel )"
 
 #: test4.ml:125
 msgid "TestGettext.Library.f_"
@@ -74,23 +74,23 @@ msgstr[1] "Fonction de programme sn_ ( pluriel )"
 
 #: test4.ml:77
 msgid "TestGettext.f_"
-msgstr "Fonction aliasée f_"
+msgstr "Fonction aliasÃ©e f_"
 
 #: test4.ml:83
 msgid "TestGettext.fn_ singular"
 msgid_plural "TestGettext.fn_ plural"
-msgstr[0] "Fonction aliasée fn_ ( singulier )"
-msgstr[1] "Fonction aliasée fn_ ( pluriel )"
+msgstr[0] "Fonction aliasÃ©e fn_ ( singulier )"
+msgstr[1] "Fonction aliasÃ©e fn_ ( pluriel )"
 
 #: test4.ml:74
 msgid "TestGettext.s_"
-msgstr "Fonction simple aliasée s_"
+msgstr "Fonction simple aliasÃ©e s_"
 
 #: test4.ml:80
 msgid "TestGettext.sn_ singular"
 msgid_plural "TestGettext.sn_ plural"
-msgstr[0] "Fonction aliasée sn_ ( singulier )"
-msgstr[1] "Fonction aliasée sn_ ( pluriel )"
+msgstr[0] "Fonction aliasÃ©e sn_ ( singulier )"
+msgstr[1] "Fonction aliasÃ©e sn_ ( pluriel )"
 
 #: test4.ml:29
 msgid "f_"
@@ -136,43 +136,43 @@ domain "mydomain"
 
 #: test4.ml:98
 msgid "GettextCompat.dcgettext"
-msgstr "Fonction de compatibilité dcgettext"
+msgstr "Fonction de compatibilitÃ© dcgettext"
 
 #: test4.ml:116
 msgid "GettextCompat.dcngettext singular"
 msgid_plural "GettextCompat.dcngettext plural"
-msgstr[0] "Fonction de compatibilité dcngettext ( singulier )"
-msgstr[1] "Fonction de compatibilité dcngettext ( pluriel )"
+msgstr[0] "Fonction de compatibilitÃ© dcngettext ( singulier )"
+msgstr[1] "Fonction de compatibilitÃ© dcngettext ( pluriel )"
 
 #: test4.ml:92
 msgid "GettextCompat.dgettext"
-msgstr "Fonction de compatibilité dgettext"
+msgstr "Fonction de compatibilitÃ© dgettext"
 
 #: test4.ml:110
 msgid "GettextCompat.dngettext singular"
 msgid_plural "GettextCompat.dngettext plural "
-msgstr[0] "Fonction de compatibilité dngettext ( singulier )"
-msgstr[1] "Fonction de compatibilité dngettext ( pluriel )"
+msgstr[0] "Fonction de compatibilitÃ© dngettext ( singulier )"
+msgstr[1] "Fonction de compatibilitÃ© dngettext ( pluriel )"
 
 #: test4.ml:101
 msgid "GettextCompat.fdcgettext"
-msgstr "Fonction de compatibilité fdcgettext"
+msgstr "Fonction de compatibilitÃ© fdcgettext"
 
 #: test4.ml:119
 msgid "GettextCompat.fdcngettext singular"
 msgid_plural "GettextCompat.fdcngettext plural"
-msgstr[0] "Fonction de compatibilité fdcngettext ( singulier )"
-msgstr[1] "Fonction de compatibilité fdcngettext ( pluriel )"
+msgstr[0] "Fonction de compatibilitÃ© fdcngettext ( singulier )"
+msgstr[1] "Fonction de compatibilitÃ© fdcngettext ( pluriel )"
 
 #: test4.ml:95
 msgid "GettextCompat.fdgettext"
-msgstr "Fonction de compatibilité fdgettext"
+msgstr "Fonction de compatibilitÃ© fdgettext"
 
 #: test4.ml:113
 msgid "GettextCompat.fdngettext singular"
 msgid_plural "GettextCompat.fdngettext plural"
-msgstr[0] "Fonction de compatibilité fdngettext ( singulier )"
-msgstr[1] "Fonction de compatibilité fdngettext ( pluriel )"
+msgstr[0] "Fonction de compatibilitÃ© fdngettext ( singulier )"
+msgstr[1] "Fonction de compatibilitÃ© fdngettext ( pluriel )"
 
 #: test4.ml:50
 msgid "dcgettext"

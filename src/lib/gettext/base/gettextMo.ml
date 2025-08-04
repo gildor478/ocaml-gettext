@@ -194,7 +194,7 @@ let get_translated_value failsafe translation plural_number =
 let germanic_plural (* The germanic default *) n = if n <> 1 then 1 else 0
 
 let input_mo_informations failsafe chn mo_header =
-  (* La position de "" est forcément 0 *)
+  (* La position de "" est forcÃ©ment 0 *)
   let empty_translation =
     get_translated_value failsafe
       (input_mo_translation failsafe chn mo_header 0)

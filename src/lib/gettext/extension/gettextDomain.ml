@@ -28,7 +28,7 @@ open FileUtil
 open GettextTypes
 open GettextCategory
 
-(* BUG : a mettre à jour *)
+(* BUG : a mettre Ã  jour *)
 (** compute_path textdomain category t : return the path to the mo file
     corresponding to textdomain and category. Language is guessed from category
     binding. If the textdomain is not found, it tries to use the build default
