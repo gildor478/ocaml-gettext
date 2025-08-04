@@ -8,6 +8,10 @@
   this build flag, so we are deprecating the ability to configure this extra
   path.
 
+### Fixed
+- Drop `seq` dependencies, since there is a compatible `StdLib.Seq` module
+  (closes: #35).
+
 ## v0.5.0 - 2025-02-16
 
 ### Changed
