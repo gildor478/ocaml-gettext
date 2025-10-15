@@ -112,7 +112,7 @@ let rec is_like lid = function
   | [] -> false
   | func :: functions -> (
       match lid with
-      | (Lident f | Ldot (_, f)) when f = func -> true
+      | (Lident f | Ldot (_, {txt = f; _})) when f = func -> true
       | _ -> is_like lid functions )
 
 let visit_expr (iterator : Ast_iterator.iterator) expr =
